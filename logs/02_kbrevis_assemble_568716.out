@@ -1,0 +1,54 @@
+Settings:
+  Output files: "/sciclone/home/iadanforth/scr10/data/kbrevis/reference/host_index.*.bt2l"
+  Line rate: 7 (line is 128 bytes)
+  Lines per side: 1 (side is 128 bytes)
+  Offset rate: 4 (one in 16)
+  FTable chars: 10
+  Strings: unpacked
+  Max bucket size: default
+  Max bucket size, sqrt multiplier: default
+  Max bucket size, len divisor: 32
+  Difference-cover sample period: 1024
+  Endianness: little
+  Actual local endianness: little
+  Sanity checking: disabled
+  Assertions: disabled
+  Random seed: 0
+  Sizeofs: void*:8, int:4, long:8, size_t:8
+Input files DNA, FASTA:
+  /sciclone/home/iadanforth/scr10/data/kbrevis/reference/dog_ref_genome.fna
+  /sciclone/home/iadanforth/scr10/data/kbrevis/reference/cat_ref_genome.fna
+  /sciclone/home/iadanforth/scr10/data/kbrevis/reference/mouse_ref_genome.fna
+  /sciclone/home/iadanforth/scr10/data/kbrevis/reference/human_ref_genome.fna
+Reading reference sizes
+  Time reading reference sizes: 00:01:26
+Calculating joined length
+Writing header
+Reserving space for joined string
+Joining reference sequences
+  Time to join reference sequences: 00:00:48
+bmax according to bmaxDivN setting: 334347053
+Using parameters --bmax 250760290 --dcv 1024
+  Doing ahead-of-time memory usage test
+  Passed!  Constructing with these parameters: --bmax 250760290 --dcv 1024
+Constructing suffix-array element generator
+Building DifferenceCoverSample
+  Building sPrime
+  Building sPrimeOrder
+  V-Sorting samples
+  V-Sorting samples time: 00:01:34
+  Allocating rank array
+  Ranking v-sort output
+  Ranking v-sort output time: 00:01:00
+  Invoking Larsson-Sadakane on ranks
+  Invoking Larsson-Sadakane on ranks time: 00:02:13
+  Sanity-checking and returning
+Building samples
+Reserving space for 86 sample suffixes
+Generating random suffixes
+QSorting 86 sample offsets, eliminating duplicates
+QSorting sample offsets, eliminating duplicates time: 00:00:00
+Multikey QSorting 86 samples
+  (Using difference cover)
+  Multikey QSorting samples time: 00:00:00
+Calculating bucket sizes

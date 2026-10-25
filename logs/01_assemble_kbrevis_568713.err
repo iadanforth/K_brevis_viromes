@@ -1,0 +1,51 @@
+
+EnvironmentNameNotFound: Could not find conda environment: fastp-env
+You can list all discoverable environments with `conda info --envs`.
+
+
+Read1 before filtering:
+total reads: 32023388
+total bases: 4835531588
+Q20 bases: 4585870198(94.8369%)
+Q30 bases: 4295701493(88.8362%)
+Q40 bases: 3393963953(70.188%)
+
+Read2 before filtering:
+total reads: 32023388
+total bases: 4835531588
+Q20 bases: 4305758539(89.0442%)
+Q30 bases: 3809856137(78.7888%)
+Q40 bases: 2713964003(56.1255%)
+
+Read1 after filtering:
+total reads: 28178944
+total bases: 3448613100
+Q20 bases: 3359079350(97.4038%)
+Q30 bases: 3219782264(93.3646%)
+Q40 bases: 2730678799(79.1819%)
+
+Read2 after filtering:
+total reads: 28178944
+total bases: 3448613100
+Q20 bases: 3233972812(93.776%)
+Q30 bases: 2960577891(85.8484%)
+Q40 bases: 2271947900(65.88%)
+
+Filtering result:
+reads passed filter: 56357888
+reads failed due to low quality: 2961258
+reads failed due to too many N: 8210
+reads failed due to too short: 4719420
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 9163282
+bases trimmed due to adapters: 288149134
+
+Duplication rate: 3.76084%
+
+Insert size peak (evaluated by paired-end reads): 141
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/reference/kbrevis_reads_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/reference/kbrevis_reads_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/reference/kbrevis_clean/kbrevis_reads_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/reference/kbrevis_clean/kbrevis_reads_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 100 seconds
