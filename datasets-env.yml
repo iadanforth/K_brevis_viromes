@@ -1,0 +1,7 @@
+name: datasets-env
+channels:
+  - conda-forge
+dependencies:
+  - ca-certificates=2026.10.19
+  - ncbi-datasets-cli=18.39.0
+prefix: /sciclone/home/iadanforth/.conda/envs/datasets-env
