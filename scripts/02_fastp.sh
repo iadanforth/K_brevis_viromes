@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-REF_DIR="$HOME/scr10/data/kbrevis/reference"
-CLEAN_DIR="$HOME/scr10/data/kbrevis/reference/kbrevis_clean"
+RAW_DIR="$HOME/scr10/data/kbrevis/test_data"
+CLEAN_DIR="$HOME/scr10/data/kbrevis/trim"
 
 command -v fastp >/dev/null 2>&1 || {
     echo "fastp is not available; activate the environment that contains it." >&2
@@ -12,10 +12,10 @@ command -v fastp >/dev/null 2>&1 || {
 mkdir -p "$CLEAN_DIR"
 
 shopt -s nullglob
-R1_FILES=("$REF_DIR"/*_1.fastq)
+R1_FILES=("$RAW_DIR"/*_1.fastq)
 
 if ((${#R1_FILES[@]} == 0)); then
-    echo "No *_1.fastq files found in $REF_DIR" >&2
+    echo "No *_1.fastq files found in $RAW_DIR" >&2
     exit 1
 fi
 
@@ -44,4 +44,3 @@ for R1 in "${R1_FILES[@]}"; do
         --json /dev/null \
         --html /dev/null
 done
-

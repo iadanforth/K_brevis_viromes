@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+# 2. apply for loop to SraRunTable.csv
 RUN_TABLE="${1:-$HOME/scr10/data/kbrevis/SraRunTable.csv}"
 RAW_DIR="$HOME/scr10/data/kbrevis/raw"
 TEMP_DIR="$HOME/scr10/data/kbrevis/temp"

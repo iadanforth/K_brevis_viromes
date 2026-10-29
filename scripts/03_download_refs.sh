@@ -1,11 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# we're gonna want the NCBI datasets 
-
-#!/bin/bash
-set -euo pipefail
-
 REF_DIR="$HOME/scr10/data/kbrevis/reference"
 mkdir -p "$REF_DIR"
 
@@ -57,6 +52,7 @@ rm -rf mouse_ref_genome.zip
 rm -rf human_ref_genome.zip
 
 
+# get K. brevis seqs - unclear if this is whole genome but I doubt it 
 fasterq-dump SRR14099984 \
     --split-files \
     --outdir "$REF_DIR" \
