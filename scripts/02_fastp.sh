@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-RAW_DIR="$HOME/scr10/data/kbrevis/test_data"
+RAW_DIR="$HOME/scr10/data/kbrevis/raw"
 CLEAN_DIR="$HOME/scr10/data/kbrevis/trim"
 
 command -v fastp >/dev/null 2>&1 || {

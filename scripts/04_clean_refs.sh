@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REF_DIR="$HOME/scr10/data/kbrevis/reference"
-TRIM_DIR="$HOME/scr10/data/kbrevis/test_data_trim"
+TRIM_DIR="$HOME/scr10/data/kbrevis/trim"
 OUT_DIR="$HOME/scr10/data/kbrevis/clean"
 INDEX_PREFIX="$REF_DIR/host_index"
 
@@ -11,6 +11,8 @@ REF_FASTAS=(
     "$REF_DIR/cat_ref_genome.fna"
     "$REF_DIR/mouse_ref_genome.fna"
     "$REF_DIR/human_ref_genome.fna"
+    "$REF_DIR/phix174.fna"
+    "$REF_DIR/kbrevis_ref.fna"
 )
 
 for ref in "${REF_FASTAS[@]}"; do

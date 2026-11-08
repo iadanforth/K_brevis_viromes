@@ -60,3 +60,18 @@ fasterq-dump SRR14099984 \
 
 mv "$REF_DIR/SRR14099984_1.fastq" "$REF_DIR/kbrevis_reads_1.fastq"
 mv "$REF_DIR/SRR14099984_2.fastq" "$REF_DIR/kbrevis_reads_2.fastq"
+
+# now need to turn the kbrevis reads into .fna files so that they can be used in the next 
+# script where you want to demove reads that match them. 
+# convert R1 into fasta
+
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate seqtk-env
+
+seqtk seq -a "$REF_DIR/kbrevis_reads_1.fastq" >> "$REF_DIR/kbrevis_reads_1.fa"
+seqtk seq -a "$REF_DIR/kbrevis_reads_2.fastq" >> "$REF_DIR/kbrevis_reads_2.fa"
+cat "$REF_DIR/kbrevis_reads_1.fa" "$REF_DIR/kbrevis_reads_2.fa" > "$REF_DIR/kbrevis_ref.fna"
+# this results in a .fna file in your reference directory that you can now pull from. It's 
+# not an assembled genome, just all of the reads that came from a Kbrevis culture. But it might 
+# help to get rid of some of the complexity in your contig-making attempts when you run metaSPAdes.
