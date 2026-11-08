@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=06_metaSPAdes
+#SBATCH --job-name=05_metaSPAdes
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -7,11 +7,60 @@
 #SBATCH --time=2-00:00:00
 #SBATCH --mail-type=FAIL,BEGIN,END
 #SBATCH --mail-user=iadanforth@wm.edu
-#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/06_metaspades_%j.out
-#SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/06_metaspades_%j.err
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_%j.out
+#SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_%j.err
 
-set -eo pipefail
+set -euo pipefail
 
-set -u pipefail 
+if (($# != 3)); then
+    echo "Usage: sbatch $0 SAMPLE_NAME R1.fastq R2.fastq" >&2
+    exit 2
+fi
 
-bash ./scripts/06_metaspades.sh
+NAME="$1"
+R1="$2"
+R2="$3"
+THREADS="${SLURM_CPUS_PER_TASK:?SLURM_CPUS_PER_TASK is not set}"
+OUT_DIR="$HOME/K_brevis_viromes/output/contigs"
+SAMPLE_OUT="$OUT_DIR/$NAME"
+
+[[ -s "$R1" ]] || {
+    echo "Missing or empty R1 file: $R1" >&2
+    exit 1
+}
+[[ -s "$R2" ]] || {
+    echo "Missing or empty R2 file: $R2" >&2
+    exit 1
+}
+
+if [[ -s "$OUT_DIR/${NAME}_contigs.fasta" ]]; then
+    echo "[$NAME] already assembled, skipping"
+    exit 0
+fi
+if [[ -e "$SAMPLE_OUT" ]]; then
+    echo "Output directory already exists for $NAME: $SAMPLE_OUT" >&2
+    echo "Move or remove it before resubmitting this sample." >&2
+    exit 1
+fi
+
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate metaspades-env
+
+command -v metaspades.py >/dev/null 2>&1 || {
+    echo "metaspades.py not found in metaspades-env" >&2
+    exit 1
+}
+
+mkdir -p "$OUT_DIR"
+echo "[$NAME] assembling paired reads"
+metaspades.py \
+    --only-assembler \
+    -1 "$R1" \
+    -2 "$R2" \
+    -o "$SAMPLE_OUT" \
+    -t "$THREADS" \
+    -m 60 \
+    -k 21,33,55,77,99,127
+
+cp "$SAMPLE_OUT/contigs.fasta" "$OUT_DIR/${NAME}_contigs.fasta"
