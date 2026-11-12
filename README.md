@@ -918,6 +918,162 @@ checkv download_database > ~/scr10/data/kbrevis/checkv_db
 ``` 
 
 
+----------------------------------------------------------------------------------------
+
+# 3. Comparing metaviralSPAdes and metaSPAdes assemblies (done with Claude Code)
+
+Everything in this section was written or run by Claude Code (an AI coding agent) on
+2026-11-12, from my prompts. The exact prompts are in `PROMPT_LOG.md`. Script changes are
+listed in the order they were made.
+
+#### 3a. Copy the CheckV database to data10
+
+Scratch is purged after 90 days without access, so the CheckV database was copied to
+data10, which is backed up. The scr10 copy was left in place.
+
+```
+mkdir -p /sciclone/data10/iadanforth/databases
+rsync -a /sciclone/scr10/iadanforth/databases/checkv_db /sciclone/data10/iadanforth/databases/
+diff -rq /sciclone/scr10/iadanforth/databases/checkv_db /sciclone/data10/iadanforth/databases/checkv_db   # no output = identical
+```
+
+Result: `~/data10/databases/checkv_db` (6.4 GB), identical to the original. Scripts still
+point at the scr10 copy until they're changed.
+
+#### 3b. Why run metaSPAdes as well?
+
+I thought every metaviralSPAdes contig (`05_metaspades.sh/.slurm`, output in
+`~/scr10/data/kbrevis/contigs/`) was circular. Counting the contig types in the headers
+showed that isn't true:
+
+```
+cat ~/scr10/data/kbrevis/contigs/*_contigs.fasta | grep '>' | grep -o 'type_[a-z]*' | sort | uniq -c
+#    904 type_circular
+#     12 type_linearrepeat
+#   4709 type_linear
+```
+
+metaviralSPAdes only outputs contigs that it classifies as viral, so its output is a
+filtered set. Running plain metaSPAdes on the same reads gives the full assembly. Comparing
+the two shows which viral contigs both assemblers recover (higher confidence) and which
+come from only one.
+
+#### 3c. SCRIPT: 05_metaspades_nov.sh / 05_metaspades_nov.slurm (metaSPAdes run)
+
+These scripts already existed and were reused as-is. They are copies of
+`05_metaspades.sh/.slurm` with three differences: `metaspades.py` instead of
+`metaviralspades.py`, output to `~/scr10/data/kbrevis/contigs_no_v/`, and job names starting
+`metaspades_no_v_`. Same reads (`~/scr10/data/kbrevis/clean/*_1_CLEAN.fastq` +
+`*_2_CLEAN.fastq`), same `--only-assembler`, 32 cores, 360 GB (`-m 340`).
+
+The only edit was a typo fix in the stdout log name in `05_metaspades_nov.slurm`:
+
+```
+# before
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_no_v__%j.out
+# after
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_no_v_%j.out
+```
+
+The 20 jobs were first submitted to kuro's `serial` partition (jobs 109726–109745). Slurm
+estimated they wouldn't start until about Nov 18, so they were moved to gulf's `gz`
+partition (the Zahn-group nodes: 64 cores, 1 TB, fastest CPUs). Each gz job was submitted
+first, and its kuro job was cancelled only once the gz submission succeeded:
+
+```
+module purge; module load slurm/gulf
+sbatch -p gz -t 3-00:00:00 --job-name="metaspades_no_v_${NAME}" \
+    scripts/05_metaspades_nov.slurm "$NAME" "$R1" "$R2"
+# then: module purge; module load slurm/kuro; scancel <old kuro job id>
+```
+
+gz jobs 92235–92254. The `-p gz` and `-t` on the command line override the
+`#SBATCH --partition=serial` and 2-day limit inside the script. **Risk:** my account only
+has the `normal` QOS, so a job submitted with the `gz_preempt` QOS will cancel mine. If that
+happens, delete the partial `contigs_no_v/<SAMPLE>/` folder (the script refuses to run if it
+exists) and resubmit that sample.
+
+#### 3d. SCRIPT: merge_assemblies.py (new)
+
+Python script that takes one sample's two contig sets plus the BLAST/ANI table, decides
+which contigs are the same, and writes the merged output. It uses only the Python standard
+library and runs in `checkv-env`.
+
+How "the same contig" is decided: two contigs, one from each assembler, are the same if they
+share **≥95 % average nucleotide identity over ≥85 % of the shorter contig**. That's the
+standard cutoff for calling two viral sequences the same virus (MIUViG / CheckV
+`aniclust` defaults). Both thresholds can be changed (`--min-ani`, `--min-cov`).
+
+How contigs are merged (greedy clustering, like CheckV's `aniclust`):
+1. Rank all contigs: metaviralSPAdes **circular** contigs first (likely complete genomes),
+   then longest first. On a tie, metaviralSPAdes comes first.
+2. Go down the list. Each contig not yet used becomes a cluster representative and absorbs
+   every unused contig from the *other* assembler that matches it.
+3. Write one sequence per cluster: the representative. Sequences are not stitched
+   together; the best existing contig is kept and the others are recorded as matches.
+   Contigs are only compared between assemblers, not within one.
+
+Output in `~/scr10/data/kbrevis/contigs_merged/`:
+- `SAMPLE_merged_contigs.fasta`: one contig per cluster, i.e. everything from both
+  assemblers with cross-assembler duplicates removed. Header example:
+  `>SRR28004141_MV_NODE_1_..._type_circular sample=SRR28004141 found_by=both rep_assembler=metaviralspades mv_topology=circular n_matched=2`
+- `SAMPLE_shared_contigs.fasta`: only the clusters found by **both** assemblers.
+- `SAMPLE_clusters.tsv`: one row per cluster with representative, length, metaviralSPAdes
+  topology, `found_by` (both / metaviralspades / metaspades), matched contigs, and their
+  ANI and coverage.
+- `SAMPLE_merge_summary.txt`: counts.
+
+#### 3e. SCRIPT: 06_merge_assemblies.slurm (new)
+
+Runs the comparison for one sample (`sbatch 06_merge_assemblies.slurm SAMPLE`). 16 cores,
+64 GB, 12 h; partition `serial` in the header, but override it for the cluster you submit
+to. Steps:
+1. `seqkit-env`: prefix contig names with `MV_` (metaviralSPAdes,
+   `contigs/SAMPLE_contigs.fasta`) or `MS_` (metaSPAdes,
+   `contigs_no_v/SAMPLE_contigs.fasta`). metaSPAdes contigs under 1,000 bp are dropped
+   (`MIN_LEN`, changeable via environment variable).
+2. `checkv-env`: `makeblastdb` on the metaSPAdes contigs, then
+   `blastn -query mv.fasta -db ms_db -outfmt '6 std qlen slen' -max_target_seqs 10000`.
+3. `anicalc` (from CheckV) turns the BLAST hits into one ANI + coverage row per contig pair.
+4. `merge_assemblies.py` (3d) clusters and writes the outputs.
+5. Deletes the BLAST database. Working files stay in `contigs_merged/SAMPLE/`.
+
+`seqkit` is in `seqkit-env`, not `checkv-env`, which is why the script switches
+environments.
+
+#### 3f. SCRIPT: 06_merge_assemblies.sh (new)
+
+Submits one `06_merge_assemblies.slurm` job per sample that has both a metaviralSPAdes and a
+metaSPAdes assembly. Samples without a metaSPAdes assembly yet, or already merged, are
+skipped. Run it once the metaSPAdes jobs have finished:
+
+```
+bash scripts/06_merge_assemblies.sh
+```
+
+#### 3g. Testing
+
+No metaSPAdes output existed yet, so the merge step was tested with a stand-in "metaSPAdes"
+file made of:
+- SRR28004141's metaviralSPAdes contigs with renamed headers (should all match),
+- SRR28004137's contigs (mostly shouldn't match),
+- a copy of SRR28004141's longest contig with 2 kb trimmed off (should match).
+
+Result: all 30 SRR28004141 contigs were `found_by=both`, the trimmed copy merged into its
+full-length circular contig (kept as the representative), and 154 unmatched contigs were
+kept as `metaspades` only. SRR28004137's NODE_4 also merged: it's identical to
+SRR28004141's NODE_4, so the same phage was assembled in both samples.
+
+#### 3h. Next steps
+
+- Most `found_by=metaspades` contigs will be bacterial or algal, because metaSPAdes
+  assembles the whole metagenome. Run a virus identifier (geNomad or VirSorter2) on the
+  merged contigs before calling them viral.
+- Then run CheckV (`checkv end_to_end`, database now in
+  `~/data10/databases/checkv_db/checkv-db-v1.5`) to estimate completeness. CheckV doesn't
+  decide whether a contig is viral.
+
+
 
 
 
