@@ -1,0 +1,134 @@
+[setup] gvmag-bin-env already exists
+[setup] checkv-env already exists
+[setup] genomad-env already exists
+[setup] aniclustermap-env already exists
+[setup] aniclustermap-env is broken; rebuilding from envs/aniclustermap-env.yml
+
+Remove all packages in environment /sciclone/home/iadanforth/.conda/envs/aniclustermap-env:
+
+
+## Package Plan ##
+
+  environment location: /sciclone/home/iadanforth/.conda/envs/aniclustermap-env
+
+
+The following packages will be REMOVED:
+
+  _openmp_mutex-4.5-20_gnu
+  aniclustermap-1.1.0-pyhdfd78af_0
+  brotli-1.2.1-h505cf86_0
+  brotli-bin-1.2.1-h9908984_0
+  bzip2-1.0.8-hda65f42_10
+  ca-certificates-2026.10.23-hbd8a1cb_0
+  contourpy-1.3.3-py311h724c32c_4
+  cycler-0.12.1-pyhcf101f3_2
+  fastani-1.33-h4dfc31f_3
+  fonttools-4.68.0-py311h92159aa_0
+  formulaic-1.2.2-pyhd8ed1ab_0
+  freetype-2.12.1-h267a509_2
+  gsl-2.7-he838d99_0
+  interface_meta-1.3.0-pyhd8ed1ab_1
+  kiwisolver-1.5.1-py311h4c6fd42_3
+  lcms2-2.16-hb7c19ff_0
+  ld_impl_linux-64-2.46.1-bootstrap_ha15bf96_3
+  lerc-4.3.0-he78707d_0
+  libblas-3.11.0-12_h4a7cf45_openblas
+  libbrotlicommon-1.2.1-h39a168f_0
+  libbrotlidec-1.2.1-ha411449_0
+  libbrotlienc-1.2.1-h018ffa1_0
+  libcblas-3.11.0-12_h0358290_openblas
+  libdeflate-1.25-hd45a770_1
+  libexpat-2.9.0-hd2095e1_0
+  libffi-3.7.0-h81df57d_1
+  libgcc-16.2.0-ha9f2e26_7
+  libgcc-ng-16.2.0-h69a702a_7
+  libgfortran-16.2.0-h69a702a_7
+  libgfortran5-16.2.0-h6b99dfc_7
+  libgomp-16.2.0-he0feb66_7
+  libjpeg-turbo-3.2.1-h7cc23a3_0
+  liblapack-3.11.0-12_h47877c9_openblas
+  liblzma-5.8.3-hb03c661_1
+  liblzma-devel-5.8.3-hb03c661_1
+  libnsl-2.0.1-hb9d3cd8_1
+  libopenblas-0.3.34-pthreads_hf13c14d_2
+  libpng-1.6.43-h2797004_0
+  libsqlite-3.46.0-hde9e2c9_0
+  libstdcxx-16.2.0-h934c35e_7
+  libstdcxx-ng-16.2.0-hdf11a46_7
+  libtiff-4.6.0-h1dd3fc0_3
+  libuuid-2.42.4-hcfc3c73_1
+  libwebp-base-1.6.0-hd42ef1d_1
+  libxcb-1.15-h0b41bf4_0
+  libxcrypt-4.4.38-h280c20c_0
+  libzlib-1.2.13-h4ab18f5_6
+  matplotlib-base-3.10.1-py311h2b939e6_0
+  munkres-1.1.4-pyhd8ed1ab_1
+  narwhals-2.28.0-pyh5ded981_0
+  ncurses-6.6-hdb14827_1
+  numpy-1.26.4-py311h64a7726_0
+  openjpeg-2.5.2-h488ebb8_0
+  openssl-3.6.5-h781a0a9_0
+  packaging-26.3-pyhc364b38_0
+  pandas-1.5.3-py311h2872171_1
+  patsy-1.0.3-pyhcf101f3_0
+  pillow-10.3.0-py311h18e6fac_0
+  pip-26.2.2-pyh8b19718_2
+  pthread-stubs-0.4-h7cc23a3_1004
+  pyparsing-3.3.3-pyh5ded981_0
+  python-3.11.9-hb806964_0_cpython
+  python-dateutil-4.0.0-pyh5ded981_0
+  python-tzdata-2026.6-pyh5ded981_0
+  python_abi-3.11-9_cp311
+  pytz-2026.6-pyh5ded981_0
+  qhull-2020.2-haf43d43_6
+  readline-8.3-hd6e31c0_1
+  scipy-1.17.1-py311hbe70eeb_1
+  seaborn-0.11.2-hd8ed1ab_0
+  seaborn-base-0.11.2-pyhd8ed1ab_0
+  setuptools-84.2.1-pyhe730653_0
+  statsmodels-0.15.0-np2py311h98b8029_2
+  tk-8.6.13-noxft_h4845f30_101
+  typing-extensions-4.16.0-h69aa097_0
+  typing_extensions-4.16.0-pyhcf101f3_0
+  tzdata-2026e-h5d301ff_0
+  unicodedata2-18.0.0-py311h0d48ccd_0
+  wheel-0.48.0-pyhd8ed1ab_0
+  wrapt-2.5.2-py311h194be0f_0
+  xorg-libxau-1.0.12-h7cc23a3_2
+  xorg-libxdmcp-1.1.5-h7cc23a3_2
+  xz-5.8.3-ha02ee65_1
+  xz-gpl-tools-5.8.3-ha02ee65_1
+  xz-tools-5.8.3-hb03c661_1
+  zlib-1.2.13-h4ab18f5_6
+  zstd-1.5.6-ha6fb4c9_0
+
+
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate aniclustermap-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[setup] aniclustermap-env now works
+pixi 0.84.2
+[setup] CheckV db: /sciclone/home/iadanforth/data10/databases/checkv_db/checkv-db-v1.5
+1.7
+[setup] GVMAGs V2 metadata: 18726 lines
+[setup] done

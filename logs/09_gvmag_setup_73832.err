@@ -1,0 +1,110 @@
+/sciclone/apps/miniforge3-24.9.2-0/lib/python3.12/argparse.py:2006: FutureWarning: `remote_definition` is deprecated and will be removed in 25.9. Use `conda env create --file=URL` instead.
+  action(self, namespace, argument_values, option_string)
+
+
+==> WARNING: A newer version of conda exists. <==
+    current version: 24.9.2
+    latest version: 26.10.0
+
+Please update conda by running
+
+    $ conda update -n base -c conda-forge conda
+
+
+/sciclone/apps/miniforge3-24.9.2-0/lib/python3.12/argparse.py:2006: FutureWarning: `remote_definition` is deprecated and will be removed in 25.9. Use `conda env create --file=URL` instead.
+  action(self, namespace, argument_values, option_string)
+
+
+==> WARNING: A newer version of conda exists. <==
+    current version: 24.9.2
+    latest version: 26.10.0
+
+Please update conda by running
+
+    $ conda update -n base -c conda-forge conda
+
+
+/sciclone/apps/miniforge3-24.9.2-0/lib/python3.12/argparse.py:2006: FutureWarning: `remote_definition` is deprecated and will be removed in 25.9. Use `conda env create --file=URL` instead.
+  action(self, namespace, argument_values, option_string)
+
+
+==> WARNING: A newer version of conda exists. <==
+    current version: 24.9.2
+    latest version: 26.10.0
+
+Please update conda by running
+
+    $ conda update -n base -c conda-forge conda
+
+
+/sciclone/apps/miniforge3-24.9.2-0/lib/python3.12/argparse.py:2006: FutureWarning: `remote_definition` is deprecated and will be removed in 25.9. Use `conda env create --file=URL` instead.
+  action(self, namespace, argument_values, option_string)
+
+
+==> WARNING: A newer version of conda exists. <==
+    current version: 24.9.2
+    latest version: 26.10.0
+
+Please update conda by running
+
+    $ conda update -n base -c conda-forge conda
+
+
+Cloning into '/sciclone/home/iadanforth/data10/programs/gvclass-v1.1.1'...
+Note: switching to '23cdbb9292f42dd1b76b51f905fe1b1a262a67c6'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+ WARN Encountered 1 warning while parsing the manifest:
+  ⚠ The `project` field is deprecated. Use `workspace` instead.
+   ╭─[/sciclone/data10/iadanforth/programs/gvclass-v1.1.1/pixi.toml:1:1]
+ 1 │ ╭─▶ [project]
+ 2 │ │   name = "gvclass"
+ 3 │ │   version = "1.1.0"
+ 4 │ │   description = "Giant virus classification tool using phylogenetic analysis"
+ 5 │ │   authors = ["fschulz@lbl.gov"]
+ 6 │ │   channels = ["conda-forge", "bioconda"]
+ 7 │ ├─▶ platforms = ["linux-64"]
+   · ╰──── replace this with 'workspace'
+ 8 │     
+   ╰────
+
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+✔ The default environment has been installed.
+ WARN Encountered 1 warning while parsing the manifest:
+  ⚠ The `project` field is deprecated. Use `workspace` instead.
+   ╭─[/sciclone/data10/iadanforth/programs/gvclass-v1.1.1/pixi.toml:1:1]
+ 1 │ ╭─▶ [project]
+ 2 │ │   name = "gvclass"
+ 3 │ │   version = "1.1.0"
+ 4 │ │   description = "Giant virus classification tool using phylogenetic analysis"
+ 5 │ │   authors = ["fschulz@lbl.gov"]
+ 6 │ │   channels = ["conda-forge", "bioconda"]
+ 7 │ ├─▶ platforms = ["linux-64"]
+   · ╰──── replace this with 'workspace'
+ 8 │     
+   ╰────
+
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+✨ Pixi task (run-example): python run_gvclass.py example -o example_results --threads 8
+
+CheckV v0.9.0: download_database
+[1/4] Checking latest version of CheckV's database...
+[2/4] Downloading 'checkv-db-v1.5'...
+[3/4] Extracting 'checkv-db-v1.5'...
+[4/4] Building DIAMOND database...
+Run time: 127.02 seconds
+Peak mem: 1.08 GB

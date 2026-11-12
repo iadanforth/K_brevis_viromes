@@ -1,0 +1,8 @@
+# Read mapping + binning, pinned to the versions in Booker et al. 2026 (Supplemental Methods)
+name: gvmag-bin-env
+channels: [conda-forge, bioconda]
+dependencies:
+  - bbmap=35.85
+  - samtools=1.15.1
+  - metabat2=2.15
+  - seqkit

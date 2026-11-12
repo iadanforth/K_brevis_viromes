@@ -1,0 +1,12 @@
+# Pairwise ANI between GVMAGs + clustered heatmap, pinned to Booker et al. 2026
+# (Supplemental Methods: "ANIclustermap v1.1.0"). ANIclustermap calls fastANI.
+#
+# matplotlib-base is pinned <3.9 because ANIclustermap 1.1.0 depends on seaborn 0.11.x,
+# which calls matplotlib.cm.register_cmap(); that function was removed in matplotlib 3.9,
+# so an unpinned solve installs matplotlib 3.10 and ANIclustermap fails on import with
+# "module 'matplotlib.cm' has no attribute 'register_cmap'".
+name: aniclustermap-env
+channels: [conda-forge, bioconda]
+dependencies:
+  - aniclustermap=1.1.0
+  - matplotlib-base<3.9

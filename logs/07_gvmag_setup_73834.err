@@ -1,0 +1,20 @@
+ WARN Encountered 1 warning while parsing the manifest:
+  ⚠ The `project` field is deprecated. Use `workspace` instead.
+   ╭─[/sciclone/data10/iadanforth/programs/gvclass-v1.1.1/pixi.toml:1:1]
+ 1 │ ╭─▶ [project]
+ 2 │ │   name = "gvclass"
+ 3 │ │   version = "1.1.0"
+ 4 │ │   description = "Giant virus classification tool using phylogenetic analysis"
+ 5 │ │   authors = ["fschulz@lbl.gov"]
+ 6 │ │   channels = ["conda-forge", "bioconda"]
+ 7 │ ├─▶ platforms = ["linux-64"]
+   · ╰──── replace this with 'workspace'
+ 8 │     
+   ╰────
+
+ WARN the lock file is up-to-date but uses an older format (v6), run `pixi lock` to upgrade to v7 for improved reproducibility
+✔ The default environment has been installed.
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 4780k  100 4780k    0     0  13.4M      0 --:--:-- --:--:-- --:--:-- 13.4M

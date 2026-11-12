@@ -1,0 +1,8 @@
+# Gene prediction (pyrodigal-gv; paper lists "v3.5.1" = the pyrodigal version) and
+# gene annotation (geNomad 1.7.4), pinned to Booker et al. 2026 (Supplemental Methods)
+name: genomad-env
+channels: [conda-forge, bioconda]
+dependencies:
+  - genomad=1.7.4
+  - pyrodigal=3.5.1
+  - pyrodigal-gv

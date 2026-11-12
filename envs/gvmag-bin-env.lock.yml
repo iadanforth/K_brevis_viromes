@@ -1,0 +1,40 @@
+name: gvmag-bin-env
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - _openmp_mutex=4.5
+  - bbmap=35.85
+  - boost-cpp=1.74.0
+  - bzip2=1.0.8
+  - c-ares=1.34.9
+  - ca-certificates=2026.10.23
+  - htslib=1.17
+  - icu=70.1
+  - java-jdk=8.0.112
+  - keyutils=1.6.3
+  - krb5=1.20.1
+  - libcurl=7.87.0
+  - libdeflate=1.13
+  - libedit=3.1.20260512
+  - libev=4.33
+  - libgcc=16.2.0
+  - libgcc-ng=16.2.0
+  - libgomp=16.2.0
+  - libnghttp2=1.51.0
+  - libssh2=1.10.0
+  - libstdcxx=16.2.0
+  - libstdcxx-ng=16.2.0
+  - libxcrypt=4.4.38
+  - libzlib=1.2.13
+  - metabat2=2.15
+  - ncurses=6.6
+  - openjdk=8.0.112
+  - openssl=1.1.1w
+  - perl=5.44.0
+  - samtools=1.15.1
+  - seqkit=2.14.0
+  - xz=5.2.6
+  - zlib=1.2.13
+  - zstd=1.5.6
+prefix: /sciclone/home/iadanforth/.conda/envs/gvmag-bin-env

@@ -1,0 +1,10 @@
+[setup] gvmag-bin-env already exists
+[setup] checkv-env already exists
+[setup] genomad-env already exists
+[setup] aniclustermap-env already exists
+pixi 0.84.2
+[setup] CheckV db: /sciclone/home/iadanforth/data10/databases/checkv_db/checkv-db-v1.5
+1.7
+[setup] downloading GVMAGs V2 metadata (GVDB_stats.tsv)
+[setup] GVMAGs V2 metadata: 18726 lines
+[setup] done

@@ -1,0 +1,11 @@
+[bam_sort_core] merging from 4 files and 8 in-memory blocks...
+Output depth matrix to /sciclone/home/iadanforth/scr10/data/kbrevis/binning_test/bins/SRR28004137/SRR28004137_depth.txt
+Output matrix to /sciclone/home/iadanforth/scr10/data/kbrevis/binning_test/bins/SRR28004137/SRR28004137_depth.txt
+Opening 1 bams
+Consolidating headers
+Processing bam files
+Thread 0 finished: SRR28004137_SORTED.bam with 107757356 reads and 959285 readsWellMapped
+Creating depth matrix file: /sciclone/home/iadanforth/scr10/data/kbrevis/binning_test/bins/SRR28004137/SRR28004137_depth.txt
+Closing most bam files
+Closing last bam file
+Finished

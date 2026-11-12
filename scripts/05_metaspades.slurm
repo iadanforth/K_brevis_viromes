@@ -1,16 +1,23 @@
 #!/bin/bash
-#SBATCH --job-name=05_metaSPAdes
+#SBATCH --partition=serial
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=32
 #SBATCH --time=2-00:00:00
+#SBATCH --mem=360G
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --mail-user=iadanforth@wm.edu
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_%j.out
+#SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_%j.err
 #SBATCH --mail-type=FAIL,BEGIN,END
 #SBATCH --mail-user=iadanforth@wm.edu
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_%j.out
 #SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_%j.err
 
 set -euo pipefail
+
+THREADS="${SLURM_CPUS_PER_TASK:?Submit with sbatch}"
+export OMP_NUM_THREADS="$THREADS"
 
 if (($# != 3)); then
     echo "Usage: sbatch $0 SAMPLE_NAME R1.fastq R2.fastq" >&2
@@ -20,9 +27,10 @@ fi
 NAME="$1"
 R1="$2"
 R2="$3"
-THREADS="${SLURM_CPUS_PER_TASK:?SLURM_CPUS_PER_TASK is not set}"
-OUT_DIR="$HOME/K_brevis_viromes/output/contigs"
+OUT_DIR="$HOME/scr10/data/kbrevis/contigs"
 SAMPLE_OUT="$OUT_DIR/$NAME"
+
+mkdir -p "$OUT_DIR"
 
 [[ -s "$R1" ]] || {
     echo "Missing or empty R1 file: $R1" >&2
@@ -47,20 +55,19 @@ module load miniforge3
 eval "$(conda shell.bash hook)"
 conda activate metaspades-env
 
-command -v metaspades.py >/dev/null 2>&1 || {
-    echo "metaspades.py not found in metaspades-env" >&2
+command -v metaviralspades.py >/dev/null 2>&1 || {
+    echo "metaviralspades.py not found in metaspades-env" >&2
     exit 1
 }
 
-mkdir -p "$OUT_DIR"
+# Assemble paired metagenomic DNA reads with metaviralSPAdes.
 echo "[$NAME] assembling paired reads"
-metaspades.py \
+metaviralspades.py \
     --only-assembler \
     -1 "$R1" \
     -2 "$R2" \
     -o "$SAMPLE_OUT" \
     -t "$THREADS" \
-    -m 60 \
-    -k 21,33,55,77,99,127
+    -m 340
 
 cp "$SAMPLE_OUT/contigs.fasta" "$OUT_DIR/${NAME}_contigs.fasta"

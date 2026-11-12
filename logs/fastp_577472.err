@@ -1,0 +1,920 @@
+Read1 before filtering:
+total reads: 55553057
+total bases: 8268465791
+Q20 bases: 8055632233(97.426%)
+Q30 bases: 7694052100(93.053%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 55553057
+total bases: 8267591754
+Q20 bases: 7977204994(96.4876%)
+Q30 bases: 7527099595(91.0434%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 53903127
+total bases: 6535860724
+Q20 bases: 6390927966(97.7825%)
+Q30 bases: 6120646808(93.6471%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 53903127
+total bases: 6535015820
+Q20 bases: 6346407474(97.1139%)
+Q30 bases: 6010842439(91.979%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 107806254
+reads failed due to low quality: 1159470
+reads failed due to too many N: 714826
+reads failed due to too short: 1425564
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 99164
+bases trimmed due to adapters: 3243672
+
+Duplication rate: 10.7704%
+
+Insert size peak (evaluated by paired-end reads): 190
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004137_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004137_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004137_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004137_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 175 seconds
+Read1 before filtering:
+total reads: 55033119
+total bases: 8199514500
+Q20 bases: 7987915764(97.4194%)
+Q30 bases: 7624574322(92.9881%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 55033119
+total bases: 8198838999
+Q20 bases: 7897186327(96.3208%)
+Q30 bases: 7443378959(90.7858%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 53489838
+total bases: 6489454424
+Q20 bases: 6345449989(97.7809%)
+Q30 bases: 6074147645(93.6003%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 53489838
+total bases: 6488762444
+Q20 bases: 6293329332(96.9881%)
+Q30 bases: 5952626505(91.7375%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 106979676
+reads failed due to low quality: 1292156
+reads failed due to too many N: 697142
+reads failed due to too short: 1097264
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 38832
+bases trimmed due to adapters: 1039402
+
+Duplication rate: 10.365%
+
+Insert size peak (evaluated by paired-end reads): 201
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004138_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004138_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004138_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004138_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 182 seconds
+Read1 before filtering:
+total reads: 51804521
+total bases: 7731338253
+Q20 bases: 7530324842(97.4%)
+Q30 bases: 7185899259(92.9451%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 51804521
+total bases: 7730683699
+Q20 bases: 7388323804(95.5714%)
+Q30 bases: 6908438801(89.3639%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 50388784
+total bases: 6118788493
+Q20 bases: 5984255816(97.8013%)
+Q30 bases: 5729049144(93.6304%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 50388784
+total bases: 6118191690
+Q20 bases: 5897316529(96.3899%)
+Q30 bases: 5535945648(90.4834%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 100777568
+reads failed due to low quality: 1561458
+reads failed due to too many N: 662278
+reads failed due to too short: 607738
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 30242
+bases trimmed due to adapters: 917344
+
+Duplication rate: 9.26989%
+
+Insert size peak (evaluated by paired-end reads): 221
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004139_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004139_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004139_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004139_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 173 seconds
+Read1 before filtering:
+total reads: 33874766
+total bases: 4582698244
+Q20 bases: 4472169526(97.5881%)
+Q30 bases: 4288797563(93.5867%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 33874766
+total bases: 4528473704
+Q20 bases: 4322106871(95.4429%)
+Q30 bases: 4042976280(89.279%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 23361343
+total bases: 2768022858
+Q20 bases: 2712510176(97.9945%)
+Q30 bases: 2607149755(94.1882%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 23361343
+total bases: 2762357007
+Q20 bases: 2652909519(96.0379%)
+Q30 bases: 2483453906(89.9034%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 46722686
+reads failed due to low quality: 1009508
+reads failed due to too many N: 21846
+reads failed due to too short: 19995492
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 168146
+bases trimmed due to adapters: 7345986
+
+Duplication rate: 11.5918%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004140_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004140_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004140_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004140_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 97 seconds
+Read1 before filtering:
+total reads: 53279502
+total bases: 7946708215
+Q20 bases: 7742507989(97.4304%)
+Q30 bases: 7394359572(93.0493%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 53279502
+total bases: 7945965181
+Q20 bases: 7614256893(95.8255%)
+Q30 bases: 7141768840(89.8792%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 51783982
+total bases: 6286310330
+Q20 bases: 6149542532(97.8244%)
+Q30 bases: 5891346989(93.7171%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 51783982
+total bases: 6285634140
+Q20 bases: 6071744379(96.5972%)
+Q30 bases: 5716376848(90.9435%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 103567964
+reads failed due to low quality: 1505782
+reads failed due to too many N: 688164
+reads failed due to too short: 797094
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 34856
+bases trimmed due to adapters: 1061019
+
+Duplication rate: 9.38498%
+
+Insert size peak (evaluated by paired-end reads): 209
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004141_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004141_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004141_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004141_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 174 seconds
+Read1 before filtering:
+total reads: 521768625
+total bases: 78265293750
+Q20 bases: 75135679821(96.0013%)
+Q30 bases: 71075237129(90.8132%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 521768625
+total bases: 78265293750
+Q20 bases: 74730786911(95.4839%)
+Q30 bases: 70236578557(89.7417%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 507937922
+total bases: 61947128504
+Q20 bases: 60079334183(96.9849%)
+Q30 bases: 57176082079(92.2982%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 507937922
+total bases: 61947128504
+Q20 bases: 59878948159(96.6614%)
+Q30 bases: 56655976984(91.4586%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 1015875844
+reads failed due to low quality: 18751158
+reads failed due to too many N: 1625298
+reads failed due to too short: 7284950
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 12873818
+bases trimmed due to adapters: 458501624
+
+Duplication rate: 8.88281%
+
+Insert size peak (evaluated by paired-end reads): 139
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004142_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004142_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004142_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004142_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 1740 seconds
+Read1 before filtering:
+total reads: 520087713
+total bases: 78013156950
+Q20 bases: 75148518757(96.328%)
+Q30 bases: 71409338660(91.535%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 520087713
+total bases: 78013156950
+Q20 bases: 74749681980(95.8168%)
+Q30 bases: 70250486728(90.0495%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 473353057
+total bases: 57422707693
+Q20 bases: 55972068474(97.4738%)
+Q30 bases: 53546233666(93.2492%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 473353057
+total bases: 57422707693
+Q20 bases: 55589328996(96.8072%)
+Q30 bases: 52549069532(91.5127%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 946706114
+reads failed due to low quality: 13635648
+reads failed due to too many N: 1514656
+reads failed due to too short: 78319008
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 157095134
+bases trimmed due to adapters: 4044625812
+
+Duplication rate: 7.52084%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004143_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004143_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004143_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004143_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 1850 seconds
+Read1 before filtering:
+total reads: 605129110
+total bases: 90769366500
+Q20 bases: 88131462772(97.0938%)
+Q30 bases: 84189667275(92.7512%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 605129110
+total bases: 90769366500
+Q20 bases: 87522392679(96.4228%)
+Q30 bases: 82511532028(90.9024%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 578379360
+total bases: 70390430471
+Q20 bases: 68777748658(97.7089%)
+Q30 bases: 65991865335(93.7512%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 578379360
+total bases: 70390430471
+Q20 bases: 68302589467(97.0339%)
+Q30 bases: 64668393140(91.871%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 1156758720
+reads failed due to low quality: 13861900
+reads failed due to too many N: 1855796
+reads failed due to too short: 37781804
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 82612688
+bases trimmed due to adapters: 1959196044
+
+Duplication rate: 9.25257%
+
+Insert size peak (evaluated by paired-end reads): 229
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004144_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004144_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004144_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004144_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 2074 seconds
+Read1 before filtering:
+total reads: 49277211
+total bases: 7324373782
+Q20 bases: 7132759839(97.3839%)
+Q30 bases: 6803872013(92.8936%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 49277211
+total bases: 7323451261
+Q20 bases: 7014571309(95.7823%)
+Q30 bases: 6565950446(89.6565%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 47492834
+total bases: 5754721846
+Q20 bases: 5627066678(97.7817%)
+Q30 bases: 5385035363(93.5759%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 47492834
+total bases: 5753753168
+Q20 bases: 5556717479(96.5755%)
+Q30 bases: 5223275650(90.7803%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 94985668
+reads failed due to low quality: 1357854
+reads failed due to too many N: 630782
+reads failed due to too short: 1580118
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 73080
+bases trimmed due to adapters: 2165834
+
+Duplication rate: 9.09147%
+
+Insert size peak (evaluated by paired-end reads): 183
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004145_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004145_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004145_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004145_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 169 seconds
+Read1 before filtering:
+total reads: 39064666
+total bases: 5277087366
+Q20 bases: 5138872365(97.3808%)
+Q30 bases: 4902727819(92.9059%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 39064666
+total bases: 5267351841
+Q20 bases: 5090209826(96.637%)
+Q30 bases: 4813908713(91.3914%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 27570400
+total bases: 3258973878
+Q20 bases: 3182484627(97.653%)
+Q30 bases: 3040042209(93.2822%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 27570400
+total bases: 3253553149
+Q20 bases: 3157509689(97.048%)
+Q30 bases: 2988550350(91.855%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 55140800
+reads failed due to low quality: 677264
+reads failed due to too many N: 26240
+reads failed due to too short: 22285028
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 80512
+bases trimmed due to adapters: 3530219
+
+Duplication rate: 11.1725%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004146_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004146_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004146_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004146_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 105 seconds
+Read1 before filtering:
+total reads: 42177923
+total bases: 5726459780
+Q20 bases: 5575759551(97.3684%)
+Q30 bases: 5320539879(92.9115%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 42177923
+total bases: 5710919605
+Q20 bases: 5528287776(96.8021%)
+Q30 bases: 5237600089(91.712%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 30312872
+total bases: 3581658752
+Q20 bases: 3497248477(97.6433%)
+Q30 bases: 3341595317(93.2974%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 30312872
+total bases: 3575422267
+Q20 bases: 3477006867(97.2474%)
+Q30 bases: 3298533190(92.2558%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 60625744
+reads failed due to low quality: 731462
+reads failed due to too many N: 28394
+reads failed due to too short: 22970246
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 83146
+bases trimmed due to adapters: 3700237
+
+Duplication rate: 12.5971%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004147_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004147_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004147_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004147_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 114 seconds
+Read1 before filtering:
+total reads: 56576799
+total bases: 8408724715
+Q20 bases: 8191198290(97.4131%)
+Q30 bases: 7808580679(92.8628%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 56576799
+total bases: 8407852427
+Q20 bases: 8146957937(96.897%)
+Q30 bases: 7699832738(91.5791%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 54928190
+total bases: 6653444321
+Q20 bases: 6504066736(97.7549%)
+Q30 bases: 6218330223(93.4603%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 54928190
+total bases: 6652184672
+Q20 bases: 6484137329(97.4738%)
+Q30 bases: 6152562640(92.4894%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 109856380
+reads failed due to low quality: 855072
+reads failed due to too many N: 739228
+reads failed due to too short: 1702918
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 62832
+bases trimmed due to adapters: 1529414
+
+Duplication rate: 12.1047%
+
+Insert size peak (evaluated by paired-end reads): 195
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004148_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004148_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004148_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004148_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 184 seconds
+Read1 before filtering:
+total reads: 32641452
+total bases: 4313982855
+Q20 bases: 4200819193(97.3768%)
+Q30 bases: 4010915979(92.9748%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 32641452
+total bases: 4290925312
+Q20 bases: 4146133444(96.6256%)
+Q30 bases: 3923653135(91.4407%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 21302657
+total bases: 2510879987
+Q20 bases: 2451757431(97.6453%)
+Q30 bases: 2343010004(93.3143%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 21302657
+total bases: 2505833999
+Q20 bases: 2431168285(97.0203%)
+Q30 bases: 2301331885(91.839%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 42605314
+reads failed due to low quality: 597280
+reads failed due to too many N: 19726
+reads failed due to too short: 22060584
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 90112
+bases trimmed due to adapters: 3738273
+
+Duplication rate: 10.9412%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004149_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004149_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004149_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004149_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 83 seconds
+Read1 before filtering:
+total reads: 42165394
+total bases: 5949397172
+Q20 bases: 5790974300(97.3372%)
+Q30 bases: 5516594463(92.7253%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 42165394
+total bases: 5927482446
+Q20 bases: 5722993109(96.5501%)
+Q30 bases: 5403740923(91.1642%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 34522698
+total bases: 4128699069
+Q20 bases: 4030852976(97.6301%)
+Q30 bases: 3846632207(93.1681%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 34522698
+total bases: 4123136418
+Q20 bases: 3999401834(96.999%)
+Q30 bases: 3782498408(91.7384%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 69045396
+reads failed due to low quality: 722776
+reads failed due to too many N: 32472
+reads failed due to too short: 14530144
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 100882
+bases trimmed due to adapters: 4823093
+
+Duplication rate: 11.6544%
+
+Insert size peak (evaluated by paired-end reads): 156
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004150_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004150_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004150_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004150_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 126 seconds
+Read1 before filtering:
+total reads: 47239016
+total bases: 6509203966
+Q20 bases: 6337845911(97.3674%)
+Q30 bases: 6043596987(92.8469%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 47239016
+total bases: 6492257808
+Q20 bases: 6215297324(95.734%)
+Q30 bases: 5813913259(89.5515%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 35570761
+total bases: 4229184495
+Q20 bases: 4131647864(97.6937%)
+Q30 bases: 3947372738(93.3365%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 35570761
+total bases: 4223164215
+Q20 bases: 4063363533(96.2161%)
+Q30 bases: 3803596998(90.0651%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 71141522
+reads failed due to low quality: 1082240
+reads failed due to too many N: 33100
+reads failed due to too short: 22221170
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 82050
+bases trimmed due to adapters: 3642523
+
+Duplication rate: 12.9526%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004151_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004151_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004151_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004151_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 129 seconds
+Read1 before filtering:
+total reads: 54912843
+total bases: 8188468613
+Q20 bases: 7978425154(97.4349%)
+Q30 bases: 7616952814(93.0205%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 54912843
+total bases: 8187528141
+Q20 bases: 7902913415(96.5238%)
+Q30 bases: 7463779170(91.1603%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 53552200
+total bases: 6499753251
+Q20 bases: 6355807596(97.7854%)
+Q30 bases: 6084660534(93.6137%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 53552200
+total bases: 6498931977
+Q20 bases: 6313436584(97.1458%)
+Q30 bases: 5983319978(92.0662%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 107104400
+reads failed due to low quality: 1151916
+reads failed due to too many N: 707980
+reads failed due to too short: 861390
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 53694
+bases trimmed due to adapters: 1828324
+
+Duplication rate: 10.3639%
+
+Insert size peak (evaluated by paired-end reads): 208
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004152_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004152_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004152_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004152_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 184 seconds
+Read1 before filtering:
+total reads: 42669896
+total bases: 6062520286
+Q20 bases: 5908672548(97.4623%)
+Q30 bases: 5650633310(93.206%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 42669896
+total bases: 5995331186
+Q20 bases: 5775335116(96.3305%)
+Q30 bases: 5451220676(90.9244%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 35125907
+total bases: 4201156505
+Q20 bases: 4109107576(97.809%)
+Q30 bases: 3938392540(93.7454%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 35125907
+total bases: 4193358512
+Q20 bases: 4062531075(96.8801%)
+Q30 bases: 3841795071(91.6162%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 70251814
+reads failed due to low quality: 951170
+reads failed due to too many N: 33228
+reads failed due to too short: 14103580
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 101010
+bases trimmed due to adapters: 4772133
+
+Duplication rate: 12.4623%
+
+Insert size peak (evaluated by paired-end reads): 162
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004153_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004153_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004153_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004153_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 123 seconds
+Read1 before filtering:
+total reads: 54954908
+total bases: 8199400579
+Q20 bases: 7982323433(97.3525%)
+Q30 bases: 7613203153(92.8507%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 54954908
+total bases: 8198790376
+Q20 bases: 7850107723(95.7471%)
+Q30 bases: 7361944218(89.7931%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 53403475
+total bases: 6485448783
+Q20 bases: 6340320974(97.7623%)
+Q30 bases: 6066813020(93.545%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 53403475
+total bases: 6484900552
+Q20 bases: 6261404623(96.5536%)
+Q30 bases: 5894767709(90.8999%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 106806950
+reads failed due to low quality: 1629670
+reads failed due to too many N: 703226
+reads failed due to too short: 769970
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 48974
+bases trimmed due to adapters: 1621228
+
+Duplication rate: 9.94503%
+
+Insert size peak (evaluated by paired-end reads): 221
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004154_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR28004154_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004154_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR28004154_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 189 seconds
+Read1 before filtering:
+total reads: 35873429
+total bases: 4655702943
+Q20 bases: 4582017531(98.4173%)
+Q30 bases: 4395063379(94.4017%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 35873429
+total bases: 4586562354
+Q20 bases: 4495302343(98.0103%)
+Q30 bases: 4268080774(93.0562%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 21732138
+total bases: 2551650883
+Q20 bases: 2520902295(98.795%)
+Q30 bases: 2436503023(95.4873%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 21732138
+total bases: 2540628856
+Q20 bases: 2496433576(98.2605%)
+Q30 bases: 2384486117(93.8542%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 43464276
+reads failed due to low quality: 34934
+reads failed due to too many N: 2524
+reads failed due to too short: 28245124
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 390168
+bases trimmed due to adapters: 11483560
+
+Duplication rate: 8.28516%
+
+Insert size peak (evaluated by paired-end reads): 138
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR34748663_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR34748663_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR34748663_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR34748663_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 89 seconds
+Read1 before filtering:
+total reads: 44212795
+total bases: 6390635294
+Q20 bases: 6281415811(98.2909%)
+Q30 bases: 6001305564(93.9078%)
+Q40 bases: 0(0%)
+
+Read2 before filtering:
+total reads: 44212795
+total bases: 6309248470
+Q20 bases: 6171471665(97.8163%)
+Q30 bases: 5826856476(92.3542%)
+Q40 bases: 0(0%)
+
+Read1 after filtering:
+total reads: 39281904
+total bases: 4738030628
+Q20 bases: 4674662696(98.6626%)
+Q30 bases: 4501777982(95.0137%)
+Q40 bases: 0(0%)
+
+Read2 after filtering:
+total reads: 39281904
+total bases: 4723904433
+Q20 bases: 4638702445(98.1964%)
+Q30 bases: 4417015044(93.5035%)
+Q40 bases: 0(0%)
+
+Filtering result:
+reads passed filter: 78563808
+reads failed due to low quality: 36650
+reads failed due to too many N: 438024
+reads failed due to too short: 9387108
+reads failed due to adapter dimer: 0
+reads with adapter trimmed: 289674
+bases trimmed due to adapters: 10804875
+
+Duplication rate: 6.27909%
+
+Insert size peak (evaluated by paired-end reads): 195
+
+JSON report: /dev/null
+HTML report: /dev/null
+
+fastp --in1 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR34748664_1.fastq --in2 /sciclone/home/iadanforth/scr10/data/kbrevis/raw/SRR34748664_2.fastq --out1 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR34748664_1_TRIMMED.fastq --out2 /sciclone/home/iadanforth/scr10/data/kbrevis/trim/SRR34748664_2_TRIMMED.fastq --trim_front1 8 --trim_front2 8 --trim_tail1 20 --trim_tail2 20 --n_base_limit 0 --length_required 100 --average_qual 20 --json /dev/null --html /dev/null 
+fastp v1.3.7, time used: 139 seconds

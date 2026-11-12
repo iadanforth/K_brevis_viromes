@@ -3,9 +3,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
-READ_DIR="$HOME/scr10/data/kbrevis/corrected"
-OUT_DIR="$HOME/K_brevis_viromes/output/contigs"
+READ_DIR="$HOME/scr10/data/kbrevis/clean"
+OUT_DIR="$HOME/scr10/data/kbrevis/contigs"
 SLURM_SCRIPT="$SCRIPT_DIR/05_metaspades.slurm"
+
 
 [[ -d "$READ_DIR" ]] || {
     echo "Corrected read directory not found: $READ_DIR" >&2
@@ -21,7 +22,6 @@ mkdir -p "$OUT_DIR" "$REPO_DIR/logs"
 shopt -s nullglob
 R1_FILES=(
     "$READ_DIR"/*_1_*.fastq
-    "$READ_DIR"/*_1.fastq
 )
 
 ((${#R1_FILES[@]} > 0)) || {
@@ -32,15 +32,10 @@ R1_FILES=(
 for R1 in "${R1_FILES[@]}"; do
     case "$R1" in
         *_1_*.fastq)
-            R2="${R1/_1_/_2_}"
             FILE_NAME="${R1##*/}"
             NAME="${FILE_NAME%_1_*}"
-            ;;
-        *_1.fastq)
-            R2="${R1%_1.fastq}_2.fastq"
-            FILE_NAME="${R1##*/}"
-            NAME="${FILE_NAME%_1.fastq}"
-            ;;
+            SUFFIX="${FILE_NAME#"$NAME"_1_}"
+            R2="$READ_DIR/${NAME}_2_${SUFFIX}"
     esac
 
     [[ -s "$R1" ]] || {

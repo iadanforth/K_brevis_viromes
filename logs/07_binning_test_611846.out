@@ -1,0 +1,6 @@
+[SRR28004137] mapping reads to contigs
+[SRR28004137] calculating contig depths
+[SRR28004137] binning
+MetaBAT 2 (v2.12.1) using minContig 2500, minCV 1.0, minCVSum 1.0, maxP 95%, minS 60, and maxEdges 200. 
+4 bins (3558892 bases in total) formed.
+[SRR28004137] produced 4 bins

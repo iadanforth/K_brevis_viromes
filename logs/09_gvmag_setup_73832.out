@@ -1,0 +1,911 @@
+[setup] creating gvmag-bin-env from envs/gvmag-bin-env.yml
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate gvmag-bin-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[setup] creating gvmag-checkv-env from envs/gvmag-checkv-env.yml
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working...  
+For Linux 64, Open MPI is built with CUDA awareness but this support is disabled by default.
+To enable it, please set the environment variable OMPI_MCA_opal_cuda_support=true before
+launching your MPI processes. Equivalently, you can set the MCA parameter in the command line:
+mpiexec --mca opal_cuda_support 1 ...
+ 
+In addition, the UCX support is also built but disabled by default.
+To enable it, first install UCX (conda install -c conda-forge ucx). Then, set the environment
+variables OMPI_MCA_pml="ucx" OMPI_MCA_osc="ucx" before launching your MPI processes.
+Equivalently, you can set the MCA parameters in the command line:
+mpiexec --mca pml ucx --mca osc ucx ...
+Note that you might also need to set UCX_MEMTYPE_CACHE=n for CUDA awareness via UCX.
+Please consult UCX's documentation for detail.
+ 
+
+
+     CheckV v0.9.0 an external database which needs to be downloaded
+     and unarchived. The link for the database can be found in CheckV's
+     instructions at https://bitbucket.org/berkeleylab/checkv/
+
+
+
+done
+#
+# To activate this environment, use
+#
+#     $ conda activate gvmag-checkv-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[setup] creating genomad-env from envs/genomad-env.yml
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate genomad-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[setup] creating aniclustermap-env from envs/aniclustermap-env.yml
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate aniclustermap-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[setup] installing pixi
+This script will automatically download and install Pixi (latest) for you.
+Getting it from this url: https://github.com/prefix-dev/pixi/releases/latest/download/pixi-x86_64-unknown-linux-musl.tar.gz
+The 'pixi' binary is installed into '/sciclone/home/iadanforth/data10/programs/pixi/bin'
+Sending an anonymous installation ping to prefix.dev (version, OS, arch). Set PIXI_NO_TELEMETRY=1 or DO_NOT_TRACK=1 to opt out. See https://pixi.sh/latest/reference/telemetry/
+No path update because PIXI_NO_PATH_UPDATE is set
+pixi 0.84.2
+[setup] cloning GVClass v1.1.1
+resources/.dir_bash_history
+resources/gvclassSeptember25_labels.tsv
+resources/database/
+resources/database/faa/
+resources/database/faa/COG0103.faa
+resources/database/faa/COG0164.faa
+resources/database/faa/genomad001596.faa
+resources/database/faa/OG5703.faa
+resources/database/faa/OG6818.faa
+resources/database/faa/OG1363.faa
+resources/database/faa/OG2086.faa
+resources/database/faa/OG4974.faa
+resources/database/faa/1220881at2759.faa
+resources/database/faa/OG6734.faa
+resources/database/faa/COG0092.faa
+resources/database/faa/OG4703.faa
+resources/database/faa/genomad000023.faa
+resources/database/faa/OG7182.faa
+resources/database/faa/COG0200.faa
+resources/database/faa/COG0052.faa
+resources/database/faa/OG15424.faa
+resources/database/faa/OG1684.faa
+resources/database/faa/OG5478.faa
+resources/database/faa/543764at2759.faa
+resources/database/faa/OG8441.faa
+resources/database/faa/OG3600.faa
+resources/database/faa/OG8330.faa
+resources/database/faa/OG3465.faa
+resources/database/faa/OG6246.faa
+resources/database/faa/OG6733.faa
+resources/database/faa/COG0086.faa
+resources/database/faa/OG5517.faa
+resources/database/faa/OG32.faa
+resources/database/faa/OG7121.faa
+resources/database/faa/OG1180.faa
+resources/database/faa/OG7507.faa
+resources/database/faa/OG345.faa
+resources/database/faa/OG270.faa
+resources/database/faa/OG8506.faa
+resources/database/faa/COG0198.faa
+resources/database/faa/OG7108.faa
+resources/database/faa/OG39.faa
+resources/database/faa/OG5421.faa
+resources/database/faa/OG10161.faa
+resources/database/faa/OG6396.faa
+resources/database/faa/OG495.faa
+resources/database/faa/OG7143.faa
+resources/database/faa/OG6248.faa
+resources/database/faa/OG1683.faa
+resources/database/faa/OG2428.faa
+resources/database/faa/OG6832.faa
+resources/database/faa/OG937.faa
+resources/database/faa/OG426.faa
+resources/database/faa/OG28799.faa
+resources/database/faa/COG0541.faa
+resources/database/faa/OG469.faa
+resources/database/faa/OG500.faa
+resources/database/faa/gamadvirusMCP.faa
+resources/database/faa/1346165at2759.faa
+resources/database/faa/OG3084.faa
+resources/database/faa/OG3725.faa
+resources/database/faa/COG0186.faa
+resources/database/faa/OG806.faa
+resources/database/faa/OG6558.faa
+resources/database/faa/GVOGm0022.faa
+resources/database/faa/OG15.faa
+resources/database/faa/OG68.faa
+resources/database/faa/genomad090963.faa
+resources/database/faa/OG28776.faa
+resources/database/faa/OG375.faa
+resources/database/faa/OG714.faa
+resources/database/faa/OG1935.faa
+resources/database/faa/OG800.faa
+resources/database/faa/OG3754.faa
+resources/database/faa/OG440.faa
+resources/database/faa/COG0087.faa
+resources/database/faa/OG1395.faa
+resources/database/faa/OG5414.faa
+resources/database/faa/OG1357.faa
+resources/database/faa/OG1242.faa
+resources/database/faa/genomad016854.faa
+resources/database/faa/genomad006053.faa
+resources/database/faa/OG911.faa
+resources/database/faa/OG4641.faa
+resources/database/faa/OG834.faa
+resources/database/faa/OG402.faa
+resources/database/faa/OG6674.faa
+resources/database/faa/320059at2759.faa
+resources/database/faa/OG29081.faa
+resources/database/faa/COG0096.faa
+resources/database/faa/OG3.faa
+resources/database/faa/OG2156.faa
+resources/database/faa/1430056at2759.faa
+resources/database/faa/OG8000.faa
+resources/database/faa/OG1865.faa
+resources/database/faa/OG7864.faa
+resources/database/faa/OG9514.faa
+resources/database/faa/OG9233.faa
+resources/database/faa/COG0504.faa
+resources/database/faa/OG44.faa
+resources/database/faa/OG23.faa
+resources/database/faa/OG10020.faa
+resources/database/faa/OG6389.faa
+resources/database/faa/OG1674.faa
+resources/database/faa/OG10137.faa
+resources/database/faa/OG6848.faa
+resources/database/faa/COG0016.faa
+resources/database/faa/OG5023.faa
+resources/database/faa/OG7.faa
+resources/database/faa/OG5947.faa
+resources/database/faa/OG303.faa
+resources/database/faa/OG235.faa
+resources/database/faa/OG809.faa
+resources/database/faa/OG8545.faa
+resources/database/faa/OG1537.faa
+resources/database/faa/COG0185.faa
+resources/database/faa/1157302at2759.faa
+resources/database/faa/COG0090.faa
+resources/database/faa/625387at2759.faa
+resources/database/faa/OG3848.faa
+resources/database/faa/genomad051630.faa
+resources/database/faa/OG11191.faa
+resources/database/faa/OG965.faa
+resources/database/faa/OG1552.faa
+resources/database/faa/OG4124.faa
+resources/database/faa/OG15456.faa
+resources/database/faa/OG1772.faa
+resources/database/faa/OG5208.faa
+resources/database/faa/COG0081.faa
+resources/database/faa/OG7107.faa
+resources/database/faa/OG5115.faa
+resources/database/faa/OG3908.faa
+resources/database/faa/OG10355.faa
+resources/database/faa/OG1710.faa
+resources/database/faa/COG0255.faa
+resources/database/faa/OG1831.faa
+resources/database/faa/OG8245.faa
+resources/database/faa/OG6685.faa
+resources/database/faa/1032689at2759.faa
+resources/database/faa/OG2041.faa
+resources/database/faa/OG59.faa
+resources/database/faa/OG5821.faa
+resources/database/faa/OG38.faa
+resources/database/faa/OG239.faa
+resources/database/faa/OG4001.faa
+resources/database/faa/834694at2759.faa
+resources/database/faa/OG267.faa
+resources/database/faa/OG7177.faa
+resources/database/faa/GVOGm0003.faa
+resources/database/faa/OG3719.faa
+resources/database/faa/OG191.faa
+resources/database/faa/OG1477.faa
+resources/database/faa/OG5198.faa
+resources/database/faa/OG6948.faa
+resources/database/faa/GVOGm0013.faa
+resources/database/faa/OG6795.faa
+resources/database/faa/OG81.faa
+resources/database/faa/OG5937.faa
+resources/database/faa/1079827at2759.faa
+resources/database/faa/OG7462.faa
+resources/database/faa/OG365.faa
+resources/database/faa/OG14.faa
+resources/database/faa/OG1050.faa
+resources/database/faa/OG9172.faa
+resources/database/faa/OG183.faa
+resources/database/faa/OG6024.faa
+resources/database/faa/OG920.faa
+resources/database/faa/1567796at2759.faa
+resources/database/faa/OG209.faa
+resources/database/faa/VLTF2.faa
+resources/database/faa/OG1026.faa
+resources/database/faa/OG310.faa
+resources/database/faa/GVOGm0760.faa
+resources/database/faa/OG7481.faa
+resources/database/faa/OG7113.faa
+resources/database/faa/OG7235.faa
+resources/database/faa/OG5761.faa
+resources/database/faa/OG5860.faa
+resources/database/faa/COG0097.faa
+resources/database/faa/OG7532.faa
+resources/database/faa/OG7106.faa
+resources/database/faa/OG10034.faa
+resources/database/faa/OG1164.faa
+resources/database/faa/OG48359.faa
+resources/database/faa/OG2166.faa
+resources/database/faa/1576404at2759.faa
+resources/database/faa/OG412.faa
+resources/database/faa/OG6481.faa
+resources/database/faa/OG541.faa
+resources/database/faa/OG884.faa
+resources/database/faa/OG6907.faa
+resources/database/faa/1200489at2759.faa
+resources/database/faa/OG2155.faa
+resources/database/faa/OG206.faa
+resources/database/faa/OG4799.faa
+resources/database/faa/OG197.faa
+resources/database/faa/OG5942.faa
+resources/database/faa/OG34261.faa
+resources/database/faa/OG5945.faa
+resources/database/faa/1348942at2759.faa
+resources/database/faa/OG43.faa
+resources/database/faa/OG22.faa
+resources/database/faa/OG19209.faa
+resources/database/faa/1106766at2759.faa
+resources/database/faa/1645187at2759.faa
+resources/database/faa/OG10924.faa
+resources/database/faa/OG1860.faa
+resources/database/faa/OG14872.faa
+resources/database/faa/OG29.faa
+resources/database/faa/OG22794.faa
+resources/database/faa/OG1813.faa
+resources/database/faa/OG7125.faa
+resources/database/faa/OG1590.faa
+resources/database/faa/OG9005.faa
+resources/database/faa/OG25858.faa
+resources/database/faa/OG2068.faa
+resources/database/faa/OG29302.faa
+resources/database/faa/OG746.faa
+resources/database/faa/OG7123.faa
+resources/database/faa/COG0048.faa
+resources/database/faa/OG1758.faa
+resources/database/faa/OG2111.faa
+resources/database/faa/OG1098.faa
+resources/database/faa/OG7186.faa
+resources/database/faa/GVOGm0054.faa
+resources/database/faa/OG769.faa
+resources/database/faa/OG242.faa
+resources/database/faa/OG2243.faa
+resources/database/faa/OG5660.faa
+resources/database/faa/OG503.faa
+resources/database/faa/OG5951.faa
+resources/database/faa/OG354.faa
+resources/database/faa/OG30.faa
+resources/database/faa/HUHlong.faa
+resources/database/faa/OG7114.faa
+resources/database/faa/OG6204.faa
+resources/database/faa/OG6117.faa
+resources/database/faa/OG37.faa
+resources/database/faa/674160at2759.faa
+resources/database/faa/COG0089.faa
+resources/database/faa/OG287.faa
+resources/database/faa/COG0051.faa
+resources/database/faa/genomad000026.faa
+resources/database/faa/OG7672.faa
+resources/database/faa/OG1269.faa
+resources/database/faa/OG7870.faa
+resources/database/faa/OG876.faa
+resources/database/faa/1275837at2759.faa
+resources/database/faa/OG105.faa
+resources/database/faa/OG8381.faa
+resources/database/faa/OG25871.faa
+resources/database/faa/OG30202.faa
+resources/database/faa/OG28797.faa
+resources/database/faa/genomad029205.faa
+resources/database/faa/OG3842.faa
+resources/database/faa/OG48358.faa
+resources/database/faa/genomad057391.faa
+resources/database/faa/genomad066074.faa
+resources/database/faa/OG25875.faa
+resources/database/faa/OG28795.faa
+resources/database/faa/1161199at2759.faa
+resources/database/faa/genomad000172.faa
+resources/database/faa/736068at2759.faa
+resources/database/faa/OG3538.faa
+resources/database/faa/OG1724.faa
+resources/database/faa/OG8929.faa
+resources/database/faa/OG387.faa
+resources/database/faa/OG785.faa
+resources/database/faa/OG528.faa
+resources/database/faa/GVOGm0890.faa
+resources/database/faa/OG13.faa
+resources/database/faa/1019762at2759.faa
+resources/database/faa/OG389.faa
+resources/database/faa/COG0060.faa
+resources/database/faa/OG1419.faa
+resources/database/faa/OG2030.faa
+resources/database/faa/176625at2759.faa
+resources/database/faa/OG504.faa
+resources/database/faa/974865at2759.faa
+resources/database/faa/OG586.faa
+resources/database/faa/OG1352.faa
+resources/database/faa/OG28796.faa
+resources/database/faa/OG1063.faa
+resources/database/faa/OG11118.faa
+resources/database/faa/OG4628.faa
+resources/database/faa/OG1217.faa
+resources/database/faa/OG48357.faa
+resources/database/faa/OG1046.faa
+resources/database/faa/OG9423.faa
+resources/database/faa/OG4821.faa
+resources/database/faa/OG8501.faa
+resources/database/faa/OG348.faa
+resources/database/faa/OG8131.faa
+resources/database/faa/OG28774.faa
+resources/database/faa/OG42.faa
+resources/database/faa/OG2375.faa
+resources/database/faa/OG6276.faa
+resources/database/faa/OG5005.faa
+resources/database/faa/OG5584.faa
+resources/database/faa/1193442at2759.faa
+resources/database/faa/OG1035.faa
+resources/database/faa/OG10163.faa
+resources/database/faa/OG282.faa
+resources/database/faa/OG4640.faa
+resources/database/faa/OG28.faa
+resources/database/faa/923657at2759.faa
+resources/database/faa/OG6208.faa
+resources/database/faa/1423847at2759.faa
+resources/database/faa/OG2196.faa
+resources/database/faa/OG6872.faa
+resources/database/faa/OG506.faa
+resources/database/faa/OG6702.faa
+resources/database/faa/1322299at2759.faa
+resources/database/faa/1432328at2759.faa
+resources/database/faa/OG2006.faa
+resources/database/faa/OG325.faa
+resources/database/faa/582756at2759.faa
+resources/database/faa/OG15303.faa
+resources/database/faa/OG7353.faa
+resources/database/faa/OG15632.faa
+resources/database/faa/COG0202.faa
+resources/database/faa/1309031at2759.faa
+resources/database/faa/OG419.faa
+resources/database/faa/OG8481.faa
+resources/database/faa/OG462.faa
+resources/database/faa/OG238.faa
+resources/database/faa/OG6008.faa
+resources/database/faa/OG10083.faa
+resources/database/faa/OG2284.faa
+resources/database/faa/OG1616.faa
+resources/database/faa/OG1490.faa
+resources/database/faa/OG6804.faa
+resources/database/faa/1038775at2759.faa
+resources/database/faa/COG0197.faa
+resources/database/faa/OG6151.faa
+resources/database/faa/OG1091.faa
+resources/database/faa/COG0130.faa
+resources/database/faa/OG9378.faa
+resources/database/faa/COG0519.faa
+resources/database/faa/OG57.faa
+resources/database/faa/OG36.faa
+resources/database/faa/COG0193.faa
+resources/database/faa/OG784.faa
+resources/database/faa/OG7868.faa
+resources/database/faa/OG23491.faa
+resources/database/faa/1434266at2759.faa
+resources/database/faa/OG3060.faa
+resources/database/faa/OG9061.faa
+resources/database/faa/OG3373.faa
+resources/database/faa/OG612.faa
+resources/database/faa/OG15192.faa
+resources/database/faa/OG16493.faa
+resources/database/faa/1194691at2759.faa
+resources/database/faa/OG7279.faa
+resources/database/faa/OG2291.faa
+resources/database/faa/OG1676.faa
+resources/database/faa/OG9007.faa
+resources/database/faa/OG28798.faa
+resources/database/faa/OG5299.faa
+resources/database/faa/OG1204.faa
+resources/database/faa/OG4281.faa
+resources/database/faa/OG857.faa
+resources/database/faa/OG938.faa
+resources/database/faa/OG1804.faa
+resources/database/faa/OG5943.faa
+resources/database/faa/OG4379.faa
+resources/database/faa/OG6383.faa
+resources/database/faa/869548at2759.faa
+resources/database/faa/OG25874.faa
+resources/database/faa/OG7105.faa
+resources/database/faa/OG1232.faa
+resources/database/faa/OG3859.faa
+resources/database/faa/OG4599.faa
+resources/database/faa/OG6114.faa
+resources/database/faa/OG12.faa
+resources/database/faa/OG787.faa
+resources/database/faa/COG0091.faa
+resources/database/faa/OG5935.faa
+resources/database/faa/OG9559.faa
+resources/database/faa/1090038at2759.faa
+resources/database/faa/OG7206.faa
+resources/database/faa/OG1421.faa
+resources/database/faa/OG25870.faa
+resources/database/faa/OG5958.faa
+resources/database/faa/OG912.faa
+resources/database/faa/COG0691.faa
+resources/database/faa/OG19.faa
+resources/database/faa/OG7510.faa
+resources/database/faa/976469at2759.faa
+resources/database/faa/COG0495.faa
+resources/database/faa/OG7802.faa
+resources/database/faa/OG1942.faa
+resources/database/faa/OG8025.faa
+resources/database/faa/OG415.faa
+resources/database/faa/OG1249.faa
+resources/database/faa/1504863at2759.faa
+resources/database/faa/OG1190.faa
+resources/database/faa/COG0088.faa
+resources/database/faa/OG7111.faa
+resources/database/faa/OG704.faa
+resources/database/faa/OG2924.faa
+resources/database/faa/OG25876.faa
+resources/database/faa/OG6.faa
+resources/database/faa/OG41908.faa
+resources/database/faa/OG417.faa
+resources/database/faa/OG8461.faa
+resources/database/faa/OG169.faa
+resources/database/faa/OG4797.faa
+resources/database/faa/1338131at2759.faa
+resources/database/faa/OG4458.faa
+resources/database/faa/OG6225.faa
+resources/database/faa/OG186.faa
+resources/database/faa/OG6881.faa
+resources/database/faa/OG3490.faa
+resources/database/faa/OG1426.faa
+resources/database/faa/OG41.faa
+resources/database/faa/OG6129.faa
+resources/database/faa/genomad008072.faa
+resources/database/faa/OG918.faa
+resources/database/faa/OG276.faa
+resources/database/faa/OG25872.faa
+resources/database/faa/COG0093.faa
+resources/database/faa/COG0049.faa
+resources/database/faa/OG3587.faa
+resources/database/faa/OG27.faa
+resources/database/faa/OG6833.faa
+resources/database/faa/OG5401.faa
+resources/database/faa/COG0018.faa
+resources/database/faa/OG9366.faa
+resources/database/faa/OG6584.faa
+resources/database/faa/OG4207.faa
+resources/database/faa/genomad000217.faa
+resources/database/faa/COG0533.faa
+resources/database/faa/OG11679.faa
+resources/database/faa/OG36377.faa
+resources/database/faa/OG8577.faa
+resources/database/faa/OG482.faa
+resources/database/faa/OG925.faa
+resources/database/faa/OG2128.faa
+resources/database/faa/OG10108.faa
+resources/database/faa/OG7103.faa
+resources/database/faa/OG10514.faa
+resources/database/faa/855834at2759.faa
+resources/database/faa/OG1435.faa
+resources/database/faa/OG25873.faa
+resources/database/faa/OG7494.faa
+resources/database/faa/GVOGm0172.faa
+resources/database/faa/OG17810.faa
+resources/database/faa/OG249.faa
+resources/database/faa/OG3596.faa
+resources/database/faa/OG892.faa
+resources/database/faa/COG0100.faa
+resources/database/faa/OG742.faa
+resources/database/faa/OG48360.faa
+resources/database/faa/OG7282.faa
+resources/database/faa/COG0201.faa
+resources/database/faa/OG1094.faa
+resources/database/faa/OG35.faa
+resources/database/faa/OG5966.faa
+resources/database/faa/1178688at2759.faa
+resources/database/faa/OG16992.faa
+resources/database/faa/OG19714.faa
+resources/database/faa/OG314.faa
+resources/database/faa/OG2211.faa
+resources/database/faa/OG8001.faa
+resources/database/faa/OG6520.faa
+resources/database/faa/OG6292.faa
+resources/database/faa/OG657.faa
+resources/database/faa/OG203.faa
+resources/database/faa/OG6813.faa
+resources/database/faa/1291729at2759.faa
+resources/database/faa/OG3263.faa
+resources/database/faa/OG1707.faa
+resources/database/faa/OG1943.faa
+resources/database/faa/OG6796.faa
+resources/database/faa/COG0216.faa
+resources/database/faa/OG436.faa
+resources/database/faa/OG1148.faa
+resources/database/faa/OG5155.faa
+resources/database/faa/OG6704.faa
+resources/database/faa/OG7138.faa
+resources/database/faa/OG945.faa
+resources/database/faa/OG421.faa
+resources/database/faa/OG14026.faa
+resources/database/faa/genomad020215.faa
+resources/database/faa/OG21616.faa
+resources/database/faa/OG2350.faa
+resources/database/faa/OG5658.faa
+resources/database/faa/1079130at2759.faa
+resources/database/faa/COG0343.faa
+resources/database/faa/OG6173.faa
+resources/database/faa/1382842at2759.faa
+resources/database/faa/OG8057.faa
+resources/database/faa/genomad000979.faa
+resources/database/faa/OG11.faa
+resources/database/faa/OG114.faa
+resources/database/faa/OG875.faa
+resources/database/faa/OG9688.faa
+resources/database/faa/GVOGm0461.faa
+resources/database/faa/OG376.faa
+resources/database/faa/OG201.faa
+resources/database/faa/OG658.faa
+resources/database/faa/OG6330.faa
+resources/database/faa/1249159at2759.faa
+resources/database/faa/OG516.faa
+resources/database/faa/OG18.faa
+resources/database/faa/OG8558.faa
+resources/database/faa/OG736.faa
+resources/database/faa/OG347.faa
+resources/database/faa/OG7065.faa
+resources/database/faa/GVOGm0023.faa
+resources/database/faa/1197019at2759.faa
+resources/database/faa/1552706at2759.faa
+resources/database/faa/genomad020681.faa
+resources/database/faa/OG2708.faa
+resources/database/faa/OG5938.faa
+resources/database/faa/383503at2759.faa
+resources/database/faa/OG8482.faa
+resources/database/faa/OG1859.faa
+resources/database/faa/OG6785.faa
+resources/database/faa/OG1608.faa
+resources/database/faa/COG0102.faa
+resources/database/faa/OG5283.faa
+resources/database/faa/OG904.faa
+resources/database/faa/OG1617.faa
+resources/database/faa/OG6034.faa
+resources/database/faa/734666at2759.faa
+resources/database/faa/OG7832.faa
+resources/database/faa/OG5311.faa
+resources/database/faa/OG40.faa
+resources/database/faa/OG955.faa
+resources/database/faa/genomad132751.faa
+resources/database/faa/OG1821.faa
+resources/database/faa/OG6740.faa
+resources/database/faa/COG0072.faa
+resources/database/faa/OG26.faa
+resources/database/faa/OG762.faa
+resources/database/faa/OG7112.faa
+resources/database/faa/OG975.faa
+resources/database/faa/OG19441.faa
+resources/database/faa/OG385.faa
+resources/database/faa/OG5776.faa
+resources/database/faa/OG484.faa
+resources/database/faa/OG6015.faa
+resources/database/faa/OG1515.faa
+resources/database/faa/genomad000616.faa
+resources/database/faa/OG1810.faa
+resources/database/faa/OG245.faa
+resources/database/faa/OG6099.faa
+resources/database/faa/OG5095.faa
+resources/database/faa/OG5160.faa
+resources/database/faa/OG7528.faa
+resources/database/faa/OG5931.faa
+resources/database/faa/1380409at2759.faa
+resources/database/faa/OG1688.faa
+resources/database/faa/OG6794.faa
+resources/database/faa/OG9427.faa
+resources/database/faa/OG5946.faa
+resources/database/faa/777920at2759.faa
+resources/database/faa/257318at2759.faa
+resources/database/faa/OG527.faa
+resources/database/faa/OG771.faa
+resources/database/faa/OG5952.faa
+resources/database/faa/OG25877.faa
+resources/database/faa/426305at2759.faa
+resources/database/faa/OG5312.faa
+resources/database/faa/OG18995.faa
+resources/database/faa/OG55163.faa
+resources/database/faa/OG237.faa
+resources/database/faa/OG5828.faa
+resources/database/faa/OG4174.faa
+resources/database/faa/OG8.faa
+resources/database/faa/COG0098.faa
+resources/database/faa/OG19461.faa
+resources/database/faa/OG17782.faa
+resources/database/faa/OG11371.faa
+resources/database/faa/OG118.faa
+resources/database/faa/OG299.faa
+resources/database/faa/OG34.faa
+resources/database/faa/692986at2759.faa
+resources/database/faa/OG17864.faa
+resources/database/faa/OG5980.faa
+resources/database/faa/1260807at2759.faa
+resources/database/faa/OG3976.faa
+resources/database/faa/OG1891.faa
+resources/database/faa/OG786.faa
+resources/database/faa/OG2843.faa
+resources/database/faa/OG5423.faa
+resources/database/faa/OG1864.faa
+resources/database/faa/OG475.faa
+resources/database/faa/COG0080.faa
+resources/database/faa/1588798at2759.faa
+resources/database/faa/OG6258.faa
+resources/database/faa/OG774.faa
+resources/database/faa/OG5563.faa
+resources/database/faa/OG6142.faa
+resources/database/faa/1003258at2759.faa
+resources/database/faa/OG28775.faa
+resources/database/faa/OG1614.faa
+resources/database/faa/1284731at2759.faa
+resources/database/faa/OG5995.faa
+resources/database/faa/OG2404.faa
+resources/database/faa/COG0099.faa
+resources/database/faa/OG10.faa
+resources/database/faa/OG5965.faa
+resources/database/faa/1111142at2759.faa
+resources/database/faa/COG0127.faa
+resources/database/faa/OG41909.faa
+resources/database/faa/OG901.faa
+resources/database/faa/VLTF3.faa
+resources/database/faa/OG4118.faa
+resources/database/faa/OG17.faa
+resources/database/faa/OG2922.faa
+resources/database/faa/OG1407.faa
+resources/database/faa/OG379.faa
+resources/database/faa/1488436at2759.faa
+resources/database/faa/OG1305.faa
+resources/database/faa/OG5944.faa
+resources/database/faa/OG7754.faa
+resources/database/faa/OG295.faa
+resources/database/faa/OG1645.faa
+resources/database/faa/OG5880.faa
+resources/database/faa/OG28794.faa
+resources/database/faa/OG6799.faa
+resources/database/faa/OG3700.faa
+resources/database/faa/OG9385.faa
+resources/database/faa/OG4615.faa
+resources/database/faa/COG0013.faa
+resources/database/faa/OG5939.faa
+resources/database/faa/COG0172.faa
+resources/database/faa/OG667.faa
+resources/database/faa/OG5977.faa
+resources/database/faa/HUH.faa
+resources/database/faa/OG19400.faa
+resources/database/faa/OG25.faa
+resources/database/faa/COG0085.faa
+resources/database/faa/OG10505.faa
+resources/database/faa/COG0481.faa
+resources/database/faa/OG959.faa
+resources/database/faa/OG122.faa
+resources/database/faa/OG832.faa
+resources/database/faa/OG7658.faa
+resources/database/faa/1617752at2759.faa
+resources/database/faa/OG2081.faa
+resources/database/faa/1455730at2759.faa
+resources/database/faa/OG6097.faa
+resources/database/faa/genomad000254.faa
+resources/database/faa/OG542.faa
+resources/database/faa/COG0858.faa
+resources/database/faa/OG989.faa
+resources/database/faa/1222562at2759.faa
+resources/database/faa/1236198at2759.faa
+resources/database/faa/OG7110.faa
+resources/database/faa/OG1780.faa
+resources/database/faa/OG581.faa
+resources/database/faa/OG526.faa
+resources/database/faa/COG0256.faa
+resources/database/faa/OG7460.faa
+resources/database/faa/OG7455.faa
+resources/database/faa/OG1920.faa
+resources/database/faa/OG5873.faa
+resources/database/faa/OG1197.faa
+resources/database/faa/OG1055.faa
+resources/database/faa/OG5907.faa
+resources/database/faa/OG4899.faa
+resources/database/faa/OG6000.faa
+resources/database/faa/COG0233.faa
+resources/database/faa/296129at2759.faa
+resources/database/faa/OG3696.faa
+resources/database/faa/939345at2759.faa
+resources/database/faa/OG15718.faa
+resources/database/faa/OG33.faa
+resources/database/faa/OG7176.faa
+resources/database/faa/OG6561.faa
+resources/database/faa/OG5950.faa
+resources/database/faa/OG12902.faa
+resources/database/faa/OG9392.faa
+resources/database/faa/OG6380.faa
+resources/database/faa/OG7614.faa
+resources/database/faa/OG1983.faa
+resources/database/faa/OG1.faa
+resources/database/faa/COG0244.faa
+resources/database/faa/OG7743.faa
+resources/database/faa/OG9596.faa
+resources/database/faa/OG825.faa
+resources/database/faa/OG634.faa
+resources/database/faa/OG4201.faa
+resources/database/faa/OG27147.faa
+resources/database/faa/OG5954.faa
+resources/database/faa/OG1340.faa
+resources/database/faa/OG1086.faa
+resources/database/faa/1346432at2759.faa
+resources/database/faa/OG25878.faa
+resources/database/faa/OG130.faa
+resources/database/faa/OG2527.faa
+resources/database/faa/OG489.faa
+resources/database/faa/OG2605.faa
+resources/database/faa/OG16301.faa
+resources/database/faa/OG7109.faa
+resources/database/faa/ATPase.faa
+resources/database/faa/OG6684.faa
+resources/database/faa/OG8498.faa
+resources/database/faa/OG83.faa
+resources/database/faa/OG960.faa
+resources/database/faa/OG3477.faa
+resources/database/faa/OG5.faa
+resources/database/faa/OG15866.faa
+resources/database/faa/OG757.faa
+resources/database/faa/OG1626.faa
+resources/database/faa/OG5956.faa
+resources/database/faa/OG16.faa
+resources/database/faa/OG312.faa
+resources/database/faa/OG2003.faa
+resources/database/faa/OG5940.faa
+resources/database/faa/COG0094.faa
+resources/database/faa/OG5849.faa
+resources/database/faa/1057950at2759.faa
+resources/database/faa/OG8730.faa
+resources/database/faa/OG9.faa
+resources/database/faa/OG8768.faa
+resources/database/faa/genomad001683.faa
+resources/database/faa/OG5941.faa
+resources/database/faa/COG0184.faa
+resources/database/faa/OG448.faa
+resources/database/faa/COG0532.faa
+resources/database/faa/OG6041.faa
+resources/database/faa/OG4547.faa
+resources/database/faa/1623701at2759.faa
+resources/database/faa/OG4181.faa
+resources/database/faa/OG5686.faa
+resources/database/faa/OG372.faa
+resources/database/faa/OG7135.faa
+resources/database/faa/OG45.faa
+resources/database/faa/OG24.faa
+resources/database/faa/OG1657.faa
+resources/database/faa/OG1709.faa
+resources/database/faa/OG2513.faa
+resources/database/faa/OG6760.faa
+resources/database/faa/OG6989.faa
+resources/database/faa/1530008at2759.faa
+resources/models/
+resources/models/combined.hmm
+resources/order_completeness.tab
+resources/marker_stats.tsv
+resources/DB_VERSION
+
+📦 Database not found at resources
+📥 Setting up database...
+✅ Database setup complete!
+
+
+    ╔═════════════════════════════════════════════════════════════╗
+    ║                                                           ║
+    ║  [95m██████╗[0m [95m██╗   ██╗[0m[91m ██████╗[0m[31m██╗[0m      [31m█████╗[0m [38;5;208m███████╗[0m[93m███████╗[0m ║
+    ║ [95m██╔════╝[0m [95m██║   ██║[0m[91m██╔════╝[0m[31m██║[0m     [31m██╔══██╗[0m[38;5;208m██╔════╝[0m[93m██╔════╝[0m ║
+    ║ [95m██║  ███╗[0m[95m██║   ██║[0m[91m██║[0m     [31m██║[0m     [31m███████║[0m[38;5;208m███████╗[0m[93m███████╗[0m ║
+    ║ [95m██║   ██║[0m[95m╚██╗ ██╔╝[0m[91m██║[0m     [31m██║[0m     [31m██╔══██║[0m[38;5;208m╚════██║[0m[93m╚════██║[0m ║
+    ║ [95m╚██████╔╝[0m [95m╚████╔╝[0m [91m╚██████╗[0m[31m███████╗[0m[31m██║  ██║[0m[38;5;208m███████║[0m[93m███████║[0m ║
+    ║  [95m╚═════╝[0m   [95m╚═══╝[0m   [91m╚═════╝[0m[31m╚══════╝[0m[31m╚═╝  ╚═╝[0m[38;5;208m╚══════╝[0m[93m╚══════╝[0m ║
+    ║                                                           ║
+    ║         Giant Virus Classification Tool v1.1.1            ║
+    ║                                                           ║
+    ╚═════════════════════════════════════════════════════════════╝
+
+============================================================
+                    Pipeline Configuration
+============================================================
+Config file: config/gvclass_config.yaml
+Query directory: example
+Output directory: example_results
+Database: resources
+Threads: 8 (Workers: 2 × 4 threads)
+Tree method: fasttree
+Fast mode: True
+Resume mode: DISABLED
+Total queries: 2
+============================================================
+Progress: [  0%] Query 0/2 | Memory: 1MB (peak: 1MB)                            Progress: [  0%] Query 0/2 | Memory: 60MB (peak: 60MB)                          Progress: [  0%] Query 0/2 | Memory: 71MB (peak: 71MB)                          Progress: [  0%] Query 0/2 | Memory: 76MB (peak: 76MB)                          Progress: [  0%] Query 0/2 | Memory: 84MB (peak: 84MB)                          Progress: [  0%] Query 0/2 | Memory: 90MB (peak: 90MB)                          Progress: [  0%] Query 0/2 | Memory: 110MB (peak: 110MB)                        Progress: [  0%] Query 0/2 | Memory: 115MB (peak: 115MB)                        Progress: [  0%] Query 0/2 | Memory: 151MB (peak: 151MB)                        Progress: [  0%] Query 0/2 | Memory: 163MB (peak: 163MB)                        Progress: [  0%] Query 0/2 | Memory: 192MB (peak: 192MB)                        Progress: [  0%] Query 0/2 | Memory: 211MB (peak: 211MB)                        Progress: [  0%] Query 0/2 | Memory: 225MB (peak: 225MB)                        Progress: [  0%] Query 0/2 | Memory: 246MB (peak: 246MB)                        Progress: [  0%] Query 0/2 | Memory: 331MB (peak: 331MB)                        Progress: [  0%] Query 0/2 | Memory: 297MB (peak: 331MB)                        Progress: [  0%] Query 0/2 | Memory: 302MB (peak: 331MB)                        Progress: [  0%] Query 0/2 | Memory: 334MB (peak: 334MB)                        Progress: [  0%] Query 0/2 | Memory: 347MB (peak: 347MB)                        Progress: [  0%] Query 0/2 | Memory: 352MB (peak: 352MB)                        Progress: [  0%] Query 0/2 | Memory: 355MB (peak: 355MB)                        Progress: [  0%] Query 0/2 | Memory: 368MB (peak: 368MB)                        Progress: [  0%] Query 0/2 | Memory: 381MB (peak: 381MB)                        Progress: [  0%] Query 0/2 | Memory: 422MB (peak: 422MB)                        Progress: [  0%] Query 0/2 | Memory: 487MB (peak: 487MB)                        Progress: [  0%] Query 0/2 | Memory: 535MB (peak: 535MB)                        Progress: [  0%] Query 0/2 | Memory: 562MB (peak: 562MB)                        Progress: [  0%] Query 0/2 | Memory: 573MB (peak: 573MB)                        Progress: [  0%] Query 0/2 | Memory: 582MB (peak: 582MB)                        Progress: [  0%] Query 0/2 | Memory: 591MB (peak: 591MB)                        Progress: [  0%] Query 0/2 | Memory: 601MB (peak: 601MB)                        Progress: [  0%] Query 0/2 | Memory: 668MB (peak: 668MB)                        Progress: [  0%] Query 0/2 | Memory: 678MB (peak: 678MB)                        Progress: [  0%] Query 0/2 | Memory: 866MB (peak: 866MB)                        Progress: [  0%] Query 0/2 | Memory: 1057MB (peak: 1057MB)                      Progress: [  0%] Query 0/2 | Memory: 1242MB (peak: 1242MB)                      Progress: [  0%] Query 0/2 | Memory: 1330MB (peak: 1330MB)                      Progress: [  0%] Query 0/2 | Memory: 1692MB (peak: 1692MB)                      Progress: [  0%] Query 0/2 | Memory: 1931MB (peak: 1931MB)                      Progress: [  0%] Query 0/2 | Memory: 2208MB (peak: 2208MB)                      Progress: [  0%] Query 0/2 | Memory: 2306MB (peak: 2306MB)                      Progress: [  0%] Query 0/2 | Memory: 2474MB (peak: 2474MB)                      Progress: [  0%] Query 0/2 | Memory: 2653MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2509MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2343MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2393MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2296MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2306MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2368MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2605MB (peak: 2653MB)                      Progress: [  0%] Query 0/2 | Memory: 2659MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2406MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2197MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2247MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2273MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2260MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2274MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2313MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2343MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2389MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2446MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2529MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2562MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2560MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2573MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2592MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2593MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2597MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2614MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2630MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2615MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2619MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2650MB (peak: 2659MB)                      Progress: [  0%] Query 0/2 | Memory: 2672MB (peak: 2672MB)                      Progress: [  0%] Query 0/2 | Memory: 2665MB (peak: 2672MB)                      Progress: [ 50%] Query 1/2 | Memory: 2666MB (peak: 2672MB)                      Progress: [ 50%] Query 1/2 | Memory: 2647MB (peak: 2672MB)                      Progress: [100%] Query 2/2 | Memory: 2646MB (peak: 2672MB)                      Progress: [100%] Query 2/2 | Memory: 2592MB (peak: 2672MB)                      Progress: [100%] Query 2/2 | Memory: 1651MB (peak: 2672MB)                                                                                                      
+✅ Pipeline completed successfully!
+🔍 Validating pipeline outputs...
+✅ All outputs validated successfully
+📊 Generating combined summary...
+✅ Combined summary written to: example_results/gvclass_summary.tsv
+⏱️  Runtime: 1m 26s
+💾 Peak memory usage: 2672 MB
+📊 Results saved to: example_results
+[setup] CheckV db: /sciclone/home/iadanforth/data10/databases/checkv_db_for_v0.9.0/checkv-db-v1.5
+[12:37:17] Requesting                                                           
+           https://portal.nersc.gov/genomad/__data__/genomad_db_v1.7.tar.gz.    
+
+[12:37:46] Finished downloading genomad_db_v1.7.tar.gz.                         
+[12:37:59] Database extracted to                                                
+           /sciclone/home/iadanforth/data10/databases/genomad_db.               
+[12:38:00] Deleted genomad_db_v1.7.tar.gz.                                      
+[12:38:00] geNomad database (v1.7) is ready to be used!                         
+1.7
+[setup] done

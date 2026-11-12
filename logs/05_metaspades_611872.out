@@ -1,0 +1,207 @@
+[SRR28004142] assembling paired reads
+Command line: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/metaviralspades.py	--only-assembler	-1	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq	-2	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq	-o	/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142	-t	8	-m	120	
+
+System information:
+  SPAdes version: 4.3.0
+  Python version: 3.15.2
+  OS: Linux-5.14.0-687.15.1.el9_8.x86_64-x86_64-with-glibc2.34
+
+Output dir: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142
+Mode: ONLY assembling (without read error correction)
+Debug mode is turned OFF
+
+Dataset parameters:
+  Metagenomic mode
+  Reads:
+    Library number: 1, library type: paired-end
+      orientation: fr
+      left reads: ['/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq']
+      right reads: ['/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq']
+      interlaced reads: not specified
+      single reads: not specified
+      merged reads: not specified
+Assembly parameters:
+  k: automatic selection based on read length
+  Extrachromosomal mode is turned ON
+  Repeat resolution is enabled
+  Mismatch careful mode is turned OFF
+  MismatchCorrector will be SKIPPED
+  Coverage cutoff is turned OFF
+  Assembly graph output will use GFA v1.2 format
+Other parameters:
+  Dir for temp files: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/tmp
+  Threads: 8
+  Memory limit (in Gb): 120
+
+
+======= SPAdes pipeline started. Log can be found here: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/spades.log
+
+/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq: max reads length: 122
+/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq: max reads length: 122
+
+Reads length: 122
+
+Default k-mer sizes were set to [21, 33, 55, 77] because estimated read length (122) is less than 150
+
+===== Before start started. 
+
+
+===== Assembling started. 
+
+
+===== K21 started. 
+
+
+== Running: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/spades-core /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/config.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/mda_mode.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/meta_mode.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/plasmid_mode.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/metaviral_mode.info
+
+  0:00:00.000     1M / 22M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/config.info"
+  0:00:00.000     1M / 22M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/mda_mode.info"
+  0:00:00.000     1M / 22M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/meta_mode.info"
+  0:00:00.000     1M / 22M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/plasmid_mode.info"
+  0:00:00.000     1M / 22M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/metaviral_mode.info"
+  0:00:00.000     1M / 22M   INFO    General                 (memory_limit.cpp          :  55)   Memory limit set to 120 Gb
+  0:00:00.016     1M / 22M   INFO    General                 (main.cpp                  : 102)   Starting SPAdes, built from N/A, git revision N/A
+  0:00:00.016     1M / 22M   INFO    General                 (main.cpp                  : 103)   Maximum k-mer length: 128
+  0:00:00.016     1M / 22M   INFO    General                 (main.cpp                  : 104)   Assembling dataset ("/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/dataset.info") with K=21
+  0:00:00.016     1M / 22M   INFO    General                 (main.cpp                  : 105)   Maximum # of threads to use (adjusted due to OMP capabilities): 8
+  0:00:00.016     1M / 22M   INFO    General                 (pipeline.cpp              : 221)   SPAdes started
+  0:00:00.016     1M / 22M   INFO    General                 (pipeline.cpp              : 234)   Starting from stage: read_conversion
+  0:00:00.016     1M / 22M   INFO    General                 (pipeline.cpp              : 245)   Two-step repeat resolution disabled
+  0:00:00.021     1M / 22M   INFO   GraphCore                (graph_core.hpp            : 582)   Graph created, vertex min_id: 3, edge min_id: 3
+  0:00:00.021     1M / 22M   INFO   GraphCore                (graph_core.hpp            : 583)   Vertex size: 48, edge size: 40
+  0:00:00.037     1M / 22M   INFO    General                 (edge_index.hpp            : 132)   Size of edge index entries: 12/8
+  0:00:00.040     1M / 22M   INFO   StageManager             (stage.cpp                 : 210)   STAGE == Binary Read Conversion (id: read_conversion)
+  0:00:00.043     1M / 22M   INFO    General                 (read_converter.cpp        :  78)   Converting reads to binary format for library #0 (takes a while)
+  0:00:00.043     1M / 22M   INFO    General                 (read_converter.cpp        :  99)   Converting paired reads
+  0:00:00.322    81M / 118M  INFO    General                 (binary_converter.cpp      : 127)   16384 reads processed
+  0:00:00.332    81M / 124M  INFO    General                 (binary_converter.cpp      : 127)   32768 reads processed
+  0:00:00.352    81M / 132M  INFO    General                 (binary_converter.cpp      : 127)   65536 reads processed
+  0:00:00.531    81M / 166M  INFO    General                 (binary_converter.cpp      : 127)   131072 reads processed
+  0:00:00.864    56M / 198M  INFO    General                 (binary_converter.cpp      : 127)   262144 reads processed
+  0:00:01.500     0M / 238M  INFO    General                 (binary_converter.cpp      : 127)   524288 reads processed
+  0:00:02.866     0M / 286M  INFO    General                 (binary_converter.cpp      : 127)   1048576 reads processed
+  0:00:05.169     0M / 371M  INFO    General                 (binary_converter.cpp      : 127)   2097152 reads processed
+  0:00:10.059     0M / 389M  INFO    General                 (binary_converter.cpp      : 127)   4194304 reads processed
+  0:00:19.531     0M / 436M  INFO    General                 (binary_converter.cpp      : 127)   8388608 reads processed
+  0:00:39.778     0M / 503M  INFO    General                 (binary_converter.cpp      : 127)   16777216 reads processed
+  0:01:20.215     0M / 503M  INFO    General                 (binary_converter.cpp      : 127)   33554432 reads processed
+  0:02:41.039     0M / 575M  INFO    General                 (binary_converter.cpp      : 127)   67108864 reads processed
+  0:05:26.332     0M / 604M  INFO    General                 (binary_converter.cpp      : 127)   134217728 reads processed
+  0:11:00.670     0M / 604M  INFO    General                 (binary_converter.cpp      : 127)   268435456 reads processed
+  0:20:42.832     0M / 604M  INFO    General                 (binary_converter.cpp      : 143)   499373113 reads written
+  0:20:42.840     0M / 604M  INFO    General                 (read_converter.cpp        : 113)   Converting single reads
+  0:20:42.888     0M / 604M  INFO    General                 (binary_converter.cpp      : 143)   0 reads written
+  0:20:42.888     0M / 604M  INFO    General                 (read_converter.cpp        : 119)   Converting merged reads
+  0:20:42.894     0M / 604M  INFO    General                 (binary_converter.cpp      : 143)   0 reads written
+  0:20:43.914     1M / 604M  INFO   StageManager             (stage.cpp                 : 210)   STAGE == de Bruijn graph construction (id: construction)
+  0:20:45.966     1M / 604M  INFO    General                 (construction.cpp          : 150)   Max read length 122
+  0:20:45.968     1M / 604M  INFO    General                 (construction.cpp          : 156)   Average read length 121.961
+  0:20:45.972     1M / 604M  INFO    General                 (stage.cpp                 : 120)   PROCEDURE == k+1-mer counting (id: construction:kpomer_counting)
+  0:20:45.975     1M / 604M  INFO    General                 (kmer_index_builder.hpp    : 308)   Splitting kmer instances into 80 files using 8 threads. This might take a while.
+  0:20:46.145     1M / 604M  INFO    General                 (file_limit.hpp            :  43)   Open file limit set to 1024
+  0:20:46.149     1M / 604M  INFO    General                 (kmer_splitter.hpp         :  96)   Memory available for splitting buffers: 4.99999 Gb
+  0:20:46.151     1M / 604M  INFO    General                 (kmer_splitter.hpp         : 104)   Using cell size of 838860
+  0:20:53.108  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 6324301 reads
+  0:20:59.281  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 12634262 reads
+  0:21:06.898  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 18966151 reads
+  0:21:13.893  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 25280322 reads
+  0:21:20.130  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 31618331 reads
+  0:21:25.969  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 37955486 reads
+  0:21:33.793  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 44287010 reads
+  0:21:39.713  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 50634258 reads
+  0:21:46.246  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 56970108 reads
+  0:21:51.962  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 63325086 reads
+  0:21:58.814  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 69661494 reads
+  0:22:05.152  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 75997236 reads
+  0:23:10.355  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 139345257 reads
+  0:25:27.849  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 271844908 reads
+  0:30:16.755  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 542955751 reads
+  0:39:53.377  4641M / 4641M INFO    General                 (kmer_splitters.hpp        : 128)   Processed 1074088583 reads
+  0:59:00.468     1M / 3562M INFO    General                 (kmer_splitters.hpp        : 134)   Used 1997492452 reads
+  0:59:00.520     1M / 3562M INFO    General                 (kmer_index_builder.hpp    : 314)   Starting k-mer counting.
+  1:14:47.887     1M / 27G   INFO    General                 (kmer_index_builder.hpp    : 325)   K-mer counting done. There are 5414468593 kmers in total.
+  1:14:47.887     1M / 27G   INFO    General                 (stage.cpp                 : 120)   PROCEDURE == Extension index construction (id: construction:extension_index_construction)
+  1:14:47.979     1M / 27G   INFO   K-mer Index Building     (kmer_index_builder.hpp    : 503)   Building kmer index
+  1:14:47.979     1M / 27G   INFO    General                 (kmer_index_builder.hpp    : 308)   Splitting kmer instances into 80 files using 8 threads. This might take a while.
+  1:14:48.187     1M / 27G   INFO    General                 (file_limit.hpp            :  43)   Open file limit set to 1024
+  1:14:48.187     1M / 27G   INFO    General                 (kmer_splitter.hpp         :  96)   Memory available for splitting buffers: 4.99997 Gb
+  1:14:48.187     1M / 27G   INFO    General                 (kmer_splitter.hpp         : 104)   Using cell size of 838860
+  1:14:50.516  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 6661691 kmers
+  1:14:52.581  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 13376693 kmers
+  1:14:55.883  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 20166803 kmers
+  1:14:56.522  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 27074040 kmers
+  1:15:00.686  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 34033741 kmers
+  1:15:03.098  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 41135703 kmers
+  1:15:04.551  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 48446011 kmers
+  1:15:10.145  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 55882189 kmers
+  1:15:12.931  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 63704387 kmers
+  1:15:17.449  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 71469761 kmers
+  1:15:18.561  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 79522807 kmers
+  1:15:20.310  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 87592106 kmers
+  1:15:24.125  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 96037036 kmers
+  1:15:25.116  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 104565826 kmers
+  1:15:26.047  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 113554223 kmers
+  1:15:29.187  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 123024132 kmers
+  1:15:37.534  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 132696786 kmers
+  1:15:40.840  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 142842215 kmers
+  1:16:46.471  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 516513744 kmers
+  1:16:52.041  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 547507283 kmers
+  1:18:31.682  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 1088371880 kmers
+  1:21:18.716  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 2170121673 kmers
+  1:25:34.540  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 197)   Processed 4333612014 kmers
+  1:28:07.673  4641M / 27G   INFO    General                 (kmer_splitters.hpp        : 202)   Used 5414479593 kmers.
+  1:28:07.674     1M / 27G   INFO    General                 (kmer_index_builder.hpp    : 314)   Starting k-mer counting.
+  1:32:26.221     1M / 27G   INFO    General                 (kmer_index_builder.hpp    : 325)   K-mer counting done. There are 5131530896 kmers in total.
+  1:32:26.221     1M / 27G   INFO   K-mer Index Building     (kmer_index_builder.hpp    : 460)   Building perfect hash indices
+  1:39:12.391  3606M / 27G   INFO   K-mer Index Building     (kmer_index_builder.hpp    : 496)   Index built. Total 5131530896 kmers, 3706378472 bytes occupied (5.7782 bits per kmer).
+  1:39:12.396  3606M / 27G   INFO    General                 (kmer_index_builder.hpp    : 191)   Merging final buckets.
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (5138022400 bytes, address: 0x14acad200000, alignment: 67108864, commit: 1)
+  1:40:39.627  8502M / 27G   INFO   DeBruijnExtensionIndexBu (kmer_extension_index_build: 101)   Building k-mer extensions from k+1-mers
+  1:51:26.418  8502M / 27G   INFO   DeBruijnExtensionIndexBu (kmer_extension_index_build: 106)   Building k-mer extensions from k+1-mers finished.
+  1:51:26.444  8502M / 27G   INFO    General                 (stage.cpp                 : 120)   PROCEDURE == Early tip clipping (id: construction:early_tip_clipper)
+  1:51:26.452  8502M / 27G   INFO    General                 (construction.cpp          : 298)   Early tip clipper length bound set as (RL - K)
+  1:51:26.475  8502M / 27G   INFO   Early tip clipping       (early_simplification.hpp  :  48)   Early tip clipping
+  2:04:48.660    14G / 27G   INFO   Early tip clipping       (early_simplification.hpp  :  83)   #tipped junctions: 65914961
+  2:04:57.263    14G / 27G   INFO   Early tip clipping       (early_simplification.hpp  :  94)   Clipped tips: 66831230
+  2:04:57.660  8502M / 27G   INFO   Early tip clipping       (early_simplification.hpp  :  50)   1073567526 22-mers were removed by early tip clipper
+  2:04:57.660  8502M / 27G   INFO    General                 (stage.cpp                 : 120)   PROCEDURE == Condensing graph (id: construction:graph_condensing)
+  2:04:57.662  8502M / 27G   INFO   UnbranchingPathExtractor (debruijn_graph_constructor: 324)   Extracting unbranching paths
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (10120855552 bytes, address: 0x14a9c9000000, alignment: 67108864, commit: 1)
+  2:17:20.788    19G / 27G   INFO   UnbranchingPathExtractor (debruijn_graph_constructor: 348)   Extracting unbranching paths finished. 632255024 sequences extracted
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (10120855552 bytes, address: 0x14a76cc00000, alignment: 67108864, commit: 1)
+  2:22:53.340    19G / 34G   INFO   UnbranchingPathExtractor (debruijn_graph_constructor: 362)   Collecting perfect loops
+  2:26:19.916    19G / 34G   INFO   UnbranchingPathExtractor (debruijn_graph_constructor: 395)   Collecting perfect loops finished. 1247 loops collected
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (20237516800 bytes, address: 0x14a2b5c00000, alignment: 67108864, commit: 1)
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (10120855552 bytes, address: 0x14aa50c00000, alignment: 67108864, commit: 1)
+  2:26:40.736    19G / 34G   INFO   DeBruijnGraphConstructor (debruijn_graph_constructor: 597)   Sorting edges...
+mimalloc: warning: thread 0x14aef8df9640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14aa04400000, alignment: 67108864, commit: 1)
+mimalloc: warning: thread 0x14aef97fe640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14aeabe00000, alignment: 67108864, commit: 1)
+mimalloc: warning: thread 0x14aef95fd640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14ae60200000, alignment: 67108864, commit: 1)
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14ae14600000, alignment: 67108864, commit: 1)
+mimalloc: warning: thread 0x14aef93fc640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14aa04400000, alignment: 67108864, commit: 1)
+mimalloc: warning: thread 0x14aef8ffa640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14a9b8800000, alignment: 67108864, commit: 1)
+mimalloc: warning: thread 0x14aef99ff640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14a96cc00000, alignment: 67108864, commit: 1)
+mimalloc: warning: thread 0x14aef91fb640: unable to allocate aligned OS memory directly, fall back to over-allocation (1270874112 bytes, address: 0x14a921000000, alignment: 67108864, commit: 1)
+  2:27:09.406    19G / 34G   INFO   DeBruijnGraphConstructor (debruijn_graph_constructor: 602)   Edges sorted
+  2:27:09.407    19G / 34G   INFO    General                 (debruijn_graph_constructor: 511)   Total 1264512542 edges to create
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (50839158784 bytes, address: 0x149e79c00000, alignment: 67108864, commit: 1)
+  2:27:09.449    66G / 66G   INFO    General                 (debruijn_graph_constructor: 514)   Collecting link records
+mimalloc: warning: unable to allocate aligned OS memory directly, fall back to over-allocation (20237516800 bytes, address: 0x1499c1c00000, alignment: 67108864, commit: 1)
+
+
+== Error ==  system call for: "['/sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/spades-core', '/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/config.info', '/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/mda_mode.info', '/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/meta_mode.info', '/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/plasmid_mode.info', '/sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/K21/configs/metaviral_mode.info']" finished abnormally, OS return value: -9
+
+SPAdes finished with the following error code: -1.
+
+If the reason for this error is unclear, you can report an issue on our GitHub repository github.com/ablab/spades
+
+Please provide us with params.txt and spades.log files from the output directory.
+
+
+SPAdes log can be found here: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs/SRR28004142/spades.log
+
+Thank you for using metaviralSPAdes! If you use it in your research, please cite:
+
+  Antipov, D., Raiko, M., Lapidus, A. and Pevzner, P.A., 2020. Metaviral SPAdes: assembly of viruses from metagenomic data. Bioinformatics, 36(14), pp.4126-4129.
+  doi.org/10.1093/bioinformatics/btaa490
+

@@ -1,0 +1,10 @@
+[33m[WARN][0m you may switch on flag -g/--remove-gaps to remove spaces
+
+ArgumentError: deactivate does not accept arguments
+remainder_args: ['seqkit-env']
+
+
+Usage: checkv end_to_end [OPTIONS] INPUT OUTPUT
+Try 'checkv end_to_end --help' for help.
+
+Error: Invalid value for '-d': Directory 'checkv_db//sciclone/home/iadanforth/scr10/databases/checkv_db/checkv-db-v1.5' does not exist.
