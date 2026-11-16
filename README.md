@@ -6300,7 +6300,34 @@ output/
 ```
 
 Individual small result files can still be committed deliberately with `git add -f`, which
-is the right way to put something like `gvmags_votus.tsv` under version control.
+is the right way to put something like `gvmags_votus.tsv` under version control. **Five step
+09 result tables were added this way on 2026-11-16** (prompt 41 in `PROMPT_LOG.md`), because
+they are the actual findings of step 09, are small (125 B to 24 KB), and are what anyone
+reading the repository will want without having to re-run the pipeline:
+
+```bash
+git add -f output/votus/all_gvmag_summaries.tsv \
+            output/votus/gvmags_representatives.txt \
+            output/votus/gvmags_votus.tsv \
+            output/votus/votu_nearest_reference.tsv \
+            output/votus/votu_summary.txt
+git commit   # commit 9356303
+git push origin main
+```
+
+| file | size | what it holds |
+|---|---|---|
+| `gvmags_votus.tsv` | 3.1 KB | one row per GVMAG: its vOTU, whether it represents it, ANI/AF to the representative |
+| `votu_nearest_reference.tsv` | 3.0 KB | each vOTU representative's closest GVMAGs V2 relative, with that reference's taxonomy and ecosystem |
+| `all_gvmag_summaries.tsv` | 24 KB | every sample's per-GVMAG summary combined, with `<sample>__<bin>` names |
+| `gvmags_representatives.txt` | 1.8 KB | the 19 representative `.fna` paths, the input to step 10 |
+| `votu_summary.txt` | 125 B | the one-line vOTU count |
+
+Two artifacts were explicitly kept **out** of the repository at the same time and added to
+`.gitignore`: `scripts/__pycache__/` (bytecode written whenever `select_refs.py` is
+imported, e.g. by the step 10 dry run) and `*.bak` (git history is the real backup, so a
+committed `select_refs.py.bak` beside the fixed file would only be noise - the file is still
+on disk, untracked).
 
 #### 12f. Caveats
 

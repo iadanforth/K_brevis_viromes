@@ -946,3 +946,32 @@ did not do that without being asked.
 **Files:** `scripts/copy_results.slurm` (new), `.gitignore` (new), `README.md` (new Step 12
 section; next-steps items updated), `PROMPT_LOG.md`. Outside the repo: populated
 `~/K_brevis_viromes/output/{gvmags,votus}`; scratch originals left untouched.
+
+---
+
+### 41. 2026-11-16 12:55 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please add the following files to the GitHub repo?
+>
+> all_gvmag_summaries.tsv gvmags_representatives.txt gvmags_votus.tsv votu_nearest_reference.tsv votu_summary.txt
+>
+> these are all in ~/K_brevis_viromes/output/votus
+
+**Done:** Added all five with `git add -f`, since `output/` is gitignored (Step 12e); they
+are 125 B to 24 KB, so there is no reason not to track them. Before committing, found that
+two artifacts created by my own work earlier in this session had been staged and did not
+belong in the repository: `scripts/__pycache__/select_refs.cpython-39.pyc` (bytecode from
+the step 10 dry-run import) and `scripts/select_refs.py.bak`. Removed both from the index
+with `git rm --cached` (files left on disk) and added `__pycache__/`, `*.pyc` and `*.bak` to
+`.gitignore`. Also staged this session's own work - `README.md`, `PROMPT_LOG.md`,
+`.gitignore`, `scripts/copy_results.slurm`, `scripts/select_refs.py` - plus the step 10/11
+environment files (`envs/phylo-env.yml`, `envs/tree-env.yml` and their `.lock.yml`), which
+README references and `07_gvmag_setup.slurm` builds from but which were untracked. Audited
+the staged set before committing: 169 files, 6.5 MB total, largest being the step 09 `.err`
+log at 868 KB (fastANI's verbose INFO output); no bytecode, backups or data files. Committed
+as **9356303** and pushed to `origin/main` (`4a733cc..9356303`). Left the unrelated
+pre-existing working-tree changes alone (the deletions of `datasets-env.yml` and
+`sra-toolkit-env.yml`), since they are from an earlier session and nothing asked for them.
+**Files:** `.gitignore` (bytecode/backup rules), `README.md` (section 12e records which
+files were committed and which were deliberately excluded), `PROMPT_LOG.md`. Committed and
+pushed: commit 9356303 on `main`.
