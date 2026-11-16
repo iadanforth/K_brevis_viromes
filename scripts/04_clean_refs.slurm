@@ -10,9 +10,11 @@
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/clean_metagenomes_%j.out
 #SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/clean_metagenomes_%j.err
 
+set -euo pipefail
+
 module load miniforge3
 eval "$(conda shell.bash hook)"
 conda activate host-screen-env
-conda env export --no-builds > host-screen-env.yml
+conda env export --no-builds > ./envs/host-screen-env.yml
 
 bash ./scripts/04_clean_refs.sh

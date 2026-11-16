@@ -1,0 +1,10 @@
+[phylo] predicted proteins for 19 vOTU representatives
+[refs] tier 'mcl' (mcl_rep): 2606 representatives in the metadata
+[refs] orders taken from our own GVMAGs: Imitervirales, Pandoravirales, Pimascovirales
+[refs] 1523 representatives in those orders, 1083 in others
+[refs] plus 24 outgroup references from 10 other orders
+[refs] 8508 .faa files available in /sciclone/home/iadanforth/data10/databases/gvmagsV2/000_GVMAGS_V2/faa_files
+[refs] copied 1547 reference .faa files into /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/proteins
+[phylo] 1566 taxa in the alignment (19 ours + 1547 references)
+[phylo] all taxa have Prodigal-style protein IDs
+[phylo] running ncldv_markersearch (aligner: clustalo); this is the slow step

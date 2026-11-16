@@ -1,0 +1,5 @@
+[SRR28004142] ==== metaviralSPAdes-only mode ====
+[SRR28004142] no metaSPAdes assembly; its contigs become the final set unchanged.
+[SRR28004142] assembly_source=metaviralspades_only (no metaSPAdes assembly for this sample)
+[SRR28004142] metaviralSPAdes contigs passed through: 364
+[SRR28004142] clusters: 364 (one per contig; nothing was compared or deduplicated, and SRR28004142_shared_contigs.fasta is empty by definition)

@@ -477,3 +477,472 @@ with no explicit version; the installed geNomad is 1.7.4 (confirmed via
 `genomad.__version__`, the dist-info and conda-meta). CSV validated: parses with
 `csv.DictReader`, no ragged rows, no empty required cells.
 **Files:** new `~/viral_metagenomics_programs.csv`; `PROMPT_LOG.md`.
+
+---
+
+### 26. 2026-11-12 16:40 (US Eastern) — Claude Code (Opus 5)
+
+> In anticipation of finishing step 09, could you write a script that will then take these vOTUs and generate concatenated giant virus phylogenomic trees with ncldv_markersearch with "-c" option [...] use the most extensive giant virus database that exists, including the genomes published in Vasquez et al. 2025 [...] trim the concatenated giant virus genomes with trimAI (most recent version) using -automated1. Please then explain to me how I can use this trimmed alignment file and input it into BEASTX [...]
+
+**Done:** Wrote `scripts/10_gvmag_phylogeny.slurm` (pyrodigal-gv proteins for each vOTU rep
+→ reference selection → `ncldv_markersearch.py -c` → `trimal -automated1`),
+`scripts/select_refs.py`, `envs/phylo-env.yml` and `envs/beast-env.yml`. Added
+`ncldv_markersearch` install + `phylo-env` creation to `07_gvmag_setup.slurm` and ran it
+(gulf highmem, **job 92396**, COMPLETED 1:33): phylo-env has trimAl **v1.5.rev1** (newest;
+paper used 1.4.22), markersearch pinned at commit 0dec2e2 (the repo is unversioned).
+Reference selection uses GVMAGs V2 (8,508 reps) with two measured tiers — `mcl_rep` 2,606
+(default, closest to the paper's 2,037-genome tree) and `skani_rep` 8,507 — filtered by
+viral order (`--orders auto` reads orders from the step 08 GVClass summaries; Imitervirales
+= 1,049 at the mcl tier), plus per-order outgroups for rooting and `--max-refs` capping
+sampled evenly across families. Found three quirks by reading markersearch's source and
+worked around all of them: a hardcoded **relative** HMM path, outputs written to the CWD,
+and a hardcoded `hmmsearch --cpu 16` (so the job requests 32 cores and warns below 16).
+Tested: select_refs against the real GVDB_stats.tsv (correct tiering, even family sampling,
+outgroups, no dots in names); the markersearch+trimAl chain end to end as a Slurm job
+(astral **73841**, 14 s) on the repo's 3 bundled genomes — confirmed the default marker set
+is exactly the paper's seven, the symlink/CWD handling works, and trimAl cut 6,671 → 4,106
+columns. Installed BEAST X and introspected it (astral **73842**): v10.5.0, amino acid
+models **Blosum62, CPREV, Dayhoff, FLU, JTT, LG, mtREV, WAG** (undocumented on the website),
+real `beast -help` flags, and `treeannotator -type` now defaults to `hipstr` not `mcc`.
+Wrote README step 10 (10a–10i) including the full BEAST X walkthrough, and advised that
+BEAST is likely the wrong tool here (no dates; ~1,000 taxa infeasible) with IQ-TREE as the
+paper's choice. Two queued gulf copies (92397, 92399) were cancelled after resubmitting to
+astral.
+**Files:** new `scripts/10_gvmag_phylogeny.slurm`, `scripts/select_refs.py`,
+`envs/phylo-env.yml`, `envs/beast-env.yml`, `envs/beast-env.lock.yml`,
+`envs/phylo-env.lock.yml`; edited `scripts/07_gvmag_setup.slurm`, `README.md`,
+`PROMPT_LOG.md`.
+
+---
+
+### 27. 2026-11-12 17:05 (US Eastern) — Claude Code (Opus 5)
+
+> ah ok if BeastX is not appropriate for this then please remove anything relating to the use of BeastX. I must have misinterpreted it's function
+
+**Done:** Removed BEAST X throughout. Deleted `envs/beast-env.yml` and
+`envs/beast-env.lock.yml`, and removed the `beast-env` conda environment (531 MB freed).
+Deleted README section 10i (the whole BEAST walkthrough) and rewrote the remaining mentions
+in `10_gvmag_phylogeny.slurm`, `select_refs.py` and the README's caveats and next steps to
+point at IQ-TREE instead, as the paper used (`-m MFP -bb 1000 -nt AUTO -wbt`, then RAxML
+`-f i -m GTRCAT` for certainty scores). Refreshed the two embedded script listings in the
+README so they match the edited files. Verified zero BEAST/BEAUti/BEAGLE/TreeAnnotator
+mentions remain in `README.md`, `scripts/` or `envs/`; `bash -n` and a Python parse still
+pass. Entry 26 above is left unchanged as the historical record. Also found the program
+reference CSV had been moved by the user to `~/SUPERCOMPUTING/`; left it there, removed its
+one BEAST aside, and brought it up to date now that more tools are installed: trimAl
+(1.5.1, phylo-env, step 10), ncldv_markersearch (commit 0dec2e2, with its three source
+quirks), IQ-TREE (recommended next step), plus two new rows for Clustal Omega 1.2.4 and
+MUSCLE 5.3 — 49 rows now. Nothing submitted.
+**Files:** deleted `envs/beast-env.yml`, `envs/beast-env.lock.yml`; edited `README.md`,
+`scripts/10_gvmag_phylogeny.slurm`, `scripts/select_refs.py`, `PROMPT_LOG.md`,
+`~/SUPERCOMPUTING/viral_metagenomics_programs.csv`; removed the `beast-env` conda env.
+
+---
+
+### 28. 2026-11-12 17:20 (US Eastern) — Claude Code (Opus 5)
+
+> Yes, please write 11_gvmag_tree.slurm to run IQTREE
+
+**Done:** Wrote `scripts/11_gvmag_tree.slurm` and `envs/tree-env.yml`, and added `tree-env`
+to `07_gvmag_setup.slurm`'s environment loop (rerun as astral job 73845). Pinned IQ-TREE
+**2.3.6** (the paper's 2.2.2.6 is not on bioconda; 2.3.6 is the newest 2.x, so same CLI) and
+RAxML **8.2.12** (the paper's exact version). Translated the paper's IQ-TREE 1.x flags to
+2.x against the installed help text: `-bb`→`-B`, `-nt AUTO`→explicit `-T` (AUTO can exceed
+the Slurm allocation), `-wbt`→`--wbtl`; added `--bnni` (authors' recommendation against
+UFBoot over-support), `--seed` and `--mem`. **Corrected an error in the paper:** it reports
+RAxML `-f i -m GTRCAT`, but GTRCAT is a nucleotide model and the alignment is amino acids, so
+the script uses `PROTCATLG` — the published combination cannot have run as written on
+protein data. Tested in four Slurm jobs on astral: 73846 (3 taxa) failed usefully, revealing
+that IQ-TREE refuses to bootstrap <4 sequences only after model selection → added an
+up-front taxa guard; 73847 (`--bootstraps 0`) completed and exposed three misleading summary
+lines, all fixed; 73848 failed because the test alignment sat in `/tmp`, which is node-local
+and invisible to compute nodes → re-staged to scr10; 73849 (6 taxa, built from the 3 real
+genomes plus mutated copies) completed the full path, choosing `rtREV+F+I+R5`, parsing the
+UFBoot distribution, and producing real RAxML certainty scores on protein data (TC 2.947,
+relative 0.982). Removed the test output directory so real runs start clean. README: new
+step 11 (11a–11g) with the script, the paper-to-2.x flag table, the RAxML model correction,
+all four test results including the failures, and caveats; plus overview/env-table/rebuild/
+next-steps updates. Also refreshed the IQ-TREE and RAxML rows in
+`~/SUPERCOMPUTING/viral_metagenomics_programs.csv`.
+**Files:** new `scripts/11_gvmag_tree.slurm`, `envs/tree-env.yml`, `envs/tree-env.lock.yml`;
+edited `scripts/07_gvmag_setup.slurm`, `README.md`, `PROMPT_LOG.md`,
+`~/SUPERCOMPUTING/viral_metagenomics_programs.csv`.
+
+---
+
+### 29. 2026-11-13 09:50 (US Eastern) — Claude Code (Opus 5)
+
+> I am reviewing all of these scripts to make sure that I'm understanding what you've done. Can you explain to me what you had to activate a checkv-env but are not using any of the commands associated with checkv? Where does this makeblastdb command come from? And blastn? And anicalc? I don't see this in the checkV documentation
+
+**Done:** Explanation only; verified every claim rather than asserting it. (1) Confirmed from
+the conda package manifest that the `checkv` package installs exactly `bin/checkv`,
+`bin/anicalc`, `bin/aniclust` — so `anicalc` genuinely ships with CheckV as a separate
+executable and never appears in `checkv --help`, which is why the user could not find it;
+activating `checkv-env` is the correct way to get it. (2) Found the documentation the user
+was missing: the CheckV README's "Supporting code: Rapid genome clustering based on pairwise
+ANI" section, which gives the exact `makeblastdb` → `blastn` → `anicalc` → `aniclust`
+sequence this script follows, with identical flags (`-outfmt '6 std qlen slen'`,
+`-max_target_seqs 10000`) and describes 95% ANI / 85% AF as "the MIUViG
+recommended-parameters". Bitbucket's web view is a JavaScript shell that returns no text to
+fetches, so the raw URL is the one to read. (3) Confirmed `blastn`/`makeblastdb` come from
+the BLAST+ `blast` 2.16.0 package, which is NOT a CheckV dependency (CheckV needs diamond +
+hmmer) — flagged this as a convenient coincidence and verified `envs/checkv-env.yml` already
+pins `blast=2.16.0` so a rebuild from that file keeps it. Also stated the deviation: we use
+`anicalc` but not `aniclust`, because CheckV's recipe dereplicates one sequence set whereas
+this step matches contigs between two assemblers. Added all of this as a comment block in
+`06_merge_assemblies.slurm` and as a new explanation in README step 06, and refreshed the
+embedded script listing. No scripts changed behaviourally; nothing submitted.
+**Files:** `scripts/06_merge_assemblies.slurm` (comments only), `README.md`, `PROMPT_LOG.md`.
+
+---
+
+### 30. 2026-11-13 11:30 (US Eastern) — Claude Code (Opus 5)
+
+> It looks like job #92248 failed. Based on the logs, I believe this is a memory issue. That is strange considering that I previously was able to run metaviralspades on this file. Could you help me to figure out what is going wrong?
+
+**Done:** Confirmed the out-of-memory diagnosis and found why metaviralSPAdes was not a fair
+precedent. Job 92248 (SRR28004143, gulf `gz`, gz01) failed after 13:36:47 with MaxRSS
+377,484,792 KB = exactly the 360 GiB of `--mem=360G`; the log ends in a mimalloc
+`error code: 12 [Cannot allocate memory]` while entering the `SMOOTHING` distance estimator
+in K=55 `Preliminary Distance Estimation`. SPAdes' own ceiling (`-m 340`) never fired
+because its accounting read `310G / 325G`, ~10% under true RSS. The reason metaviralSPAdes
+handled the same reads in 106 GB is that it loads `plasmid_mode.info` + `metaviral_mode.info`
+on top of meta mode, which add a **chromosome removal** stage before repeat resolving — it
+discards the cellular graph and does the expensive work on the small viral remainder, while
+metaSPAdes keeps the whole metagenome graph and runs distance estimation and repeat
+resolving twice. Also established that read volume alone does not predict this: SRR28004144
+is the *largest* sample (145 GB) and finished at a 178 GB peak, so SRR28004143's
+graph complexity (~359 M unresolved paired-info records) is the cause. Made three fixes to
+`05_metaspades_nov.slurm`: `-m` is now derived from `SLURM_MEM_PER_NODE` with 10% headroom
+instead of being hardcoded at 340 (so raising `--mem` is sufficient and SPAdes aborts with
+its own message rather than inside mimalloc); a new `RESTART_FROM` variable passes
+`--restart-from <check-point>` and relaxes the "output directory exists" guard, so the
+intact K21/K33 output (~6.7 h of work) is not redone; `bash -n` passes. Per `~/AGENTS.md`
+§3, `best_cluster.sh -c 32 -m 950 -H 30` ranks bora `hima` first — `hi03` has 1,031,460 MB,
+`PreemptMode=OFF` and a 72 h limit, whereas gz is booked to 11-20 and would leave a ~40 h
+job exposed to cancellation; kuro `serial` (376 GB) and gulf highmem (503 GB/16 c) NO-FIT.
+Verified the exact resubmission with `sbatch --test-only` ("Job 625955 to start at
+2026-11-14T15:53:46 ... on nodes hi03"). **Nothing was submitted** — the command is in
+README step 05b-fix awaiting approval. Separately fixed a pre-existing README rendering bug:
+the closing fence of the step-09 script listing was glued to its last line (`exit 0` + the
+backticks), which had silently swallowed ~200 lines of step-09 prose into a code block;
+fences are now balanced (170). Flagged that SRR28004142 (job 92249, second-largest sample,
+12 h in at a 120 GB peak) may hit the same wall.
+**Files:** `scripts/05_metaspades_nov.slurm`, `README.md` (new "Step 05b-fix" section,
+refreshed step-05b listing, fence fix), `PROMPT_LOG.md`.
+
+---
+
+### 31. 2026-11-13 11:35 (US Eastern) — Claude Code (Opus 5)
+
+> Ok, please resubmit this job to the node you think is best for this. As long as it isn't going against the rules set my the admins
+
+**Done:** Before submitting, read SPAdes' own `options_parser.py` and found that the
+restart support added in prompt 30 was broken: `check_options_for_restart_from()` rejects
+both the reads (`-1`/`-2`) and `--only-assembler` when `--restart-from` is given, because
+SPAdes recovers the original command line from `$SAMPLE_OUT/params.txt` itself. Proved it
+both ways against a throwaway directory containing only a copy of `params.txt`, so the real
+46 GB run directory was never touched: passing the reads gave
+"you cannot specify input data (-1, -2, ...) with --restart-from option!" (error code 67),
+while `--restart-from k99 -o ... -t 1 -m 16` logged "Restored from Command line: ...
+--only-assembler -1 ... -m 340", then "with updated parameters: -t 1 -m 16" and
+"Memory limit (in Gb): 16" — confirming the new `-m` really overrides the stored 340 — and
+failed only on the deliberately invalid check-point ("failed to restart from k99 because
+this stage was not specified!"), which also shows `k55` is a valid name. Rewrote the
+invocation in `05_metaspades_nov.slurm` as two branches (restart: only `--restart-from`,
+`-o`, `-t`, `-m`, plus a guard that `params.txt` exists; fresh: unchanged); `bash -n`
+passes. Re-checked the target node: `hi03` was `State=IDLE`, `CPUAlloc=0`, `AllocMem=0`,
+`RealMemory=1031460`, and `scontrol show reservation` showed no reservation covering
+`hi[01-07]` (the three standing bora reservations are on `bo11`/`bo23`). Submitted
+**job 625965** to bora `hima`: 1 job, `-N 1 -c 32 -C hi --exclude=hi04,hi05,hi07
+--mem=950G -t 72:00:00 --export=ALL,RESTART_FROM=k55`, giving SPAdes `-m 855`. It is
+`PD (Priority)` behind one pending 16 GB job. Chose hima over gz because
+`PreemptMode=OFF` there and a ~40 h job on gz would be exposed to uncancellable preemption
+the whole time; GPU nodes excluded per `~/AGENTS.md` rule 2; logs go to the project `logs/`
+folder via the script's `#SBATCH` lines. Updated README step 05b-fix with the source-level
+finding, both test transcripts, the two-branch code and the real job ID, and refreshed the
+embedded script listing.
+**Files:** `scripts/05_metaspades_nov.slurm`, `README.md`, `PROMPT_LOG.md`.
+
+---
+
+### 32. 2026-11-13 17:35 (US Eastern) — Claude Code (Opus 5)
+
+> Can you give me an estimate of how long the metaspades jobs will take for the two remaining samples (SRR28004143 and SRR28004142)
+>
+> [answering the follow-up question about SRR28004142:] Ok I want you to cancel both of these jobs. I do not have the time to wait another 30 hours before moving on to the next step of this pipeline. Please cancel both of these jobs and note in the README.md that this was done because of time constraints.
+
+**Done:** Estimated both jobs from stage timings in their `spades.log` files rather than the
+hardware table, using the completed SRR28004144 K=55 run (10h36m on gz) as the template and
+measuring the `hi03`-vs-`gz` ratio directly from the identical K=55 stages the restart
+re-ran: 1.42x overall (1.51 construction, 1.10 gap closer, 1.75 raw simplification), not the
+2.2x the per-core speeds imply, because `hi03` was unshared while `gz02` was running 60 of
+64 cores for others. Estimates: SRR28004143 ~23 h more (range 18-28 h, the spread being
+almost entirely its ~4.4x-heavier distance estimation), total ~29 h of its 72 h limit;
+SRR28004142 ~12.5 h more on time alone. Also found that SRR28004142 was on course to fail
+the same way: at the `Preliminary Simplification` milestone its peak was 186 GB versus
+105 GB for SRR28004143 and 83 GB for SRR28004144, and since those two grew 3.4x and 2.1x
+respectively from that point, it needed ~400-640 GB against a 360 GB cap, with the blow-up
+due in ~4 h at `Preliminary Distance Estimation`. Asked before cancelling, per `~/AGENTS.md`
+section 8 (92249 was not submitted in this session); the user chose to cancel **both** for
+time. Ran `scancel 625965` (bora) and `scancel 92249` (gulf); both confirmed CANCELLED after
+05:55:42 and 18:22:03. Jobs 92252-92254 (SRR28004137/38/39) had meanwhile COMPLETED, so no
+metaSPAdes jobs remain queued or running. Net effect: 18 of 20 samples have both assemblies;
+SRR28004142 and SRR28004143 have metaviralSPAdes only. No script change is needed because
+`06_merge_assemblies.sh` already skips samples missing a metaSPAdes assembly, but flagged
+that this means both samples **leave the pipeline entirely from step 06 onward** (step 08
+globs `contigs_merged/*_merged_contigs.fasta`), and that together with SRR28004144 they are
+the three most deeply sequenced libraries, so results must not be described as covering all
+20 runs. Left the 54 GB and 47 GB partial run directories in place and documented how to
+resume either with `RESTART_FROM=k55 --mem=900G`, plus the 90-day scratch purge deadline of
+around 2026-02-11. Added README section "05b-fix-c. Both remaining metaSPAdes jobs cancelled
+for time (2026-11-13)" and marked the two now-superseded passages in step 05b-fix.
+**Files:** `README.md`, `PROMPT_LOG.md`. No scripts changed.
+
+---
+
+### 33. 2026-11-13 17:45 (US Eastern) — Claude Code (Opus 5)
+
+> For the 06_merge_assemblies.slurm script, can you please change this so that the final contigs to be used in the next step of the pipeline for samples SRR28004142 and SRR28004143 are just the contigs generated from metaviralspades.py? For all other samples, please continue to use the contigs that were found by either metaviralspade.py or metaspades.py or both (but don't duplicate)
+
+**Done:** Implemented the fallback across three scripts rather than only the `.slurm`,
+because `06_merge_assemblies.sh` was still skipping those two samples and would never have
+submitted a job for them. (1) `merge_assemblies.py`: `--ms`/`--ani` are now optional and go
+together; omitting both selects metaviralSPAdes-only mode, where every contig keeps an empty
+edge set so the existing greedy clustering loop makes each its own cluster with no
+special-casing. Put the fallback here, not in shell, so both modes share one code path and
+the FASTA headers and `_clusters.tsv` columns cannot drift between samples. (2) Added an
+`assembly_source` field (`merged` / `metaviralspades_only`) to both the headers and the TSV:
+without it `found_by=metaviralspades` would conflate "metaSPAdes ran and missed this contig"
+with "metaSPAdes never ran", which would corrupt any assembler comparison. Nothing had been
+merged yet, so no existing output needed regenerating. (3) `06_merge_assemblies.slurm`: an
+`MV_ONLY` switch that skips `makeblastdb`/`blastn`/`anicalc`, still applies the `MV_` prefix
+so contig IDs are uniform, and refuses if a metaSPAdes assembly actually exists. (4)
+`06_merge_assemblies.sh`: an explicit `MV_ONLY_SAMPLES="SRR28004142 SRR28004143"` list
+rather than inferring from a missing file — the automatic rule would be correct today but
+fails unsafely, since running step 06 with step 05b still queued would silently produce
+metaviralSPAdes-only results that look finished. Four tests, all before submitting anything:
+real SRR28004143 data through MV-only mode (828 contigs in, 828 out, shared file 0 bytes,
+labelled correctly); a synthetic 2-vs-2 regression test of the merge path with a fixed seed
+and a hand-written anicalc table, which gave both=1/mv_only=1/ms_only=1 and correctly left
+an 80%/45% pair unmerged; the misuse guard (exited 1 on SRR28004144); and a dry run of the
+submitter with `sbatch` stubbed, giving 18 normal merges + 2 MV-only + 0 skipped = 20.
+`bash -n` passes on both shell scripts. Noted in the README that these two samples are now
+in the pipeline but not on equal footing — single-assembler, no corroboration, empty
+`_shared_contigs.fasta`, and fewer contigs by design (364 and 828) because metaviralSPAdes
+discards the cellular graph. Nothing was submitted. Also refreshed all three embedded
+listings; the `.slurm` listing had drifted because the user trimmed a comment block from the
+file directly.
+**Files:** `scripts/merge_assemblies.py`, `scripts/06_merge_assemblies.slurm`,
+`scripts/06_merge_assemblies.sh`, `README.md`, `PROMPT_LOG.md`.
+
+---
+
+### 34. 2026-11-13 18:30 (US Eastern) — Claude Code (Opus 5)
+
+> Ok thanks so much! Yes can you please run 06_merge assemblies now? And once that works, you can go ahead and move on to the 08_gvmags step (I think that I already ran 07_gvmag_setup). As always, please make sure to be respectful when you choose the best node to submit this job. Pick the best node for the job while still adhering to admin guidelines
+
+**Done:** Ran step 06 for all 20 samples on kuro `serial` (jobs 110082, 110084-110102, all
+COMPLETED in 7-20 s): 18 two-assembler merges plus SRR28004142 (364 contigs) and
+SRR28004143 (828 contigs) as `assembly_source=metaviralspades_only`, 922,853 contigs total.
+A measured pilot (110082: 18 s, 1.68 GB) showed the original 16c/64G/12h request was ~40x
+the memory and ~700x the walltime needed, so `06_merge_assemblies.slurm` was right-sized to
+4c/12G/1h. Confirmed step 07 setup was already complete. Step 08 pilot 110103 then failed in
+2 seconds: openjdk's conda activation hook in `gvmag-bin-env` does
+`export JAVA_HOME_CONDA_BACKUP=$JAVA_HOME`, which aborts under the script's `set -euo
+pipefail` because `sbatch` jobs start with `JAVA_HOME` unset. Fixed by adding `conda_on`/
+`conda_off` helpers that lift `set -u` around all ten activate/deactivate calls, rather than
+editing files inside the conda package (which `conda env create` would undo and which would
+break reproducibility from `envs/`). Pilot 110104 then COMPLETED (73 min, 26.74 GB): 40.7 %
+of reads mapped, 21 MetaBAT2 bins, but **0 GVMAGs** - verified as genuine, not a parsing bug,
+by checking that `select_gvmags.py` uses the right column/string (`taxonomy_majority` ~
+`d_NCLDV`, confirmed against GVClass's `summarize_full.py:92`), that no line of the summary
+contains `NCLDV` at all, and that `mcp_total` (major capsid protein) is 0 in every bin; the
+stray `gvog4`/`gvog8` hits sit beside 16-70 cellular markers and are expected background.
+Submitted the remaining 19 samples as array 110120 on kuro `serial` (16c/96G/12h,
+`--array=1-19%6`), choosing kuro over the top-ranked gulf `gz` because `gz` is preemptible
+with no requeue and each task holds ~2 h of work, and lowering concurrency from 10 to 6
+(~19 % of the partition) on a shared partition. Memory was deliberately left at 96 GB rather
+than shrunk to the pilot's 26.74 GB peak, because bbmap's heap scales with assembly size and
+three samples are ~4x larger than the pilot - the same mistake that killed metaSPAdes job
+92248. Because the pilot had 0 GVMAGs it never reached CheckV, geNomad or
+`summarize_gvmags.py`, so smoke-test job 110122 exercises that tail using one existing bin
+as a stand-in GVMAG. Array 110120 and test 110122 were still queued/running at end of turn;
+nothing downstream of step 08 is verified against real GVMAGs.
+**Files:** `README.md` (new section 08f; refreshed the embedded `08_gvmags.slurm` listing;
+updated the step 08 headline and next-steps items 1 and 4), `PROMPT_LOG.md`,
+`scripts/08_gvmags.slurm` (added `conda_on`/`conda_off`, converted 10 call sites).
+Outside the repo: `~/scr10/data/kbrevis/gvmags/` (pilot output for SRR28004149,
+`sample_list_20261113_190844.txt`), smoke-test script in the session scratchpad.
+
+---
+
+### 35. 2026-11-14 09:05 (US Eastern) — Claude Code (Opus 5)
+
+> I noticed that two jobs timed out. What happened there?
+
+**Done:** Diagnosed array tasks 110120_6 and _7 (SRR28004142, SRR28004143), both TIMEOUT at
+exactly 2:00:19. Proximate cause was my own 2 h limit, set in prompt 34 on the assumption
+that these were tiny samples because their merged contig files hold only 364 and 828
+contigs. That was wrong: those files are small only because their metaSPAdes jobs were
+cancelled for time (README 06d), so they are metaviralSPAdes-only - the samples themselves
+have the largest read sets in the study after SRR28004144 (125.9 GB and 118.0 GB of clean
+R1, vs ~13.4 GB typical). bbmap runtime scales with reads, not reference size. Both jobs
+died still inside bbmap, having written 32 and 112 samtools sort temp fragments (13 GB and
+44 GB); those orphaned fragments were deleted (57 GB reclaimed). Found the underlying
+inefficiency: the script piped `out=stdout.sam` (all reads) into `samtools sort`, so ~99 %
+of reads for these two samples were sorted despite being unmapped and irrelevant to depth.
+Verified `outm=stdout.sam` emits mapped reads only with a tiny single-threaded smoke test on
+dev (8 records vs 4), then changed `08_gvmags.slurm` to use it. Also fixed a latent memory
+over-commit in the same command: bbmode `-Xmx` at 8/10 of `--mem` plus `samtools sort -m 2G`
+x 16 threads could request 108 GB against a 96 GB allocation; now 6/10 plus `-m 1G` (73 GB).
+Confirmed binning is still worthwhile for both samples (16.08 Mb and 14.28 Mb of contigs
+>= 2,500 bp, longest 1.24 Mb and 3.35 Mb, so MetaBAT2's 200 kb minimum bin is reachable).
+Resubmitted both as standalone jobs 110921 and 110922 (kuro serial, 16c/96G/**24 h**) and
+lowered array 110120's throttle from 6 to 4 so the total footprint stays near the 6 slots
+agreed in prompt 34. Note Slurm snapshots batch scripts at submit time, so the `outm` fix
+applies to 110921/110922 and future runs, not to the already-queued tasks 8-19.
+Array status at end of turn: tasks 1, 2, 4 COMPLETED; 3, 5 RUNNING; 8-19 PENDING; smoke test
+110122 still PENDING. Also noted I briefly ran `wc -l` over 126 GB FASTQs on dev, which
+violates AGENTS.md §1; killed it and used file sizes instead.
+**Files:** `scripts/08_gvmags.slurm` (bbmap `out=`->`outm=`, `-Xmx` 8/10->6/10, sort `-m 2G`
+->`-m 1G`, with comments), `PROMPT_LOG.md`, `README.md` (section 08g).
+Outside the repo: deleted `~/scr10/data/kbrevis/gvmags/SRR2800414{2,3}/binning/*.tmp.*.bam`.
+
+---
+
+### 36. 2026-11-16 (US Eastern) — Claude Code (Opus 5)
+
+> Can you find out what the status of 08_gvmags.slurm?
+
+**Done:** Read-only status check; nothing was submitted or changed on the cluster. Step 08
+is **complete for all 20 samples**: pilot 110104, array 110120 tasks 1-19 (all COMPLETED
+except 6 and 7, which timed out and were replaced by 110921/110922, both COMPLETED), and
+smoke test 110122 COMPLETED in 1 m 53 s with "TAIL TEST PASSED", so CheckV, geNomad, the
+bitscore filter and `summarize_gvmags.py` are now validated. Elapsed times 1 h 01 m to
+10 h 47 m per sample. Results: 848 MetaBAT2 bins, **26 GVMAGs in 9 of 20 samples** (3.1 % of
+bins), 24 of 26 Imitervirales plus one Pimascovirales and one Pandoravirales; CheckV gives
+5 High-quality, 14 Medium, 6 Low, 1 Not-determined, sizes 203 kb to 2.19 Mb, contamination
+0.00 % for all but two. No log contains an error and all 9 summary tables have 50 columns.
+Confirmed the prompt-34 decision to keep `--mem=96G` was right: peak RSS hit the full 96 GB
+on SRR28004144 and both standalone jobs, so shrinking to the pilot's 26.74 GB would have
+killed much of the run - but it also means those jobs ran with zero headroom. Flagged that
+11 samples have a `.done` marker and no `_gvmag_summary.tsv`, which step 09 must tolerate.
+**Files:** `README.md` (new section 08h with the results; step 08 headline changed from
+RUNNING to COMPLETE; next-steps item 4 marked done), `PROMPT_LOG.md`.
+
+---
+
+### 37. 2026-11-16 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please add the GVMAGS V2 bundle to step 09 and please verify that the 09_gvmag_votus.slurm script is going to work properly even when there are missing summary files because there was no GVMAG
+
+**Done:** Installed the GVMAGs V2 bundle via job 92893 (gulf `gz`, 4c/16G, COMPLETED in
+2 m 25 s, `--export=ALL,GVMAGS_V2_FULL=1`); gz was acceptable despite being preemptible
+because the setup script is short and fully guarded/restartable. It unpacks to
+`~/data10/databases/gvmagsV2/000_GVMAGS_V2/` with 8,508 reference `.fna` genomes (2.7 GB
+total). Verified three join points rather than assuming them: step 09's
+`find ... -name 'fna*'` matches `fna_files` (works unchanged); 8,507 of 8,508 filename
+stems match the `genome` column of `GVDB_stats.tsv` (the one exception degrades to NA via
+`meta.get`); and all nine metadata columns `votu_nearest_ref.py` reads exist. Fixed a bug
+in `07_gvmag_setup.slurm`: the download guard tested for a `database/` directory the
+tarball never creates, so every re-run with `GVMAGS_V2_FULL=1` would have re-downloaded
+1.18 GB; it now tests for the same `fna*` directory step 09 uses. Found and fixed a real
+contamination bug of my own making: the step 08 smoke test had left `_tailtest/` inside
+`~/scr10/data/kbrevis/gvmags/`, and step 09 pooled *every* subdirectory, so a **bacterial**
+bin would have entered the vOTU analysis as a 27th "GVMAG" with no summary row; moved it to
+`~/scr10/data/kbrevis/_tailtest_smoketest` and added a `.done`-marker guard to the pooling
+loop. On the missing-summary question: tested rather than asserted, by replaying the real
+pooling/combining logic (26 pooled from 9 samples, 26 rows, header once, `_tailtest`
+skipped) and running `votu_cluster.py` on the 26 real GVMAGs with a synthetic fastANI table
+under three scenarios - full summary, 3 rows removed, and no summary file at all - which
+gave 25 vOTUs with **identical cluster membership** in all three, differing only in vOTU
+numbering, with completeness correctly reported as NA. Step 09 now prints both counts and
+warns without failing if they disagree. Caveat recorded: missing completeness can change
+which genome represents a multi-member vOTU, though not the grouping.
+**Files:** `scripts/09_gvmag_votus.slurm` (`.done` guard on pooling, count/warn on summary
+rows), `scripts/07_gvmag_setup.slurm` (download guard), `README.md` (new section 09a-bis;
+next-steps item 5), `PROMPT_LOG.md`. Outside the repo: moved
+`~/scr10/data/kbrevis/gvmags/_tailtest` -> `~/scr10/data/kbrevis/_tailtest_smoketest`;
+installed `~/data10/databases/gvmagsV2/000_GVMAGS_V2/` (2.7 GB).
+
+---
+
+### 38. 2026-11-16 12:05 (US Eastern) — Claude Code (Opus 5)
+
+> Can you please go ahead and run step 09?
+
+**Done:** Ran three pre-flight checks first (all 20 samples have `.done` markers, 26 GVMAGs
+present, `_tailtest` gone, 8,508 references in place), plus a live test that
+`aniclustermap-env` and `checkv-env` both activate cleanly under `set -euo pipefail` -
+neither has an `activate.d` hook, so step 09 needed no change for the `JAVA_HOME` problem
+that killed step 08's job 110103. Submitted job **111457** to kuro `serial` (16 cores,
+64 GB, 4 h, `--with-refs`), choosing kuro over gulf `gz` even though `gz` ranked first on
+estimated finish, because `gz` is preemptible with `PreemptMode=CANCEL` and no requeue.
+It **completed in 1 m 07 s** with 14.3 GB peak memory and exit 0; `seff` is not installed on
+kuro so figures came from `sacct`. Results: **26 GVMAGs -> 19 vOTUs**, 13 singletons and
+6 multi-member vOTUs, all six spanning *different samples* (vOTU08 spans three). The
+missing-summary handling behaved in production exactly as tested in 09a-bis: 26 pooled,
+26 rows, no warning, and the one GVMAG with CheckV "Not-determined" completeness reported
+`NA` and ranked last. Against all 8,508 GVMAGs V2 references, 12 of 19 representatives have
+a relative and 7 have none, but **not one reaches the MIUViG species threshold** (>=95% ANI
+over >=85% AF) - the closest, vOTU16, is 97.95% ANI over only 25.60% of the genome. Nearest
+relatives are overwhelmingly marine Mimiviridae/Mesomimiviridae. Recorded that a re-run
+needs only `-c 8 --mem=24G -t 30:00`.
+**Files:** `README.md` (new section 09f with the full results, novelty table and caveats;
+step 10 header and blurb updated), `PROMPT_LOG.md`. Outside the repo: created
+`~/scr10/data/kbrevis/votus/` (19 vOTUs, heatmap, `votu_nearest_reference.tsv`).
+
+---
+
+### 39. 2026-11-16 12:20 (US Eastern) — Claude Code (Opus 5)
+
+> Ok it looks like that job ran in just a few minutes. Please proceed to step 10
+
+**Done:** Found and fixed a bug in `scripts/select_refs.py` that would have silently ruined
+step 10. `--orders auto` read the viral order from GVClass's `gvclass_order` column, but
+that column is a **vote string** (`NCLDV__Imitervirales:10(100.00%)`), not an order name -
+the same trap as the `domain` column in step 08. Those raw strings matched none of
+`GVDB_stats.tsv`'s bare `Order` values, so **zero** in-order references would have been
+selected; the script would not have failed, it would have built a well-formed 43-taxon tree
+from our 19 vOTUs plus ~24 distant outgroups, with no *Imitervirales* references at all and
+nothing wrong in the logs. Fixed by reading the `o_` field of the resolved
+`gvclass_taxonomy_majority` lineage via a new `order_of()` helper, and added a hard
+`sys.exit` if an order filter ever matches no reference again, since an outgroup-only
+alignment is structurally valid and therefore invisible. Verified with a count-only dry run
+(no file copying on dev) and then in production: 1,523 in-order references (1,049
+Imitervirales, 361 Pimascovirales, 113 Pandoravirales) + 24 outgroups + our 19 = **1,566
+taxa**, close to the paper's 2,037. Also confirmed `phylo-env` has no `activate.d` hook and
+the `faa_files` bundle is present. Submitted job **111459** to kuro `serial` (32 cores,
+128 GB, 24 h, defaults `--tier mcl --orders auto`), again avoiding preemptible `gz` for a
+job of this length. Still running at the time of writing, past hmmsearch and into Clustal
+Omega; `ncldv_markersearch.py` emits harmless Python 3.12 `SyntaxWarning`s.
+**Files:** `scripts/select_refs.py` (`order_of()` helper, no-match guard; previous version
+kept as `scripts/select_refs.py.bak`), `README.md` (new section 10i), `PROMPT_LOG.md`.
+
+---
+
+### 40. 2026-11-16 12:35 (US Eastern) — Claude Code (Opus 5)
+
+> Please also move the gvmags and votus directories in ~/scr10/data/kbrevis to ~/K_brevis_viromes/output and document this move in the README.md
+
+> sorry copy the directories, do not move them
+
+**Done:** Copied rather than moved, as corrected. Measured first and reported that the
+request could not be carried out in full: `gvmags` is **115 GB** while the home quota is
+50 GB with 21.2 GB free, so copying it whole is physically impossible, not merely unwise.
+Of that, 108 GB is `binning/` (the bbmap BAMs, indexes and jgi depth tables that MetaBAT2
+already consumed, regenerable from the step 06 contigs and step 02 reads) and 1.9 GB is
+`gvclass_in/`, which I verified is a byte-identical duplicate of `bins/` differing only in
+filenames. Both were excluded; everything else was copied, including all 848 MetaBAT2 bins,
+for about 4.5 GB. Wrote `scripts/copy_results.slurm` (1 core, 4 GB, 4 h) rather than copying
+on dev, because AGENTS.md section 6 requires GB-scale cross-filesystem copies to run in a
+batch job; the script checks free quota and aborts before starting if the copy would not
+fit, and uses `rsync` so an interrupted run resumes on resubmission. Submitted as job
+**111460** to kuro `serial`. Added a `.gitignore` for `output/`, since several GB of data in
+git would make the repo unclonable - the files sit in the working tree but untracked. Noted
+that the 108 GB of BAMs could go to `~/data10` (251 TB free) if they are worth keeping, and
+did not do that without being asked.
+**Files:** `scripts/copy_results.slurm` (new), `.gitignore` (new), `README.md` (new Step 12
+section; next-steps items updated), `PROMPT_LOG.md`. Outside the repo: populated
+`~/K_brevis_viromes/output/{gvmags,votus}`; scratch originals left untouched.

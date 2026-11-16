@@ -1,0 +1,15 @@
+[setup] gvmag-bin-env already exists
+[setup] checkv-env already exists
+[setup] genomad-env already exists
+[setup] aniclustermap-env already exists
+[setup] phylo-env already exists
+[setup] tree-env already exists
+[setup] aniclustermap-env works
+pixi 0.84.2
+[setup] CheckV db: /sciclone/home/iadanforth/data10/databases/checkv_db/checkv-db-v1.5
+1.7
+[setup] GVMAGs V2 metadata: 18726 lines
+[setup] downloading the full GVMAGs V2 database (1.18 GB)
+[setup] ncldv_markersearch at /sciclone/home/iadanforth/data10/programs/ncldv_markersearch (commit 0dec2e2)
+[setup] phylo-env OK: trimal 
+[setup] done

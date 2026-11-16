@@ -57,8 +57,21 @@ mkdir -p "$OUT"/{binning,bins,gvclass_in,gvmags,checkv,genomad}
 module load miniforge3
 eval "$(conda shell.bash hook)"
 
+# conda's per-package activation hooks are not written to survive `set -u`. openjdk's
+# etc/conda/activate.d/java_home.sh starts with
+#     export JAVA_HOME_CONDA_BACKUP=$JAVA_HOME
+# which aborts immediately with "JAVA_HOME: unbound variable" when JAVA_HOME is not
+# already set in the environment - and `sbatch` jobs start from a bare environment, so it
+# never is. Job 110103 died this way after 2 seconds, before doing any work. gvmag-bin-env
+# is affected because MetaBAT2/bbmap pull in openjdk (checkv-env and genomad-env are fine:
+# their hooks use "${VAR:-}"). Relax `set -u` for the duration of the activate/deactivate
+# calls only, rather than editing files inside the conda packages, which would be undone by
+# any `conda env create` and would make the environment non-reproducible from its .yml.
+conda_on()  { set +u; conda activate "$1"; set -u; }
+conda_off() { set +u; conda deactivate;    set -u; }
+
 # ---- 1-2. Map reads, compute depth, bin (gvmag-bin-env) -----------------------
-conda activate gvmag-bin-env
+conda_on gvmag-bin-env
 # Contig names only (drop the "found_by=..." descriptions) so names match the BAM.
 CONTIGS="$OUT/binning/${NAME}_contigs.fna"
 seqkit seq -i "$CONTIGS_IN" > "$CONTIGS"
@@ -66,12 +79,23 @@ seqkit seq -i "$CONTIGS_IN" > "$CONTIGS"
 BAM="$OUT/binning/${NAME}.sorted.bam"
 if [[ ! -s "$BAM.bai" ]]; then
     echo "[$NAME] mapping reads to merged contigs (bbmap)"
-    bbmap.sh -Xmx$(( SLURM_MEM_PER_NODE * 8 / 10 / 1024 ))g \
+    # outm= (not out=) emits ONLY mapped reads. Unmapped reads carry no reference
+    # position, so jgi_summarize_bam_contig_depths ignores them and they cannot affect
+    # binning - but `samtools sort` still has to sort them. For a sample whose merged
+    # contigs are a small metaviralSPAdes-only set, almost nothing maps, so `out=` made
+    # the sort spill tens of GB of temp BAMs and tasks 110120_6/_7 (SRR28004142,
+    # SRR28004143: 126 GB and 118 GB of reads) ran out of time still inside bbmap,
+    # having written 13 GB and 44 GB of fragments. Mapped-only output is identical for
+    # depth and binning and far cheaper.
+    # Heap + sort buffer must fit the allocation: 6/10 of --mem for bbmap plus
+    # THREADS x 1G for sort (96G -> 57G + 16G = 73G). The old 8/10 with -m 2G could ask
+    # for 76G + 32G = 108G against a 96G allocation.
+    bbmap.sh -Xmx$(( SLURM_MEM_PER_NODE * 6 / 10 / 1024 ))g \
         ref="$CONTIGS" nodisk=t \
         in1="$R1" in2="$R2" \
-        out=stdout.sam threads="$THREADS" \
+        outm=stdout.sam threads="$THREADS" \
         2> "$OUT/binning/${NAME}_bbmap.log" |
-        samtools sort -@ "$THREADS" -m 2G -o "$BAM" -
+        samtools sort -@ "$THREADS" -m 1G -o "$BAM" -
     samtools index "$BAM"
 fi
 
@@ -81,7 +105,7 @@ jgi_summarize_bam_contig_depths --outputDepth "$OUT/binning/${NAME}_depth.txt" "
 # so re-runs give identical bins.
 metabat2 -i "$CONTIGS" -a "$OUT/binning/${NAME}_depth.txt" \
     -o "$OUT/bins/${NAME}_bin" -t "$THREADS" --seed 1
-conda deactivate
+conda_off
 
 # GVClass wants .fna files with no "." in the base name: SAMPLE_bin.3.fa -> SAMPLE_bin_3.fna
 shopt -s nullglob
@@ -103,13 +127,13 @@ rm -rf "$OUT/gvclass"
 
 # Giant virus bins = GVClass domain-level call is NCLDV (phylum Nucleocytoviricota),
 # the classification shared by all GVMAGs in the paper (Supplemental Data 4).
-conda activate checkv-env   # any env with python3 works for the helper
+conda_on checkv-env   # any env with python3 works for the helper
 python -I "$REPO/scripts/select_gvmags.py" \
     --gvclass "$OUT/gvclass/gvclass_summary.tsv" \
     --bin-dir "$OUT/gvclass_in" \
     --out-dir "$OUT/gvmags" \
     --sample "$NAME"
-conda deactivate
+conda_off
 
 GVMAGS=("$OUT"/gvmags/*.fna)
 echo "[$NAME] ${#GVMAGS[@]} giant virus bins (GVMAGs)"
@@ -120,7 +144,7 @@ fi
 # ---- 4b. CheckV 1.1.1 with database v1.5 -------------------------------------
 # CheckV scores single sequences, so each GVMAG's contigs are joined into one record
 # (separated by 100 Ns) to get one completeness/quality value per GVMAG.
-conda activate checkv-env
+conda_on checkv-env
 JOINED="$OUT/checkv/gvmags_joined.fna"
 : > "$JOINED"
 for g in "${GVMAGS[@]}"; do
@@ -131,14 +155,14 @@ for g in "${GVMAGS[@]}"; do
         END   { print "" }' "$g" >> "$JOINED"
 done
 checkv end_to_end "$JOINED" "$OUT/checkv/out" -t "$THREADS" -d "$CHECKV_DB" --remove_tmp
-conda deactivate
+conda_off
 
 # ---- 5. Gene prediction + annotation (geNomad) --------------------------------
 # `genomad annotate` predicts the genes with pyrodigal-gv itself (the paper's gene caller)
 # and writes them to <gvmag>_annotate/<gvmag>_proteins.faa, so pyrodigal-gv is NOT called
 # separately here: that would predict the same genes twice with the same tool. --cleanup
 # only deletes geNomad's mmseqs2 scratch directory, so the proteins are kept.
-conda activate genomad-env
+conda_on genomad-env
 for g in "${GVMAGS[@]}"; do
     gname=$(basename "$g" .fna)
     genomad annotate --cleanup --threads "$THREADS" "$g" "$OUT/genomad/$gname" "$GENOMAD_DB"
@@ -148,10 +172,10 @@ for g in "${GVMAGS[@]}"; do
         'NR==1{for(i=1;i<=NF;i++) if($i=="bitscore") c=i; print; next} c && $c!="NA" && $c>=min' \
         "$GENES_TSV" > "$OUT/genomad/${gname}_genes_bitscore${MIN_BITSCORE}.tsv"
 done
-conda deactivate
+conda_off
 
 # ---- Summary table (like the paper's Supplemental Data 4) ---------------------
-conda activate checkv-env
+conda_on checkv-env
 python -I "$REPO/scripts/summarize_gvmags.py" \
     --sample "$NAME" \
     --gvclass "$OUT/gvclass/gvclass_summary.tsv" \
@@ -160,7 +184,7 @@ python -I "$REPO/scripts/summarize_gvmags.py" \
     --genomad-dir "$OUT/genomad" \
     --min-bitscore "$MIN_BITSCORE" \
     --out "$OUT/${NAME}_gvmag_summary.tsv"
-conda deactivate
+conda_off
 
 touch "$OUT/.done"
 echo "[$NAME] done: $OUT/${NAME}_gvmag_summary.tsv"

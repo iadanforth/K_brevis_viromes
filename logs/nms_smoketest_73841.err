@@ -1,0 +1,6 @@
+/sciclone/home/iadanforth/data10/programs/ncldv_markersearch/ncldv_markersearch.py:95: SyntaxWarning: invalid escape sequence '\s'
+  newline = re.sub( '\s+', '\t', line)
+/sciclone/home/iadanforth/data10/programs/ncldv_markersearch/ncldv_markersearch.py:229: SyntaxWarning: invalid escape sequence '\d'
+  contig_name = re.sub("_\d*$", "", proteinid)
+/sciclone/home/iadanforth/data10/programs/ncldv_markersearch/ncldv_markersearch.py:478: SyntaxWarning: invalid escape sequence '\*'
+  subseq = re.sub("\*", "", str(subseq))

@@ -1,0 +1,49 @@
+[setup] gvmag-bin-env already exists
+[setup] checkv-env already exists
+[setup] genomad-env already exists
+[setup] aniclustermap-env already exists
+[setup] creating phylo-env from envs/phylo-env.yml
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working...  
+For Linux 64, Open MPI is built with CUDA awareness but this support is disabled by default.
+To enable it, please set the environment variable OMPI_MCA_opal_cuda_support=true before
+launching your MPI processes. Equivalently, you can set the MCA parameter in the command line:
+mpiexec --mca opal_cuda_support 1 ...
+ 
+In addition, the UCX support is also built but disabled by default.
+To enable it, first install UCX (conda install -c conda-forge ucx). Then, set the environment
+variables OMPI_MCA_pml="ucx" OMPI_MCA_osc="ucx" before launching your MPI processes.
+Equivalently, you can set the MCA parameters in the command line:
+mpiexec --mca pml ucx --mca osc ucx ...
+Note that you might also need to set UCX_MEMTYPE_CACHE=n for CUDA awareness via UCX.
+Please consult UCX's documentation for detail.
+ 
+
+done
+#
+# To activate this environment, use
+#
+#     $ conda activate phylo-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[setup] aniclustermap-env works
+pixi 0.84.2
+[setup] CheckV db: /sciclone/home/iadanforth/data10/databases/checkv_db/checkv-db-v1.5
+1.7
+[setup] GVMAGs V2 metadata: 18726 lines
+[setup] cloning ncldv_markersearch
+[setup] ncldv_markersearch at /sciclone/home/iadanforth/data10/programs/ncldv_markersearch (commit 0dec2e2)
+[setup] phylo-env OK: trimal 
+[setup] done

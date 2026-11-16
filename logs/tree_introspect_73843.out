@@ -1,0 +1,90 @@
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate tree-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+=== binaries
+iqtree iqtree2 raxmlHPC raxmlHPC-AVX2 raxmlHPC-PTHREADS raxmlHPC-PTHREADS-AVX2 raxmlHPC-PTHREADS-SSE3 raxmlHPC-SSE3 
+
+=== iqtree version
+IQ-TREE multicore version 2.3.6 for Linux x86 64-bit built Dec 11 2024
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor, Heiko Schmidt,
+Dominik Schrempf, Michael Woodhams, Ly Trong Nhan, Thomas Wong
+
+=== do the paper's flags exist?
+  ABSENT : -m
+  ABSENT : -bb
+  ABSENT : -B
+  ABSENT : -nt
+  ABSENT : -T
+  ABSENT : -wbt
+  ABSENT : --prefix
+  ABSENT : -seed
+  ABSENT : -safe
+  ABSENT : -mem
+  ABSENT : --wbtl
+  ABSENT : -alrt
+
+=== iqtree help: bootstrap + threads sections
+  -T NUM|AUTO          No. cores/threads or AUTO-detect (default: 1)
+  --threads-max NUM    Max number of threads for -T AUTO (default: all cores)
+
+CHECKPOINT:
+--
+  --boot-trees         Write bootstrap trees to .ufboot file (default: none)
+  --wbtl               Like --boot-trees but also writing branch lengths
+  --nmax NUM           Maximum number of iterations (default: 1000)
+
+=== protein models available (sample)
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor, Heiko Schmidt,
+  --seqtype STRING     BIN, DNA, AA, NT2AA, CODON, MORPH (default: auto-detect)
+TREE SEARCH ALGORITHM:
+  --mset STR,...       Comma-separated model list (e.g. -mset WAG,LG,JTT)
+  --modelomatic        Find best codon/protein/DNA models (Whelan et al. 2015)
+                       Set merging algorithm (default: rclusterf)
+  --rcluster NUM       Percentage of partition pairs for rcluster algorithm
+  --rclusterf NUM      Percentage of partition pairs for rclusterf algorithm
+             Protein:  LG (default), Poisson, cpREV, mtREV, Dayhoff, mtMAM,
+                       JTT, WAG, mtART, mtZOA, VT, rtREV, DCMut, PMB, HIVb,
+
+=== raxml version
+
+
+This is RAxML version 8.2.12 released by Alexandros Stamatakis on May 2018.
+
+=== raxml -f i and protein models
+      -f      select algorithm:
+
+              "-f a": rapid Bootstrap analysis and search for best-scoring ML tree in one program run
+              "-f A": compute marginal ancestral states on a ROOTED reference tree provided with "-t"
+--
+      -F      enable ML tree searches under CAT model for very large trees without switching to 
+              GAMMA in the end (saves memory).
+              This option can also be used with the GAMMA models in order to avoid the thorough optimization 
+              of the best-scoring ML tree in the end.
+--
+                "-m PROTCATmatrixName[F|X]"       : specified AA matrix + Optimization of substitution rates + Optimization of site-specific
+                                                    evolutionary rates which are categorized into numberOfCategories distinct 
+                                                    rate categories for greater computational efficiency.   Final tree might be evaluated
+                                                    automatically under PROTGAMMAmatrixName[F|X], depending on the tree search option.
+                                                    With the optional "X" appendix you can specify a ML estimate of base frequencies.
+                "-m PROTCATImatrixName[F|X]"      : specified AA matrix + Optimization of substitution rates + Optimization of site-specific
+                                                    evolutionary rates which are categorized into numberOfCategories distinct 
+                                                    rate categories for greater computational efficiency.   Final tree might be evaluated
+                                                    automatically under PROTGAMMAImatrixName[F|X], depending on the tree search option.
+                                                    With the optional "X" appendix you can specify a ML estimate of base frequencies.

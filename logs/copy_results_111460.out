@@ -1,0 +1,47 @@
+[copy] need 4512 MB, home quota has 21685 MB free
+[copy] /sciclone/home/iadanforth/scr10/data/kbrevis/gvmags -> /sciclone/home/iadanforth/K_brevis_viromes/output/gvmags
+
+Number of files: 3,087 (reg: 2,885, dir: 202)
+Number of created files: 3,087 (reg: 2,885, dir: 202)
+Number of deleted files: 0
+Number of regular files transferred: 2,885
+Total file size: 4,707,328,369 bytes
+Total transferred file size: 4,707,328,369 bytes
+Literal data: 4,707,328,369 bytes
+Matched data: 0 bytes
+File list size: 65,531
+File list generation time: 0.001 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 4,708,668,707
+Total bytes received: 56,194
+
+sent 4,708,668,707 bytes  received 56,194 bytes  22,692,650.13 bytes/sec
+total size is 4,707,328,369  speedup is 1.00
+[copy] /sciclone/home/iadanforth/scr10/data/kbrevis/votus -> /sciclone/home/iadanforth/K_brevis_viromes/output/votus
+
+Number of files: 48 (reg: 42, dir: 6)
+Number of created files: 48 (reg: 42, dir: 6)
+Number of deleted files: 0
+Number of regular files transferred: 42
+Total file size: 16,053,133 bytes
+Total transferred file size: 16,053,133 bytes
+Literal data: 16,053,133 bytes
+Matched data: 0 bytes
+File list size: 0
+File list generation time: 0.001 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 16,060,120
+Total bytes received: 857
+
+sent 16,060,120 bytes  received 857 bytes  32,121,954.00 bytes/sec
+total size is 16,053,133  speedup is 1.00
+
+[copy] verifying: every file present in the source (minus exclusions) is in the copy
+[copy] files still differing after the copy: 0 (0 = complete)
+
+[copy] result sizes:
+4.4G	/sciclone/home/iadanforth/K_brevis_viromes/output/gvmags
+16M	/sciclone/home/iadanforth/K_brevis_viromes/output/votus
+[copy] GVMAG .fna files copied: 53
+[copy] MetaBAT2 bins copied:    848
+[copy] done. Scratch originals in /sciclone/home/iadanforth/scr10/data/kbrevis are untouched.

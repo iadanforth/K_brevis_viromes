@@ -1,0 +1,1378 @@
+[tree] 6 taxa, 4106 alignment columns
+[tree] worst padding/gap fraction: 84.8% (medusavirus_sim)
+[tree] WARNING: 2 taxa are >=70% X/gap and are placed unreliably:
+[tree]    84.8%  medusavirus_sim
+[tree]    84.8%  medusavirus
+[tree] Consider removing them (see phylogeny/*.table.tsv) and re-running step 10.
+[tree] iqtree2 -s /sciclone/home/iadanforth/scr10/data/kbrevis/tree_smoketest/tree6.aln -m MFP --bnni -T 8 --prefix /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags --seed 12345 --mem 13G -B 1000 --wbtl
+IQ-TREE multicore version 2.3.6 for Linux x86 64-bit built Dec 11 2024
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor, Heiko Schmidt,
+Dominik Schrempf, Michael Woodhams, Ly Trong Nhan, Thomas Wong
+
+Host:    astral.sciclone.wm.edu (AVX512, FMA3, 250 GB RAM)
+Command: iqtree2 -s /sciclone/home/iadanforth/scr10/data/kbrevis/tree_smoketest/tree6.aln -m MFP --bnni -T 8 --prefix /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags --seed 12345 --mem 13G -B 1000 --wbtl
+Seed:    12345 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Thu Nov 12 17:17:02 2026
+Kernel:  AVX+FMA - 8 threads (8 CPU cores detected)
+
+Reading alignment file /sciclone/home/iadanforth/scr10/data/kbrevis/tree_smoketest/tree6.aln ... Fasta format detected
+Reading fasta file: done in 0.000304241 secs using 69.35% CPU
+Alignment most likely contains protein sequences
+Alignment has 6 sequences with 4106 columns, 653 distinct patterns
+1327 parsimony-informative, 155 singleton sites, 2624 constant sites
+                 Gap/Ambiguity  Composition  p-value
+Analyzing sequences: done in 6.99982e-06 secs using 85.72% CPU
+   1  tupanvirus         0.19%    passed     95.31%
+   2  tupanvirus_sim     0.19%    passed     96.60%
+   3  megavirus          0.34%    passed     85.85%
+   4  megavirus_sim      0.34%    passed     96.93%
+   5  medusavirus       84.78%    failed      0.00%
+   6  medusavirus_sim   84.78%    failed      0.00%
+WARNING: 2 sequences contain more than 50% gaps/ambiguity
+****  TOTAL             28.44%  2 sequences failed composition chi2 test (p-value<5%; df=19)
+
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.000 seconds
+Perform fast likelihood tree search using LG+I+G model...
+Estimate model parameters (epsilon = 5.000)
+Perform nearest neighbor interchange...
+Estimate model parameters (epsilon = 1.000)
+1. Initial log-likelihood: -20733.834
+2. Current log-likelihood: -20731.285
+3. Current log-likelihood: -20728.914
+4. Current log-likelihood: -20726.864
+5. Current log-likelihood: -20725.084
+6. Current log-likelihood: -20723.525
+7. Current log-likelihood: -20722.151
+8. Current log-likelihood: -20720.926
+9. Current log-likelihood: -20719.829
+Optimal log-likelihood: -20718.725
+Proportion of invariable sites: 0.168
+Gamma shape alpha: 1.281
+Parameters optimization took 9 rounds (0.029 sec)
+Time for fast ML tree search: 0.077 seconds
+
+NOTE: ModelFinder requires 8 MB RAM!
+ModelFinder will test up to 1232 protein models (sample size: 4106 epsilon: 0.100) ...
+ No. Model         -LnL         df  AIC          AICc         BIC
+  1  LG            20781.608    9   41581.216    41581.260    41638.098
+  2  LG+I          20760.878    10  41541.757    41541.811    41604.959
+  3  LG+G4         20702.364    10  41424.728    41424.782    41487.931
+  4  LG+I+G4       20706.500    11  41434.999    41435.064    41504.522
+  5  LG+R2         20508.215    11  41038.431    41038.495    41107.953
+  6  LG+R3         20426.613    13  40879.225    40879.314    40961.388
+  7  LG+R4         20377.606    15  40785.212    40785.329    40880.015
+  8  LG+R5         20366.931    17  40767.863    40768.013    40875.306
+  9  LG+R6         20361.207    19  40760.413    40760.599    40880.497
+ 14  LG+I+R2       20542.317    12  41108.634    41108.710    41184.477
+ 15  LG+I+R3       20420.419    14  40868.839    40868.942    40957.322
+ 16  LG+I+R4       20345.394    16  40722.788    40722.921    40823.911
+ 17  LG+I+R5       20323.069    18  40682.137    40682.304    40795.901
+ 18  LG+I+R6       20322.747    20  40685.494    40685.699    40811.898
+ 39  LG+F+I+R5     20073.444    37  40220.887    40221.579    40454.735
+ 61  WAG+I+R5      20400.628    18  40837.257    40837.424    40951.020
+ 83  WAG+F+I+R5    20056.531    37  40187.062    40187.753    40420.910
+105  JTT+I+R5      20420.449    18  40876.898    40877.065    40990.662
+127  JTT+F+I+R5    20096.518    37  40267.036    40267.727    40500.884
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+149  Q.pfam+I+R5   20401.300    18  40838.600    40838.768    40952.364
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+171  Q.pfam+F+I+R5 20080.761    37  40235.522    40236.213    40469.369
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+193  Q.bird+I+R5   20712.331    18  41460.663    41460.830    41574.426
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+215  Q.bird+F+I+R5 20288.782    37  40651.564    40652.255    40885.411
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+237  Q.mammal+I+R5 20719.142    18  41474.283    41474.451    41588.047
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+259  Q.mammal+F+I+R5 20228.553    37  40531.105    40531.796    40764.953
+281  Q.insect+I+R5 20302.671    18  40641.343    40641.510    40755.107
+303  Q.insect+F+I+R5 20109.827    37  40293.654    40294.346    40527.502
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+325  Q.plant+I+R5  20464.810    18  40965.620    40965.787    41079.383
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+347  Q.plant+F+I+R5 20186.941    37  40447.881    40448.572    40681.729
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+369  Q.yeast+I+R5  20288.053    18  40612.105    40612.273    40725.869
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+391  Q.yeast+F+I+R5 20102.431    37  40278.863    40279.554    40512.711
+413  JTTDCMut+I+R5 20422.407    18  40880.813    40880.981    40994.577
+435  JTTDCMut+F+I+R5 20097.619    37  40269.239    40269.930    40503.086
+457  DCMut+I+R5    20635.186    18  41306.373    41306.540    41420.136
+479  DCMut+F+I+R5  20172.236    37  40418.473    40419.164    40652.320
+501  VT+I+R5       20328.604    18  40693.209    40693.376    40806.973
+523  VT+F+I+R5     20051.943    37  40177.885    40178.577    40411.733
+545  PMB+I+R5      20468.155    18  40972.310    40972.478    41086.074
+567  PMB+F+I+R5    20090.014    37  40254.029    40254.720    40487.876
+589  Blosum62+I+R5 20354.477    18  40744.954    40745.122    40858.718
+611  Blosum62+F+I+R5 20085.002    37  40244.003    40244.695    40477.851
+633  Dayhoff+I+R5  20635.231    18  41306.462    41306.629    41420.225
+655  Dayhoff+F+I+R5 20172.277    37  40418.555    40419.246    40652.403
+677  mtREV+I+R5    21693.886    18  43423.772    43423.939    43537.536
+699  mtREV+F+I+R5  20280.331    37  40634.661    40635.352    40868.509
+721  mtART+I+R5    21877.707    18  43791.413    43791.581    43905.177
+743  mtART+F+I+R5  20444.161    37  40962.322    40963.013    41196.169
+765  mtZOA+I+R5    21729.173    18  43494.346    43494.514    43608.110
+787  mtZOA+F+I+R5  20293.805    37  40661.609    40662.300    40895.457
+809  mtMet+I+R5    21482.705    18  43001.410    43001.577    43115.173
+831  mtMet+F+I+R5  20289.584    37  40653.168    40653.859    40887.016
+853  mtVer+I+R5    21846.342    18  43728.684    43728.852    43842.448
+875  mtVer+F+I+R5  20366.435    37  40806.870    40807.561    41040.717
+897  mtInv+I+R5    21484.301    18  43004.602    43004.770    43118.366
+919  mtInv+F+I+R5  20144.930    37  40363.860    40364.551    40597.708
+941  mtMAM+I+R5    21952.727    18  43941.454    43941.621    44055.218
+963  mtMAM+F+I+R5  20466.946    37  41007.892    41008.583    41241.739
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+985  FLAVI+I+R5    20896.479    18  41828.958    41829.125    41942.722
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+1007  FLAVI+F+I+R5  20390.877    37  40855.754    40856.446    41089.602
+1029  HIVb+I+R5     20576.733    18  41189.465    41189.633    41303.229
+1051  HIVb+F+I+R5   20218.278    37  40510.556    40511.248    40744.404
+1073  HIVw+I+R5     20727.623    18  41491.246    41491.413    41605.009
+1095  HIVw+F+I+R5   20363.586    37  40801.173    40801.864    41035.020
+1117  FLU+I+R5      20408.188    18  40852.376    40852.543    40966.139
+1139  FLU+F+I+R5    20173.170    37  40420.340    40421.031    40654.187
+1161  rtREV+I+R5    20403.825    18  40843.650    40843.817    40957.413
+1183  rtREV+F+I+R5  20020.234    37  40114.468    40115.159    40348.315
+1205  cpREV+I+R5    20395.622    18  40827.244    40827.412    40941.008
+1227  cpREV+F+I+R5  20059.537    37  40193.074    40193.766    40426.922
+Akaike Information Criterion:           rtREV+F+I+R5
+Corrected Akaike Information Criterion: rtREV+F+I+R5
+Bayesian Information Criterion:         rtREV+F+I+R5
+Best-fit model: rtREV+F+I+R5 chosen according to BIC
+
+All model information printed to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.model.gz
+CPU time for ModelFinder: 43.940 seconds (0h:0m:43s)
+Wall-clock time for ModelFinder: 5.609 seconds (0h:0m:5s)
+Generating 1000 samples for ultrafast bootstrap (seed: 12345)...
+
+NOTE: 5 MB RAM (0 GB) is required!
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -20020.531
+2. Current log-likelihood: -20020.152
+Optimal log-likelihood: -20020.131
+Proportion of invariable sites: 0.160
+Site proportion and rates:  (0.142,0.193) (0.129,0.194) (0.177,0.199) (0.355,0.201) (0.037,22.660)
+Parameters optimization took 2 rounds (0.041 sec)
+Wrote distance file to... 
+Computing ML distances based on estimated model parameters...
+Calculating distance matrix: done in 0.00113935 secs using 1321% CPU
+Computing ML distances took 0.001186 sec (of wall-clock time) 0.015104 sec (of CPU time)
+WARNING: Some pairwise ML distances are too long (saturated)
+Setting up auxiliary I and S matrices: done in 0.000346879 secs
+Computing RapidNJ tree took 0.001384 sec (of wall-clock time) 0.002416 sec (of CPU time)
+Log-likelihood of RapidNJ tree: -20020.136
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 99 parsimony trees... 0.060 second
+Computing log-likelihood of 6 initial trees ... 0.011 seconds
+Current best score: -20020.131
+
+Do NNI search on 7 best initial trees
+Finish initializing candidate tree set (7)
+Current best tree score: -20020.131 / CPU time: 0.201
+Number of iterations: 7
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+Iteration 10 / LogL: -20024.919 / Time: 0h:0m:6s
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+Iteration 20 / LogL: -20026.743 / Time: 0h:0m:6s
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+Iteration 30 / LogL: -20020.131 / Time: 0h:0m:6s (0h:0m:2s left)
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+Iteration 40 / LogL: -20025.178 / Time: 0h:0m:6s (0h:0m:1s left)
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+Iteration 50 / LogL: -20020.131 / Time: 0h:0m:7s (0h:0m:1s left)
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+Iteration 60 / LogL: -20020.131 / Time: 0h:0m:7s (0h:0m:1s left)
+Iteration 70 / LogL: -20026.696 / Time: 0h:0m:7s (0h:0m:0s left)
+Iteration 80 / LogL: -20031.607 / Time: 0h:0m:7s (0h:0m:0s left)
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+Iteration 90 / LogL: -20029.599 / Time: 0h:0m:8s (0h:0m:0s left)
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+WARNING: NNI search needs unusual large number of steps (6) to converge!
+UPDATE BEST LOG-LIKELIHOOD: -20020.131
+Iteration 100 / LogL: -20020.131 / Time: 0h:0m:8s (0h:0m:0s left)
+Refining ufboot trees with NNI 1 branch...
+100 samples done
+200 samples done
+300 samples done
+400 samples done
+500 samples done
+600 samples done
+700 samples done
+800 samples done
+900 samples done
+1000 samples done
+Total 28 ufboot trees refined
+TREE SEARCH COMPLETED AFTER 101 ITERATIONS / Time: 0h:0m:15s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -20020.131
+2. Current log-likelihood: -20020.118
+3. Current log-likelihood: -20020.105
+4. Current log-likelihood: -20020.095
+Optimal log-likelihood: -20020.086
+Proportion of invariable sites: 0.163
+Site proportion and rates:  (0.144,0.194) (0.131,0.194) (0.176,0.199) (0.350,0.201) (0.037,22.677)
+Parameters optimization took 4 rounds (0.077 sec)
+BEST SCORE FOUND : -20020.086
+Creating bootstrap support values...
+Split supports printed to NEXUS file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.splits.nex
+Total tree length: 10.993
+
+Total number of iterations: 101
+CPU time used for tree search: 69.828 sec (0h:1m:9s)
+Wall-clock time used for tree search: 9.413 sec (0h:0m:9s)
+Total CPU time used: 115.219 sec (0h:1m:55s)
+Total wall-clock time used: 15.282 sec (0h:0m:15s)
+UFBoot trees printed to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot
+
+Computing bootstrap consensus tree...
+Reading input file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.splits.nex...
+6 taxa and 10 splits.
+Consensus tree written to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.contree
+Reading input trees file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.contree
+Log-likelihood of consensus tree: -20020.091
+
+Analysis results written to: 
+  IQ-TREE report:                /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.iqtree
+  Maximum-likelihood tree:       /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.treefile
+  Likelihood distances:          /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.mldist
+
+Ultrafast bootstrap approximation results written to:
+  Split support values:          /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.splits.nex
+  Consensus tree:                /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.contree
+  UFBoot trees:                  /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot
+  Screen log file:               /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.log
+
+Date and Time: Thu Nov 12 17:17:18 2026
+Warning, you specified a working directory via "-w"
+Keep in mind that RAxML only accepts absolute path names, not relative ones!
+Found a total of 6 taxa in first tree of tree collection /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot
+Expecting all remaining trees in collection to have the same taxon set
+add [tupanvirus]
+add [tupanvirus_sim]
+add [megavirus]
+add [megavirus_sim]
+add [medusavirus]
+add [medusavirus_sim]
+
+
+WARNING: RAxML is not checking sequences for duplicate seqs and sites with missing data!
+
+
+This is the RAxML Master Pthread
+
+This is RAxML Worker Pthread Number: 1
+
+This is RAxML Worker Pthread Number: 2
+
+This is RAxML Worker Pthread Number: 3
+
+This is RAxML Worker Pthread Number: 4
+
+This is RAxML Worker Pthread Number: 5
+
+This is RAxML Worker Pthread Number: 6
+
+This is RAxML Worker Pthread Number: 7
+
+
+This is RAxML version 8.2.12 released by Alexandros Stamatakis on May 2018.
+
+With greatly appreciated code contributions by:
+Andre Aberer      (HITS)
+Simon Berger      (HITS)
+Alexey Kozlov     (HITS)
+Kassian Kobert    (HITS)
+David Dao         (KIT and HITS)
+Sarah Lutteropp   (KIT and HITS)
+Nick Pattengale   (Sandia)
+Wayne Pfeiffer    (SDSC)
+Akifumi S. Tanabe (NRIFS)
+Charlie Taylor    (UF)
+
+
+RAxML IC and TC score Computation: Computing IC and TC scores induced by trees in file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot w.r.t. tree in file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.treefile
+
+
+RAxML was called as follows:
+
+raxmlHPC-PTHREADS-SSE3 -T 8 -f i -t /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.treefile -z /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot -s /sciclone/home/iadanforth/scr10/data/kbrevis/tree_smoketest/tree6.aln -m PROTCATLG -n ic -w /sciclone/home/iadanforth/scr10/data/kbrevis/tree/ic -C 
+
+
+
+
+Found 1 tree in File /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.treefile
+
+
+
+Found 1000 trees in File /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot
+
+Tree 0: found 6 taxa, reference tree has 6 taxa
+Tree 1: found 6 taxa, reference tree has 6 taxa
+Tree 2: found 6 taxa, reference tree has 6 taxa
+Tree 3: found 6 taxa, reference tree has 6 taxa
+Tree 4: found 6 taxa, reference tree has 6 taxa
+Tree 5: found 6 taxa, reference tree has 6 taxa
+Tree 6: found 6 taxa, reference tree has 6 taxa
+Tree 7: found 6 taxa, reference tree has 6 taxa
+Tree 8: found 6 taxa, reference tree has 6 taxa
+Tree 9: found 6 taxa, reference tree has 6 taxa
+Tree 10: found 6 taxa, reference tree has 6 taxa
+Tree 11: found 6 taxa, reference tree has 6 taxa
+Tree 12: found 6 taxa, reference tree has 6 taxa
+Tree 13: found 6 taxa, reference tree has 6 taxa
+Tree 14: found 6 taxa, reference tree has 6 taxa
+Tree 15: found 6 taxa, reference tree has 6 taxa
+Tree 16: found 6 taxa, reference tree has 6 taxa
+Tree 17: found 6 taxa, reference tree has 6 taxa
+Tree 18: found 6 taxa, reference tree has 6 taxa
+Tree 19: found 6 taxa, reference tree has 6 taxa
+Tree 20: found 6 taxa, reference tree has 6 taxa
+Tree 21: found 6 taxa, reference tree has 6 taxa
+Tree 22: found 6 taxa, reference tree has 6 taxa
+Tree 23: found 6 taxa, reference tree has 6 taxa
+Tree 24: found 6 taxa, reference tree has 6 taxa
+Tree 25: found 6 taxa, reference tree has 6 taxa
+Tree 26: found 6 taxa, reference tree has 6 taxa
+Tree 27: found 6 taxa, reference tree has 6 taxa
+Tree 28: found 6 taxa, reference tree has 6 taxa
+Tree 29: found 6 taxa, reference tree has 6 taxa
+Tree 30: found 6 taxa, reference tree has 6 taxa
+Tree 31: found 6 taxa, reference tree has 6 taxa
+Tree 32: found 6 taxa, reference tree has 6 taxa
+Tree 33: found 6 taxa, reference tree has 6 taxa
+Tree 34: found 6 taxa, reference tree has 6 taxa
+Tree 35: found 6 taxa, reference tree has 6 taxa
+Tree 36: found 6 taxa, reference tree has 6 taxa
+Tree 37: found 6 taxa, reference tree has 6 taxa
+Tree 38: found 6 taxa, reference tree has 6 taxa
+Tree 39: found 6 taxa, reference tree has 6 taxa
+Tree 40: found 6 taxa, reference tree has 6 taxa
+Tree 41: found 6 taxa, reference tree has 6 taxa
+Tree 42: found 6 taxa, reference tree has 6 taxa
+Tree 43: found 6 taxa, reference tree has 6 taxa
+Tree 44: found 6 taxa, reference tree has 6 taxa
+Tree 45: found 6 taxa, reference tree has 6 taxa
+Tree 46: found 6 taxa, reference tree has 6 taxa
+Tree 47: found 6 taxa, reference tree has 6 taxa
+Tree 48: found 6 taxa, reference tree has 6 taxa
+Tree 49: found 6 taxa, reference tree has 6 taxa
+Tree 50: found 6 taxa, reference tree has 6 taxa
+Tree 51: found 6 taxa, reference tree has 6 taxa
+Tree 52: found 6 taxa, reference tree has 6 taxa
+Tree 53: found 6 taxa, reference tree has 6 taxa
+Tree 54: found 6 taxa, reference tree has 6 taxa
+Tree 55: found 6 taxa, reference tree has 6 taxa
+Tree 56: found 6 taxa, reference tree has 6 taxa
+Tree 57: found 6 taxa, reference tree has 6 taxa
+Tree 58: found 6 taxa, reference tree has 6 taxa
+Tree 59: found 6 taxa, reference tree has 6 taxa
+Tree 60: found 6 taxa, reference tree has 6 taxa
+Tree 61: found 6 taxa, reference tree has 6 taxa
+Tree 62: found 6 taxa, reference tree has 6 taxa
+Tree 63: found 6 taxa, reference tree has 6 taxa
+Tree 64: found 6 taxa, reference tree has 6 taxa
+Tree 65: found 6 taxa, reference tree has 6 taxa
+Tree 66: found 6 taxa, reference tree has 6 taxa
+Tree 67: found 6 taxa, reference tree has 6 taxa
+Tree 68: found 6 taxa, reference tree has 6 taxa
+Tree 69: found 6 taxa, reference tree has 6 taxa
+Tree 70: found 6 taxa, reference tree has 6 taxa
+Tree 71: found 6 taxa, reference tree has 6 taxa
+Tree 72: found 6 taxa, reference tree has 6 taxa
+Tree 73: found 6 taxa, reference tree has 6 taxa
+Tree 74: found 6 taxa, reference tree has 6 taxa
+Tree 75: found 6 taxa, reference tree has 6 taxa
+Tree 76: found 6 taxa, reference tree has 6 taxa
+Tree 77: found 6 taxa, reference tree has 6 taxa
+Tree 78: found 6 taxa, reference tree has 6 taxa
+Tree 79: found 6 taxa, reference tree has 6 taxa
+Tree 80: found 6 taxa, reference tree has 6 taxa
+Tree 81: found 6 taxa, reference tree has 6 taxa
+Tree 82: found 6 taxa, reference tree has 6 taxa
+Tree 83: found 6 taxa, reference tree has 6 taxa
+Tree 84: found 6 taxa, reference tree has 6 taxa
+Tree 85: found 6 taxa, reference tree has 6 taxa
+Tree 86: found 6 taxa, reference tree has 6 taxa
+Tree 87: found 6 taxa, reference tree has 6 taxa
+Tree 88: found 6 taxa, reference tree has 6 taxa
+Tree 89: found 6 taxa, reference tree has 6 taxa
+Tree 90: found 6 taxa, reference tree has 6 taxa
+Tree 91: found 6 taxa, reference tree has 6 taxa
+Tree 92: found 6 taxa, reference tree has 6 taxa
+Tree 93: found 6 taxa, reference tree has 6 taxa
+Tree 94: found 6 taxa, reference tree has 6 taxa
+Tree 95: found 6 taxa, reference tree has 6 taxa
+Tree 96: found 6 taxa, reference tree has 6 taxa
+Tree 97: found 6 taxa, reference tree has 6 taxa
+Tree 98: found 6 taxa, reference tree has 6 taxa
+Tree 99: found 6 taxa, reference tree has 6 taxa
+Tree 100: found 6 taxa, reference tree has 6 taxa
+Tree 101: found 6 taxa, reference tree has 6 taxa
+Tree 102: found 6 taxa, reference tree has 6 taxa
+Tree 103: found 6 taxa, reference tree has 6 taxa
+Tree 104: found 6 taxa, reference tree has 6 taxa
+Tree 105: found 6 taxa, reference tree has 6 taxa
+Tree 106: found 6 taxa, reference tree has 6 taxa
+Tree 107: found 6 taxa, reference tree has 6 taxa
+Tree 108: found 6 taxa, reference tree has 6 taxa
+Tree 109: found 6 taxa, reference tree has 6 taxa
+Tree 110: found 6 taxa, reference tree has 6 taxa
+Tree 111: found 6 taxa, reference tree has 6 taxa
+Tree 112: found 6 taxa, reference tree has 6 taxa
+Tree 113: found 6 taxa, reference tree has 6 taxa
+Tree 114: found 6 taxa, reference tree has 6 taxa
+Tree 115: found 6 taxa, reference tree has 6 taxa
+Tree 116: found 6 taxa, reference tree has 6 taxa
+Tree 117: found 6 taxa, reference tree has 6 taxa
+Tree 118: found 6 taxa, reference tree has 6 taxa
+Tree 119: found 6 taxa, reference tree has 6 taxa
+Tree 120: found 6 taxa, reference tree has 6 taxa
+Tree 121: found 6 taxa, reference tree has 6 taxa
+Tree 122: found 6 taxa, reference tree has 6 taxa
+Tree 123: found 6 taxa, reference tree has 6 taxa
+Tree 124: found 6 taxa, reference tree has 6 taxa
+Tree 125: found 6 taxa, reference tree has 6 taxa
+Tree 126: found 6 taxa, reference tree has 6 taxa
+Tree 127: found 6 taxa, reference tree has 6 taxa
+Tree 128: found 6 taxa, reference tree has 6 taxa
+Tree 129: found 6 taxa, reference tree has 6 taxa
+Tree 130: found 6 taxa, reference tree has 6 taxa
+Tree 131: found 6 taxa, reference tree has 6 taxa
+Tree 132: found 6 taxa, reference tree has 6 taxa
+Tree 133: found 6 taxa, reference tree has 6 taxa
+Tree 134: found 6 taxa, reference tree has 6 taxa
+Tree 135: found 6 taxa, reference tree has 6 taxa
+Tree 136: found 6 taxa, reference tree has 6 taxa
+Tree 137: found 6 taxa, reference tree has 6 taxa
+Tree 138: found 6 taxa, reference tree has 6 taxa
+Tree 139: found 6 taxa, reference tree has 6 taxa
+Tree 140: found 6 taxa, reference tree has 6 taxa
+Tree 141: found 6 taxa, reference tree has 6 taxa
+Tree 142: found 6 taxa, reference tree has 6 taxa
+Tree 143: found 6 taxa, reference tree has 6 taxa
+Tree 144: found 6 taxa, reference tree has 6 taxa
+Tree 145: found 6 taxa, reference tree has 6 taxa
+Tree 146: found 6 taxa, reference tree has 6 taxa
+Tree 147: found 6 taxa, reference tree has 6 taxa
+Tree 148: found 6 taxa, reference tree has 6 taxa
+Tree 149: found 6 taxa, reference tree has 6 taxa
+Tree 150: found 6 taxa, reference tree has 6 taxa
+Tree 151: found 6 taxa, reference tree has 6 taxa
+Tree 152: found 6 taxa, reference tree has 6 taxa
+Tree 153: found 6 taxa, reference tree has 6 taxa
+Tree 154: found 6 taxa, reference tree has 6 taxa
+Tree 155: found 6 taxa, reference tree has 6 taxa
+Tree 156: found 6 taxa, reference tree has 6 taxa
+Tree 157: found 6 taxa, reference tree has 6 taxa
+Tree 158: found 6 taxa, reference tree has 6 taxa
+Tree 159: found 6 taxa, reference tree has 6 taxa
+Tree 160: found 6 taxa, reference tree has 6 taxa
+Tree 161: found 6 taxa, reference tree has 6 taxa
+Tree 162: found 6 taxa, reference tree has 6 taxa
+Tree 163: found 6 taxa, reference tree has 6 taxa
+Tree 164: found 6 taxa, reference tree has 6 taxa
+Tree 165: found 6 taxa, reference tree has 6 taxa
+Tree 166: found 6 taxa, reference tree has 6 taxa
+Tree 167: found 6 taxa, reference tree has 6 taxa
+Tree 168: found 6 taxa, reference tree has 6 taxa
+Tree 169: found 6 taxa, reference tree has 6 taxa
+Tree 170: found 6 taxa, reference tree has 6 taxa
+Tree 171: found 6 taxa, reference tree has 6 taxa
+Tree 172: found 6 taxa, reference tree has 6 taxa
+Tree 173: found 6 taxa, reference tree has 6 taxa
+Tree 174: found 6 taxa, reference tree has 6 taxa
+Tree 175: found 6 taxa, reference tree has 6 taxa
+Tree 176: found 6 taxa, reference tree has 6 taxa
+Tree 177: found 6 taxa, reference tree has 6 taxa
+Tree 178: found 6 taxa, reference tree has 6 taxa
+Tree 179: found 6 taxa, reference tree has 6 taxa
+Tree 180: found 6 taxa, reference tree has 6 taxa
+Tree 181: found 6 taxa, reference tree has 6 taxa
+Tree 182: found 6 taxa, reference tree has 6 taxa
+Tree 183: found 6 taxa, reference tree has 6 taxa
+Tree 184: found 6 taxa, reference tree has 6 taxa
+Tree 185: found 6 taxa, reference tree has 6 taxa
+Tree 186: found 6 taxa, reference tree has 6 taxa
+Tree 187: found 6 taxa, reference tree has 6 taxa
+Tree 188: found 6 taxa, reference tree has 6 taxa
+Tree 189: found 6 taxa, reference tree has 6 taxa
+Tree 190: found 6 taxa, reference tree has 6 taxa
+Tree 191: found 6 taxa, reference tree has 6 taxa
+Tree 192: found 6 taxa, reference tree has 6 taxa
+Tree 193: found 6 taxa, reference tree has 6 taxa
+Tree 194: found 6 taxa, reference tree has 6 taxa
+Tree 195: found 6 taxa, reference tree has 6 taxa
+Tree 196: found 6 taxa, reference tree has 6 taxa
+Tree 197: found 6 taxa, reference tree has 6 taxa
+Tree 198: found 6 taxa, reference tree has 6 taxa
+Tree 199: found 6 taxa, reference tree has 6 taxa
+Tree 200: found 6 taxa, reference tree has 6 taxa
+Tree 201: found 6 taxa, reference tree has 6 taxa
+Tree 202: found 6 taxa, reference tree has 6 taxa
+Tree 203: found 6 taxa, reference tree has 6 taxa
+Tree 204: found 6 taxa, reference tree has 6 taxa
+Tree 205: found 6 taxa, reference tree has 6 taxa
+Tree 206: found 6 taxa, reference tree has 6 taxa
+Tree 207: found 6 taxa, reference tree has 6 taxa
+Tree 208: found 6 taxa, reference tree has 6 taxa
+Tree 209: found 6 taxa, reference tree has 6 taxa
+Tree 210: found 6 taxa, reference tree has 6 taxa
+Tree 211: found 6 taxa, reference tree has 6 taxa
+Tree 212: found 6 taxa, reference tree has 6 taxa
+Tree 213: found 6 taxa, reference tree has 6 taxa
+Tree 214: found 6 taxa, reference tree has 6 taxa
+Tree 215: found 6 taxa, reference tree has 6 taxa
+Tree 216: found 6 taxa, reference tree has 6 taxa
+Tree 217: found 6 taxa, reference tree has 6 taxa
+Tree 218: found 6 taxa, reference tree has 6 taxa
+Tree 219: found 6 taxa, reference tree has 6 taxa
+Tree 220: found 6 taxa, reference tree has 6 taxa
+Tree 221: found 6 taxa, reference tree has 6 taxa
+Tree 222: found 6 taxa, reference tree has 6 taxa
+Tree 223: found 6 taxa, reference tree has 6 taxa
+Tree 224: found 6 taxa, reference tree has 6 taxa
+Tree 225: found 6 taxa, reference tree has 6 taxa
+Tree 226: found 6 taxa, reference tree has 6 taxa
+Tree 227: found 6 taxa, reference tree has 6 taxa
+Tree 228: found 6 taxa, reference tree has 6 taxa
+Tree 229: found 6 taxa, reference tree has 6 taxa
+Tree 230: found 6 taxa, reference tree has 6 taxa
+Tree 231: found 6 taxa, reference tree has 6 taxa
+Tree 232: found 6 taxa, reference tree has 6 taxa
+Tree 233: found 6 taxa, reference tree has 6 taxa
+Tree 234: found 6 taxa, reference tree has 6 taxa
+Tree 235: found 6 taxa, reference tree has 6 taxa
+Tree 236: found 6 taxa, reference tree has 6 taxa
+Tree 237: found 6 taxa, reference tree has 6 taxa
+Tree 238: found 6 taxa, reference tree has 6 taxa
+Tree 239: found 6 taxa, reference tree has 6 taxa
+Tree 240: found 6 taxa, reference tree has 6 taxa
+Tree 241: found 6 taxa, reference tree has 6 taxa
+Tree 242: found 6 taxa, reference tree has 6 taxa
+Tree 243: found 6 taxa, reference tree has 6 taxa
+Tree 244: found 6 taxa, reference tree has 6 taxa
+Tree 245: found 6 taxa, reference tree has 6 taxa
+Tree 246: found 6 taxa, reference tree has 6 taxa
+Tree 247: found 6 taxa, reference tree has 6 taxa
+Tree 248: found 6 taxa, reference tree has 6 taxa
+Tree 249: found 6 taxa, reference tree has 6 taxa
+Tree 250: found 6 taxa, reference tree has 6 taxa
+Tree 251: found 6 taxa, reference tree has 6 taxa
+Tree 252: found 6 taxa, reference tree has 6 taxa
+Tree 253: found 6 taxa, reference tree has 6 taxa
+Tree 254: found 6 taxa, reference tree has 6 taxa
+Tree 255: found 6 taxa, reference tree has 6 taxa
+Tree 256: found 6 taxa, reference tree has 6 taxa
+Tree 257: found 6 taxa, reference tree has 6 taxa
+Tree 258: found 6 taxa, reference tree has 6 taxa
+Tree 259: found 6 taxa, reference tree has 6 taxa
+Tree 260: found 6 taxa, reference tree has 6 taxa
+Tree 261: found 6 taxa, reference tree has 6 taxa
+Tree 262: found 6 taxa, reference tree has 6 taxa
+Tree 263: found 6 taxa, reference tree has 6 taxa
+Tree 264: found 6 taxa, reference tree has 6 taxa
+Tree 265: found 6 taxa, reference tree has 6 taxa
+Tree 266: found 6 taxa, reference tree has 6 taxa
+Tree 267: found 6 taxa, reference tree has 6 taxa
+Tree 268: found 6 taxa, reference tree has 6 taxa
+Tree 269: found 6 taxa, reference tree has 6 taxa
+Tree 270: found 6 taxa, reference tree has 6 taxa
+Tree 271: found 6 taxa, reference tree has 6 taxa
+Tree 272: found 6 taxa, reference tree has 6 taxa
+Tree 273: found 6 taxa, reference tree has 6 taxa
+Tree 274: found 6 taxa, reference tree has 6 taxa
+Tree 275: found 6 taxa, reference tree has 6 taxa
+Tree 276: found 6 taxa, reference tree has 6 taxa
+Tree 277: found 6 taxa, reference tree has 6 taxa
+Tree 278: found 6 taxa, reference tree has 6 taxa
+Tree 279: found 6 taxa, reference tree has 6 taxa
+Tree 280: found 6 taxa, reference tree has 6 taxa
+Tree 281: found 6 taxa, reference tree has 6 taxa
+Tree 282: found 6 taxa, reference tree has 6 taxa
+Tree 283: found 6 taxa, reference tree has 6 taxa
+Tree 284: found 6 taxa, reference tree has 6 taxa
+Tree 285: found 6 taxa, reference tree has 6 taxa
+Tree 286: found 6 taxa, reference tree has 6 taxa
+Tree 287: found 6 taxa, reference tree has 6 taxa
+Tree 288: found 6 taxa, reference tree has 6 taxa
+Tree 289: found 6 taxa, reference tree has 6 taxa
+Tree 290: found 6 taxa, reference tree has 6 taxa
+Tree 291: found 6 taxa, reference tree has 6 taxa
+Tree 292: found 6 taxa, reference tree has 6 taxa
+Tree 293: found 6 taxa, reference tree has 6 taxa
+Tree 294: found 6 taxa, reference tree has 6 taxa
+Tree 295: found 6 taxa, reference tree has 6 taxa
+Tree 296: found 6 taxa, reference tree has 6 taxa
+Tree 297: found 6 taxa, reference tree has 6 taxa
+Tree 298: found 6 taxa, reference tree has 6 taxa
+Tree 299: found 6 taxa, reference tree has 6 taxa
+Tree 300: found 6 taxa, reference tree has 6 taxa
+Tree 301: found 6 taxa, reference tree has 6 taxa
+Tree 302: found 6 taxa, reference tree has 6 taxa
+Tree 303: found 6 taxa, reference tree has 6 taxa
+Tree 304: found 6 taxa, reference tree has 6 taxa
+Tree 305: found 6 taxa, reference tree has 6 taxa
+Tree 306: found 6 taxa, reference tree has 6 taxa
+Tree 307: found 6 taxa, reference tree has 6 taxa
+Tree 308: found 6 taxa, reference tree has 6 taxa
+Tree 309: found 6 taxa, reference tree has 6 taxa
+Tree 310: found 6 taxa, reference tree has 6 taxa
+Tree 311: found 6 taxa, reference tree has 6 taxa
+Tree 312: found 6 taxa, reference tree has 6 taxa
+Tree 313: found 6 taxa, reference tree has 6 taxa
+Tree 314: found 6 taxa, reference tree has 6 taxa
+Tree 315: found 6 taxa, reference tree has 6 taxa
+Tree 316: found 6 taxa, reference tree has 6 taxa
+Tree 317: found 6 taxa, reference tree has 6 taxa
+Tree 318: found 6 taxa, reference tree has 6 taxa
+Tree 319: found 6 taxa, reference tree has 6 taxa
+Tree 320: found 6 taxa, reference tree has 6 taxa
+Tree 321: found 6 taxa, reference tree has 6 taxa
+Tree 322: found 6 taxa, reference tree has 6 taxa
+Tree 323: found 6 taxa, reference tree has 6 taxa
+Tree 324: found 6 taxa, reference tree has 6 taxa
+Tree 325: found 6 taxa, reference tree has 6 taxa
+Tree 326: found 6 taxa, reference tree has 6 taxa
+Tree 327: found 6 taxa, reference tree has 6 taxa
+Tree 328: found 6 taxa, reference tree has 6 taxa
+Tree 329: found 6 taxa, reference tree has 6 taxa
+Tree 330: found 6 taxa, reference tree has 6 taxa
+Tree 331: found 6 taxa, reference tree has 6 taxa
+Tree 332: found 6 taxa, reference tree has 6 taxa
+Tree 333: found 6 taxa, reference tree has 6 taxa
+Tree 334: found 6 taxa, reference tree has 6 taxa
+Tree 335: found 6 taxa, reference tree has 6 taxa
+Tree 336: found 6 taxa, reference tree has 6 taxa
+Tree 337: found 6 taxa, reference tree has 6 taxa
+Tree 338: found 6 taxa, reference tree has 6 taxa
+Tree 339: found 6 taxa, reference tree has 6 taxa
+Tree 340: found 6 taxa, reference tree has 6 taxa
+Tree 341: found 6 taxa, reference tree has 6 taxa
+Tree 342: found 6 taxa, reference tree has 6 taxa
+Tree 343: found 6 taxa, reference tree has 6 taxa
+Tree 344: found 6 taxa, reference tree has 6 taxa
+Tree 345: found 6 taxa, reference tree has 6 taxa
+Tree 346: found 6 taxa, reference tree has 6 taxa
+Tree 347: found 6 taxa, reference tree has 6 taxa
+Tree 348: found 6 taxa, reference tree has 6 taxa
+Tree 349: found 6 taxa, reference tree has 6 taxa
+Tree 350: found 6 taxa, reference tree has 6 taxa
+Tree 351: found 6 taxa, reference tree has 6 taxa
+Tree 352: found 6 taxa, reference tree has 6 taxa
+Tree 353: found 6 taxa, reference tree has 6 taxa
+Tree 354: found 6 taxa, reference tree has 6 taxa
+Tree 355: found 6 taxa, reference tree has 6 taxa
+Tree 356: found 6 taxa, reference tree has 6 taxa
+Tree 357: found 6 taxa, reference tree has 6 taxa
+Tree 358: found 6 taxa, reference tree has 6 taxa
+Tree 359: found 6 taxa, reference tree has 6 taxa
+Tree 360: found 6 taxa, reference tree has 6 taxa
+Tree 361: found 6 taxa, reference tree has 6 taxa
+Tree 362: found 6 taxa, reference tree has 6 taxa
+Tree 363: found 6 taxa, reference tree has 6 taxa
+Tree 364: found 6 taxa, reference tree has 6 taxa
+Tree 365: found 6 taxa, reference tree has 6 taxa
+Tree 366: found 6 taxa, reference tree has 6 taxa
+Tree 367: found 6 taxa, reference tree has 6 taxa
+Tree 368: found 6 taxa, reference tree has 6 taxa
+Tree 369: found 6 taxa, reference tree has 6 taxa
+Tree 370: found 6 taxa, reference tree has 6 taxa
+Tree 371: found 6 taxa, reference tree has 6 taxa
+Tree 372: found 6 taxa, reference tree has 6 taxa
+Tree 373: found 6 taxa, reference tree has 6 taxa
+Tree 374: found 6 taxa, reference tree has 6 taxa
+Tree 375: found 6 taxa, reference tree has 6 taxa
+Tree 376: found 6 taxa, reference tree has 6 taxa
+Tree 377: found 6 taxa, reference tree has 6 taxa
+Tree 378: found 6 taxa, reference tree has 6 taxa
+Tree 379: found 6 taxa, reference tree has 6 taxa
+Tree 380: found 6 taxa, reference tree has 6 taxa
+Tree 381: found 6 taxa, reference tree has 6 taxa
+Tree 382: found 6 taxa, reference tree has 6 taxa
+Tree 383: found 6 taxa, reference tree has 6 taxa
+Tree 384: found 6 taxa, reference tree has 6 taxa
+Tree 385: found 6 taxa, reference tree has 6 taxa
+Tree 386: found 6 taxa, reference tree has 6 taxa
+Tree 387: found 6 taxa, reference tree has 6 taxa
+Tree 388: found 6 taxa, reference tree has 6 taxa
+Tree 389: found 6 taxa, reference tree has 6 taxa
+Tree 390: found 6 taxa, reference tree has 6 taxa
+Tree 391: found 6 taxa, reference tree has 6 taxa
+Tree 392: found 6 taxa, reference tree has 6 taxa
+Tree 393: found 6 taxa, reference tree has 6 taxa
+Tree 394: found 6 taxa, reference tree has 6 taxa
+Tree 395: found 6 taxa, reference tree has 6 taxa
+Tree 396: found 6 taxa, reference tree has 6 taxa
+Tree 397: found 6 taxa, reference tree has 6 taxa
+Tree 398: found 6 taxa, reference tree has 6 taxa
+Tree 399: found 6 taxa, reference tree has 6 taxa
+Tree 400: found 6 taxa, reference tree has 6 taxa
+Tree 401: found 6 taxa, reference tree has 6 taxa
+Tree 402: found 6 taxa, reference tree has 6 taxa
+Tree 403: found 6 taxa, reference tree has 6 taxa
+Tree 404: found 6 taxa, reference tree has 6 taxa
+Tree 405: found 6 taxa, reference tree has 6 taxa
+Tree 406: found 6 taxa, reference tree has 6 taxa
+Tree 407: found 6 taxa, reference tree has 6 taxa
+Tree 408: found 6 taxa, reference tree has 6 taxa
+Tree 409: found 6 taxa, reference tree has 6 taxa
+Tree 410: found 6 taxa, reference tree has 6 taxa
+Tree 411: found 6 taxa, reference tree has 6 taxa
+Tree 412: found 6 taxa, reference tree has 6 taxa
+Tree 413: found 6 taxa, reference tree has 6 taxa
+Tree 414: found 6 taxa, reference tree has 6 taxa
+Tree 415: found 6 taxa, reference tree has 6 taxa
+Tree 416: found 6 taxa, reference tree has 6 taxa
+Tree 417: found 6 taxa, reference tree has 6 taxa
+Tree 418: found 6 taxa, reference tree has 6 taxa
+Tree 419: found 6 taxa, reference tree has 6 taxa
+Tree 420: found 6 taxa, reference tree has 6 taxa
+Tree 421: found 6 taxa, reference tree has 6 taxa
+Tree 422: found 6 taxa, reference tree has 6 taxa
+Tree 423: found 6 taxa, reference tree has 6 taxa
+Tree 424: found 6 taxa, reference tree has 6 taxa
+Tree 425: found 6 taxa, reference tree has 6 taxa
+Tree 426: found 6 taxa, reference tree has 6 taxa
+Tree 427: found 6 taxa, reference tree has 6 taxa
+Tree 428: found 6 taxa, reference tree has 6 taxa
+Tree 429: found 6 taxa, reference tree has 6 taxa
+Tree 430: found 6 taxa, reference tree has 6 taxa
+Tree 431: found 6 taxa, reference tree has 6 taxa
+Tree 432: found 6 taxa, reference tree has 6 taxa
+Tree 433: found 6 taxa, reference tree has 6 taxa
+Tree 434: found 6 taxa, reference tree has 6 taxa
+Tree 435: found 6 taxa, reference tree has 6 taxa
+Tree 436: found 6 taxa, reference tree has 6 taxa
+Tree 437: found 6 taxa, reference tree has 6 taxa
+Tree 438: found 6 taxa, reference tree has 6 taxa
+Tree 439: found 6 taxa, reference tree has 6 taxa
+Tree 440: found 6 taxa, reference tree has 6 taxa
+Tree 441: found 6 taxa, reference tree has 6 taxa
+Tree 442: found 6 taxa, reference tree has 6 taxa
+Tree 443: found 6 taxa, reference tree has 6 taxa
+Tree 444: found 6 taxa, reference tree has 6 taxa
+Tree 445: found 6 taxa, reference tree has 6 taxa
+Tree 446: found 6 taxa, reference tree has 6 taxa
+Tree 447: found 6 taxa, reference tree has 6 taxa
+Tree 448: found 6 taxa, reference tree has 6 taxa
+Tree 449: found 6 taxa, reference tree has 6 taxa
+Tree 450: found 6 taxa, reference tree has 6 taxa
+Tree 451: found 6 taxa, reference tree has 6 taxa
+Tree 452: found 6 taxa, reference tree has 6 taxa
+Tree 453: found 6 taxa, reference tree has 6 taxa
+Tree 454: found 6 taxa, reference tree has 6 taxa
+Tree 455: found 6 taxa, reference tree has 6 taxa
+Tree 456: found 6 taxa, reference tree has 6 taxa
+Tree 457: found 6 taxa, reference tree has 6 taxa
+Tree 458: found 6 taxa, reference tree has 6 taxa
+Tree 459: found 6 taxa, reference tree has 6 taxa
+Tree 460: found 6 taxa, reference tree has 6 taxa
+Tree 461: found 6 taxa, reference tree has 6 taxa
+Tree 462: found 6 taxa, reference tree has 6 taxa
+Tree 463: found 6 taxa, reference tree has 6 taxa
+Tree 464: found 6 taxa, reference tree has 6 taxa
+Tree 465: found 6 taxa, reference tree has 6 taxa
+Tree 466: found 6 taxa, reference tree has 6 taxa
+Tree 467: found 6 taxa, reference tree has 6 taxa
+Tree 468: found 6 taxa, reference tree has 6 taxa
+Tree 469: found 6 taxa, reference tree has 6 taxa
+Tree 470: found 6 taxa, reference tree has 6 taxa
+Tree 471: found 6 taxa, reference tree has 6 taxa
+Tree 472: found 6 taxa, reference tree has 6 taxa
+Tree 473: found 6 taxa, reference tree has 6 taxa
+Tree 474: found 6 taxa, reference tree has 6 taxa
+Tree 475: found 6 taxa, reference tree has 6 taxa
+Tree 476: found 6 taxa, reference tree has 6 taxa
+Tree 477: found 6 taxa, reference tree has 6 taxa
+Tree 478: found 6 taxa, reference tree has 6 taxa
+Tree 479: found 6 taxa, reference tree has 6 taxa
+Tree 480: found 6 taxa, reference tree has 6 taxa
+Tree 481: found 6 taxa, reference tree has 6 taxa
+Tree 482: found 6 taxa, reference tree has 6 taxa
+Tree 483: found 6 taxa, reference tree has 6 taxa
+Tree 484: found 6 taxa, reference tree has 6 taxa
+Tree 485: found 6 taxa, reference tree has 6 taxa
+Tree 486: found 6 taxa, reference tree has 6 taxa
+Tree 487: found 6 taxa, reference tree has 6 taxa
+Tree 488: found 6 taxa, reference tree has 6 taxa
+Tree 489: found 6 taxa, reference tree has 6 taxa
+Tree 490: found 6 taxa, reference tree has 6 taxa
+Tree 491: found 6 taxa, reference tree has 6 taxa
+Tree 492: found 6 taxa, reference tree has 6 taxa
+Tree 493: found 6 taxa, reference tree has 6 taxa
+Tree 494: found 6 taxa, reference tree has 6 taxa
+Tree 495: found 6 taxa, reference tree has 6 taxa
+Tree 496: found 6 taxa, reference tree has 6 taxa
+Tree 497: found 6 taxa, reference tree has 6 taxa
+Tree 498: found 6 taxa, reference tree has 6 taxa
+Tree 499: found 6 taxa, reference tree has 6 taxa
+Tree 500: found 6 taxa, reference tree has 6 taxa
+Tree 501: found 6 taxa, reference tree has 6 taxa
+Tree 502: found 6 taxa, reference tree has 6 taxa
+Tree 503: found 6 taxa, reference tree has 6 taxa
+Tree 504: found 6 taxa, reference tree has 6 taxa
+Tree 505: found 6 taxa, reference tree has 6 taxa
+Tree 506: found 6 taxa, reference tree has 6 taxa
+Tree 507: found 6 taxa, reference tree has 6 taxa
+Tree 508: found 6 taxa, reference tree has 6 taxa
+Tree 509: found 6 taxa, reference tree has 6 taxa
+Tree 510: found 6 taxa, reference tree has 6 taxa
+Tree 511: found 6 taxa, reference tree has 6 taxa
+Tree 512: found 6 taxa, reference tree has 6 taxa
+Tree 513: found 6 taxa, reference tree has 6 taxa
+Tree 514: found 6 taxa, reference tree has 6 taxa
+Tree 515: found 6 taxa, reference tree has 6 taxa
+Tree 516: found 6 taxa, reference tree has 6 taxa
+Tree 517: found 6 taxa, reference tree has 6 taxa
+Tree 518: found 6 taxa, reference tree has 6 taxa
+Tree 519: found 6 taxa, reference tree has 6 taxa
+Tree 520: found 6 taxa, reference tree has 6 taxa
+Tree 521: found 6 taxa, reference tree has 6 taxa
+Tree 522: found 6 taxa, reference tree has 6 taxa
+Tree 523: found 6 taxa, reference tree has 6 taxa
+Tree 524: found 6 taxa, reference tree has 6 taxa
+Tree 525: found 6 taxa, reference tree has 6 taxa
+Tree 526: found 6 taxa, reference tree has 6 taxa
+Tree 527: found 6 taxa, reference tree has 6 taxa
+Tree 528: found 6 taxa, reference tree has 6 taxa
+Tree 529: found 6 taxa, reference tree has 6 taxa
+Tree 530: found 6 taxa, reference tree has 6 taxa
+Tree 531: found 6 taxa, reference tree has 6 taxa
+Tree 532: found 6 taxa, reference tree has 6 taxa
+Tree 533: found 6 taxa, reference tree has 6 taxa
+Tree 534: found 6 taxa, reference tree has 6 taxa
+Tree 535: found 6 taxa, reference tree has 6 taxa
+Tree 536: found 6 taxa, reference tree has 6 taxa
+Tree 537: found 6 taxa, reference tree has 6 taxa
+Tree 538: found 6 taxa, reference tree has 6 taxa
+Tree 539: found 6 taxa, reference tree has 6 taxa
+Tree 540: found 6 taxa, reference tree has 6 taxa
+Tree 541: found 6 taxa, reference tree has 6 taxa
+Tree 542: found 6 taxa, reference tree has 6 taxa
+Tree 543: found 6 taxa, reference tree has 6 taxa
+Tree 544: found 6 taxa, reference tree has 6 taxa
+Tree 545: found 6 taxa, reference tree has 6 taxa
+Tree 546: found 6 taxa, reference tree has 6 taxa
+Tree 547: found 6 taxa, reference tree has 6 taxa
+Tree 548: found 6 taxa, reference tree has 6 taxa
+Tree 549: found 6 taxa, reference tree has 6 taxa
+Tree 550: found 6 taxa, reference tree has 6 taxa
+Tree 551: found 6 taxa, reference tree has 6 taxa
+Tree 552: found 6 taxa, reference tree has 6 taxa
+Tree 553: found 6 taxa, reference tree has 6 taxa
+Tree 554: found 6 taxa, reference tree has 6 taxa
+Tree 555: found 6 taxa, reference tree has 6 taxa
+Tree 556: found 6 taxa, reference tree has 6 taxa
+Tree 557: found 6 taxa, reference tree has 6 taxa
+Tree 558: found 6 taxa, reference tree has 6 taxa
+Tree 559: found 6 taxa, reference tree has 6 taxa
+Tree 560: found 6 taxa, reference tree has 6 taxa
+Tree 561: found 6 taxa, reference tree has 6 taxa
+Tree 562: found 6 taxa, reference tree has 6 taxa
+Tree 563: found 6 taxa, reference tree has 6 taxa
+Tree 564: found 6 taxa, reference tree has 6 taxa
+Tree 565: found 6 taxa, reference tree has 6 taxa
+Tree 566: found 6 taxa, reference tree has 6 taxa
+Tree 567: found 6 taxa, reference tree has 6 taxa
+Tree 568: found 6 taxa, reference tree has 6 taxa
+Tree 569: found 6 taxa, reference tree has 6 taxa
+Tree 570: found 6 taxa, reference tree has 6 taxa
+Tree 571: found 6 taxa, reference tree has 6 taxa
+Tree 572: found 6 taxa, reference tree has 6 taxa
+Tree 573: found 6 taxa, reference tree has 6 taxa
+Tree 574: found 6 taxa, reference tree has 6 taxa
+Tree 575: found 6 taxa, reference tree has 6 taxa
+Tree 576: found 6 taxa, reference tree has 6 taxa
+Tree 577: found 6 taxa, reference tree has 6 taxa
+Tree 578: found 6 taxa, reference tree has 6 taxa
+Tree 579: found 6 taxa, reference tree has 6 taxa
+Tree 580: found 6 taxa, reference tree has 6 taxa
+Tree 581: found 6 taxa, reference tree has 6 taxa
+Tree 582: found 6 taxa, reference tree has 6 taxa
+Tree 583: found 6 taxa, reference tree has 6 taxa
+Tree 584: found 6 taxa, reference tree has 6 taxa
+Tree 585: found 6 taxa, reference tree has 6 taxa
+Tree 586: found 6 taxa, reference tree has 6 taxa
+Tree 587: found 6 taxa, reference tree has 6 taxa
+Tree 588: found 6 taxa, reference tree has 6 taxa
+Tree 589: found 6 taxa, reference tree has 6 taxa
+Tree 590: found 6 taxa, reference tree has 6 taxa
+Tree 591: found 6 taxa, reference tree has 6 taxa
+Tree 592: found 6 taxa, reference tree has 6 taxa
+Tree 593: found 6 taxa, reference tree has 6 taxa
+Tree 594: found 6 taxa, reference tree has 6 taxa
+Tree 595: found 6 taxa, reference tree has 6 taxa
+Tree 596: found 6 taxa, reference tree has 6 taxa
+Tree 597: found 6 taxa, reference tree has 6 taxa
+Tree 598: found 6 taxa, reference tree has 6 taxa
+Tree 599: found 6 taxa, reference tree has 6 taxa
+Tree 600: found 6 taxa, reference tree has 6 taxa
+Tree 601: found 6 taxa, reference tree has 6 taxa
+Tree 602: found 6 taxa, reference tree has 6 taxa
+Tree 603: found 6 taxa, reference tree has 6 taxa
+Tree 604: found 6 taxa, reference tree has 6 taxa
+Tree 605: found 6 taxa, reference tree has 6 taxa
+Tree 606: found 6 taxa, reference tree has 6 taxa
+Tree 607: found 6 taxa, reference tree has 6 taxa
+Tree 608: found 6 taxa, reference tree has 6 taxa
+Tree 609: found 6 taxa, reference tree has 6 taxa
+Tree 610: found 6 taxa, reference tree has 6 taxa
+Tree 611: found 6 taxa, reference tree has 6 taxa
+Tree 612: found 6 taxa, reference tree has 6 taxa
+Tree 613: found 6 taxa, reference tree has 6 taxa
+Tree 614: found 6 taxa, reference tree has 6 taxa
+Tree 615: found 6 taxa, reference tree has 6 taxa
+Tree 616: found 6 taxa, reference tree has 6 taxa
+Tree 617: found 6 taxa, reference tree has 6 taxa
+Tree 618: found 6 taxa, reference tree has 6 taxa
+Tree 619: found 6 taxa, reference tree has 6 taxa
+Tree 620: found 6 taxa, reference tree has 6 taxa
+Tree 621: found 6 taxa, reference tree has 6 taxa
+Tree 622: found 6 taxa, reference tree has 6 taxa
+Tree 623: found 6 taxa, reference tree has 6 taxa
+Tree 624: found 6 taxa, reference tree has 6 taxa
+Tree 625: found 6 taxa, reference tree has 6 taxa
+Tree 626: found 6 taxa, reference tree has 6 taxa
+Tree 627: found 6 taxa, reference tree has 6 taxa
+Tree 628: found 6 taxa, reference tree has 6 taxa
+Tree 629: found 6 taxa, reference tree has 6 taxa
+Tree 630: found 6 taxa, reference tree has 6 taxa
+Tree 631: found 6 taxa, reference tree has 6 taxa
+Tree 632: found 6 taxa, reference tree has 6 taxa
+Tree 633: found 6 taxa, reference tree has 6 taxa
+Tree 634: found 6 taxa, reference tree has 6 taxa
+Tree 635: found 6 taxa, reference tree has 6 taxa
+Tree 636: found 6 taxa, reference tree has 6 taxa
+Tree 637: found 6 taxa, reference tree has 6 taxa
+Tree 638: found 6 taxa, reference tree has 6 taxa
+Tree 639: found 6 taxa, reference tree has 6 taxa
+Tree 640: found 6 taxa, reference tree has 6 taxa
+Tree 641: found 6 taxa, reference tree has 6 taxa
+Tree 642: found 6 taxa, reference tree has 6 taxa
+Tree 643: found 6 taxa, reference tree has 6 taxa
+Tree 644: found 6 taxa, reference tree has 6 taxa
+Tree 645: found 6 taxa, reference tree has 6 taxa
+Tree 646: found 6 taxa, reference tree has 6 taxa
+Tree 647: found 6 taxa, reference tree has 6 taxa
+Tree 648: found 6 taxa, reference tree has 6 taxa
+Tree 649: found 6 taxa, reference tree has 6 taxa
+Tree 650: found 6 taxa, reference tree has 6 taxa
+Tree 651: found 6 taxa, reference tree has 6 taxa
+Tree 652: found 6 taxa, reference tree has 6 taxa
+Tree 653: found 6 taxa, reference tree has 6 taxa
+Tree 654: found 6 taxa, reference tree has 6 taxa
+Tree 655: found 6 taxa, reference tree has 6 taxa
+Tree 656: found 6 taxa, reference tree has 6 taxa
+Tree 657: found 6 taxa, reference tree has 6 taxa
+Tree 658: found 6 taxa, reference tree has 6 taxa
+Tree 659: found 6 taxa, reference tree has 6 taxa
+Tree 660: found 6 taxa, reference tree has 6 taxa
+Tree 661: found 6 taxa, reference tree has 6 taxa
+Tree 662: found 6 taxa, reference tree has 6 taxa
+Tree 663: found 6 taxa, reference tree has 6 taxa
+Tree 664: found 6 taxa, reference tree has 6 taxa
+Tree 665: found 6 taxa, reference tree has 6 taxa
+Tree 666: found 6 taxa, reference tree has 6 taxa
+Tree 667: found 6 taxa, reference tree has 6 taxa
+Tree 668: found 6 taxa, reference tree has 6 taxa
+Tree 669: found 6 taxa, reference tree has 6 taxa
+Tree 670: found 6 taxa, reference tree has 6 taxa
+Tree 671: found 6 taxa, reference tree has 6 taxa
+Tree 672: found 6 taxa, reference tree has 6 taxa
+Tree 673: found 6 taxa, reference tree has 6 taxa
+Tree 674: found 6 taxa, reference tree has 6 taxa
+Tree 675: found 6 taxa, reference tree has 6 taxa
+Tree 676: found 6 taxa, reference tree has 6 taxa
+Tree 677: found 6 taxa, reference tree has 6 taxa
+Tree 678: found 6 taxa, reference tree has 6 taxa
+Tree 679: found 6 taxa, reference tree has 6 taxa
+Tree 680: found 6 taxa, reference tree has 6 taxa
+Tree 681: found 6 taxa, reference tree has 6 taxa
+Tree 682: found 6 taxa, reference tree has 6 taxa
+Tree 683: found 6 taxa, reference tree has 6 taxa
+Tree 684: found 6 taxa, reference tree has 6 taxa
+Tree 685: found 6 taxa, reference tree has 6 taxa
+Tree 686: found 6 taxa, reference tree has 6 taxa
+Tree 687: found 6 taxa, reference tree has 6 taxa
+Tree 688: found 6 taxa, reference tree has 6 taxa
+Tree 689: found 6 taxa, reference tree has 6 taxa
+Tree 690: found 6 taxa, reference tree has 6 taxa
+Tree 691: found 6 taxa, reference tree has 6 taxa
+Tree 692: found 6 taxa, reference tree has 6 taxa
+Tree 693: found 6 taxa, reference tree has 6 taxa
+Tree 694: found 6 taxa, reference tree has 6 taxa
+Tree 695: found 6 taxa, reference tree has 6 taxa
+Tree 696: found 6 taxa, reference tree has 6 taxa
+Tree 697: found 6 taxa, reference tree has 6 taxa
+Tree 698: found 6 taxa, reference tree has 6 taxa
+Tree 699: found 6 taxa, reference tree has 6 taxa
+Tree 700: found 6 taxa, reference tree has 6 taxa
+Tree 701: found 6 taxa, reference tree has 6 taxa
+Tree 702: found 6 taxa, reference tree has 6 taxa
+Tree 703: found 6 taxa, reference tree has 6 taxa
+Tree 704: found 6 taxa, reference tree has 6 taxa
+Tree 705: found 6 taxa, reference tree has 6 taxa
+Tree 706: found 6 taxa, reference tree has 6 taxa
+Tree 707: found 6 taxa, reference tree has 6 taxa
+Tree 708: found 6 taxa, reference tree has 6 taxa
+Tree 709: found 6 taxa, reference tree has 6 taxa
+Tree 710: found 6 taxa, reference tree has 6 taxa
+Tree 711: found 6 taxa, reference tree has 6 taxa
+Tree 712: found 6 taxa, reference tree has 6 taxa
+Tree 713: found 6 taxa, reference tree has 6 taxa
+Tree 714: found 6 taxa, reference tree has 6 taxa
+Tree 715: found 6 taxa, reference tree has 6 taxa
+Tree 716: found 6 taxa, reference tree has 6 taxa
+Tree 717: found 6 taxa, reference tree has 6 taxa
+Tree 718: found 6 taxa, reference tree has 6 taxa
+Tree 719: found 6 taxa, reference tree has 6 taxa
+Tree 720: found 6 taxa, reference tree has 6 taxa
+Tree 721: found 6 taxa, reference tree has 6 taxa
+Tree 722: found 6 taxa, reference tree has 6 taxa
+Tree 723: found 6 taxa, reference tree has 6 taxa
+Tree 724: found 6 taxa, reference tree has 6 taxa
+Tree 725: found 6 taxa, reference tree has 6 taxa
+Tree 726: found 6 taxa, reference tree has 6 taxa
+Tree 727: found 6 taxa, reference tree has 6 taxa
+Tree 728: found 6 taxa, reference tree has 6 taxa
+Tree 729: found 6 taxa, reference tree has 6 taxa
+Tree 730: found 6 taxa, reference tree has 6 taxa
+Tree 731: found 6 taxa, reference tree has 6 taxa
+Tree 732: found 6 taxa, reference tree has 6 taxa
+Tree 733: found 6 taxa, reference tree has 6 taxa
+Tree 734: found 6 taxa, reference tree has 6 taxa
+Tree 735: found 6 taxa, reference tree has 6 taxa
+Tree 736: found 6 taxa, reference tree has 6 taxa
+Tree 737: found 6 taxa, reference tree has 6 taxa
+Tree 738: found 6 taxa, reference tree has 6 taxa
+Tree 739: found 6 taxa, reference tree has 6 taxa
+Tree 740: found 6 taxa, reference tree has 6 taxa
+Tree 741: found 6 taxa, reference tree has 6 taxa
+Tree 742: found 6 taxa, reference tree has 6 taxa
+Tree 743: found 6 taxa, reference tree has 6 taxa
+Tree 744: found 6 taxa, reference tree has 6 taxa
+Tree 745: found 6 taxa, reference tree has 6 taxa
+Tree 746: found 6 taxa, reference tree has 6 taxa
+Tree 747: found 6 taxa, reference tree has 6 taxa
+Tree 748: found 6 taxa, reference tree has 6 taxa
+Tree 749: found 6 taxa, reference tree has 6 taxa
+Tree 750: found 6 taxa, reference tree has 6 taxa
+Tree 751: found 6 taxa, reference tree has 6 taxa
+Tree 752: found 6 taxa, reference tree has 6 taxa
+Tree 753: found 6 taxa, reference tree has 6 taxa
+Tree 754: found 6 taxa, reference tree has 6 taxa
+Tree 755: found 6 taxa, reference tree has 6 taxa
+Tree 756: found 6 taxa, reference tree has 6 taxa
+Tree 757: found 6 taxa, reference tree has 6 taxa
+Tree 758: found 6 taxa, reference tree has 6 taxa
+Tree 759: found 6 taxa, reference tree has 6 taxa
+Tree 760: found 6 taxa, reference tree has 6 taxa
+Tree 761: found 6 taxa, reference tree has 6 taxa
+Tree 762: found 6 taxa, reference tree has 6 taxa
+Tree 763: found 6 taxa, reference tree has 6 taxa
+Tree 764: found 6 taxa, reference tree has 6 taxa
+Tree 765: found 6 taxa, reference tree has 6 taxa
+Tree 766: found 6 taxa, reference tree has 6 taxa
+Tree 767: found 6 taxa, reference tree has 6 taxa
+Tree 768: found 6 taxa, reference tree has 6 taxa
+Tree 769: found 6 taxa, reference tree has 6 taxa
+Tree 770: found 6 taxa, reference tree has 6 taxa
+Tree 771: found 6 taxa, reference tree has 6 taxa
+Tree 772: found 6 taxa, reference tree has 6 taxa
+Tree 773: found 6 taxa, reference tree has 6 taxa
+Tree 774: found 6 taxa, reference tree has 6 taxa
+Tree 775: found 6 taxa, reference tree has 6 taxa
+Tree 776: found 6 taxa, reference tree has 6 taxa
+Tree 777: found 6 taxa, reference tree has 6 taxa
+Tree 778: found 6 taxa, reference tree has 6 taxa
+Tree 779: found 6 taxa, reference tree has 6 taxa
+Tree 780: found 6 taxa, reference tree has 6 taxa
+Tree 781: found 6 taxa, reference tree has 6 taxa
+Tree 782: found 6 taxa, reference tree has 6 taxa
+Tree 783: found 6 taxa, reference tree has 6 taxa
+Tree 784: found 6 taxa, reference tree has 6 taxa
+Tree 785: found 6 taxa, reference tree has 6 taxa
+Tree 786: found 6 taxa, reference tree has 6 taxa
+Tree 787: found 6 taxa, reference tree has 6 taxa
+Tree 788: found 6 taxa, reference tree has 6 taxa
+Tree 789: found 6 taxa, reference tree has 6 taxa
+Tree 790: found 6 taxa, reference tree has 6 taxa
+Tree 791: found 6 taxa, reference tree has 6 taxa
+Tree 792: found 6 taxa, reference tree has 6 taxa
+Tree 793: found 6 taxa, reference tree has 6 taxa
+Tree 794: found 6 taxa, reference tree has 6 taxa
+Tree 795: found 6 taxa, reference tree has 6 taxa
+Tree 796: found 6 taxa, reference tree has 6 taxa
+Tree 797: found 6 taxa, reference tree has 6 taxa
+Tree 798: found 6 taxa, reference tree has 6 taxa
+Tree 799: found 6 taxa, reference tree has 6 taxa
+Tree 800: found 6 taxa, reference tree has 6 taxa
+Tree 801: found 6 taxa, reference tree has 6 taxa
+Tree 802: found 6 taxa, reference tree has 6 taxa
+Tree 803: found 6 taxa, reference tree has 6 taxa
+Tree 804: found 6 taxa, reference tree has 6 taxa
+Tree 805: found 6 taxa, reference tree has 6 taxa
+Tree 806: found 6 taxa, reference tree has 6 taxa
+Tree 807: found 6 taxa, reference tree has 6 taxa
+Tree 808: found 6 taxa, reference tree has 6 taxa
+Tree 809: found 6 taxa, reference tree has 6 taxa
+Tree 810: found 6 taxa, reference tree has 6 taxa
+Tree 811: found 6 taxa, reference tree has 6 taxa
+Tree 812: found 6 taxa, reference tree has 6 taxa
+Tree 813: found 6 taxa, reference tree has 6 taxa
+Tree 814: found 6 taxa, reference tree has 6 taxa
+Tree 815: found 6 taxa, reference tree has 6 taxa
+Tree 816: found 6 taxa, reference tree has 6 taxa
+Tree 817: found 6 taxa, reference tree has 6 taxa
+Tree 818: found 6 taxa, reference tree has 6 taxa
+Tree 819: found 6 taxa, reference tree has 6 taxa
+Tree 820: found 6 taxa, reference tree has 6 taxa
+Tree 821: found 6 taxa, reference tree has 6 taxa
+Tree 822: found 6 taxa, reference tree has 6 taxa
+Tree 823: found 6 taxa, reference tree has 6 taxa
+Tree 824: found 6 taxa, reference tree has 6 taxa
+Tree 825: found 6 taxa, reference tree has 6 taxa
+Tree 826: found 6 taxa, reference tree has 6 taxa
+Tree 827: found 6 taxa, reference tree has 6 taxa
+Tree 828: found 6 taxa, reference tree has 6 taxa
+Tree 829: found 6 taxa, reference tree has 6 taxa
+Tree 830: found 6 taxa, reference tree has 6 taxa
+Tree 831: found 6 taxa, reference tree has 6 taxa
+Tree 832: found 6 taxa, reference tree has 6 taxa
+Tree 833: found 6 taxa, reference tree has 6 taxa
+Tree 834: found 6 taxa, reference tree has 6 taxa
+Tree 835: found 6 taxa, reference tree has 6 taxa
+Tree 836: found 6 taxa, reference tree has 6 taxa
+Tree 837: found 6 taxa, reference tree has 6 taxa
+Tree 838: found 6 taxa, reference tree has 6 taxa
+Tree 839: found 6 taxa, reference tree has 6 taxa
+Tree 840: found 6 taxa, reference tree has 6 taxa
+Tree 841: found 6 taxa, reference tree has 6 taxa
+Tree 842: found 6 taxa, reference tree has 6 taxa
+Tree 843: found 6 taxa, reference tree has 6 taxa
+Tree 844: found 6 taxa, reference tree has 6 taxa
+Tree 845: found 6 taxa, reference tree has 6 taxa
+Tree 846: found 6 taxa, reference tree has 6 taxa
+Tree 847: found 6 taxa, reference tree has 6 taxa
+Tree 848: found 6 taxa, reference tree has 6 taxa
+Tree 849: found 6 taxa, reference tree has 6 taxa
+Tree 850: found 6 taxa, reference tree has 6 taxa
+Tree 851: found 6 taxa, reference tree has 6 taxa
+Tree 852: found 6 taxa, reference tree has 6 taxa
+Tree 853: found 6 taxa, reference tree has 6 taxa
+Tree 854: found 6 taxa, reference tree has 6 taxa
+Tree 855: found 6 taxa, reference tree has 6 taxa
+Tree 856: found 6 taxa, reference tree has 6 taxa
+Tree 857: found 6 taxa, reference tree has 6 taxa
+Tree 858: found 6 taxa, reference tree has 6 taxa
+Tree 859: found 6 taxa, reference tree has 6 taxa
+Tree 860: found 6 taxa, reference tree has 6 taxa
+Tree 861: found 6 taxa, reference tree has 6 taxa
+Tree 862: found 6 taxa, reference tree has 6 taxa
+Tree 863: found 6 taxa, reference tree has 6 taxa
+Tree 864: found 6 taxa, reference tree has 6 taxa
+Tree 865: found 6 taxa, reference tree has 6 taxa
+Tree 866: found 6 taxa, reference tree has 6 taxa
+Tree 867: found 6 taxa, reference tree has 6 taxa
+Tree 868: found 6 taxa, reference tree has 6 taxa
+Tree 869: found 6 taxa, reference tree has 6 taxa
+Tree 870: found 6 taxa, reference tree has 6 taxa
+Tree 871: found 6 taxa, reference tree has 6 taxa
+Tree 872: found 6 taxa, reference tree has 6 taxa
+Tree 873: found 6 taxa, reference tree has 6 taxa
+Tree 874: found 6 taxa, reference tree has 6 taxa
+Tree 875: found 6 taxa, reference tree has 6 taxa
+Tree 876: found 6 taxa, reference tree has 6 taxa
+Tree 877: found 6 taxa, reference tree has 6 taxa
+Tree 878: found 6 taxa, reference tree has 6 taxa
+Tree 879: found 6 taxa, reference tree has 6 taxa
+Tree 880: found 6 taxa, reference tree has 6 taxa
+Tree 881: found 6 taxa, reference tree has 6 taxa
+Tree 882: found 6 taxa, reference tree has 6 taxa
+Tree 883: found 6 taxa, reference tree has 6 taxa
+Tree 884: found 6 taxa, reference tree has 6 taxa
+Tree 885: found 6 taxa, reference tree has 6 taxa
+Tree 886: found 6 taxa, reference tree has 6 taxa
+Tree 887: found 6 taxa, reference tree has 6 taxa
+Tree 888: found 6 taxa, reference tree has 6 taxa
+Tree 889: found 6 taxa, reference tree has 6 taxa
+Tree 890: found 6 taxa, reference tree has 6 taxa
+Tree 891: found 6 taxa, reference tree has 6 taxa
+Tree 892: found 6 taxa, reference tree has 6 taxa
+Tree 893: found 6 taxa, reference tree has 6 taxa
+Tree 894: found 6 taxa, reference tree has 6 taxa
+Tree 895: found 6 taxa, reference tree has 6 taxa
+Tree 896: found 6 taxa, reference tree has 6 taxa
+Tree 897: found 6 taxa, reference tree has 6 taxa
+Tree 898: found 6 taxa, reference tree has 6 taxa
+Tree 899: found 6 taxa, reference tree has 6 taxa
+Tree 900: found 6 taxa, reference tree has 6 taxa
+Tree 901: found 6 taxa, reference tree has 6 taxa
+Tree 902: found 6 taxa, reference tree has 6 taxa
+Tree 903: found 6 taxa, reference tree has 6 taxa
+Tree 904: found 6 taxa, reference tree has 6 taxa
+Tree 905: found 6 taxa, reference tree has 6 taxa
+Tree 906: found 6 taxa, reference tree has 6 taxa
+Tree 907: found 6 taxa, reference tree has 6 taxa
+Tree 908: found 6 taxa, reference tree has 6 taxa
+Tree 909: found 6 taxa, reference tree has 6 taxa
+Tree 910: found 6 taxa, reference tree has 6 taxa
+Tree 911: found 6 taxa, reference tree has 6 taxa
+Tree 912: found 6 taxa, reference tree has 6 taxa
+Tree 913: found 6 taxa, reference tree has 6 taxa
+Tree 914: found 6 taxa, reference tree has 6 taxa
+Tree 915: found 6 taxa, reference tree has 6 taxa
+Tree 916: found 6 taxa, reference tree has 6 taxa
+Tree 917: found 6 taxa, reference tree has 6 taxa
+Tree 918: found 6 taxa, reference tree has 6 taxa
+Tree 919: found 6 taxa, reference tree has 6 taxa
+Tree 920: found 6 taxa, reference tree has 6 taxa
+Tree 921: found 6 taxa, reference tree has 6 taxa
+Tree 922: found 6 taxa, reference tree has 6 taxa
+Tree 923: found 6 taxa, reference tree has 6 taxa
+Tree 924: found 6 taxa, reference tree has 6 taxa
+Tree 925: found 6 taxa, reference tree has 6 taxa
+Tree 926: found 6 taxa, reference tree has 6 taxa
+Tree 927: found 6 taxa, reference tree has 6 taxa
+Tree 928: found 6 taxa, reference tree has 6 taxa
+Tree 929: found 6 taxa, reference tree has 6 taxa
+Tree 930: found 6 taxa, reference tree has 6 taxa
+Tree 931: found 6 taxa, reference tree has 6 taxa
+Tree 932: found 6 taxa, reference tree has 6 taxa
+Tree 933: found 6 taxa, reference tree has 6 taxa
+Tree 934: found 6 taxa, reference tree has 6 taxa
+Tree 935: found 6 taxa, reference tree has 6 taxa
+Tree 936: found 6 taxa, reference tree has 6 taxa
+Tree 937: found 6 taxa, reference tree has 6 taxa
+Tree 938: found 6 taxa, reference tree has 6 taxa
+Tree 939: found 6 taxa, reference tree has 6 taxa
+Tree 940: found 6 taxa, reference tree has 6 taxa
+Tree 941: found 6 taxa, reference tree has 6 taxa
+Tree 942: found 6 taxa, reference tree has 6 taxa
+Tree 943: found 6 taxa, reference tree has 6 taxa
+Tree 944: found 6 taxa, reference tree has 6 taxa
+Tree 945: found 6 taxa, reference tree has 6 taxa
+Tree 946: found 6 taxa, reference tree has 6 taxa
+Tree 947: found 6 taxa, reference tree has 6 taxa
+Tree 948: found 6 taxa, reference tree has 6 taxa
+Tree 949: found 6 taxa, reference tree has 6 taxa
+Tree 950: found 6 taxa, reference tree has 6 taxa
+Tree 951: found 6 taxa, reference tree has 6 taxa
+Tree 952: found 6 taxa, reference tree has 6 taxa
+Tree 953: found 6 taxa, reference tree has 6 taxa
+Tree 954: found 6 taxa, reference tree has 6 taxa
+Tree 955: found 6 taxa, reference tree has 6 taxa
+Tree 956: found 6 taxa, reference tree has 6 taxa
+Tree 957: found 6 taxa, reference tree has 6 taxa
+Tree 958: found 6 taxa, reference tree has 6 taxa
+Tree 959: found 6 taxa, reference tree has 6 taxa
+Tree 960: found 6 taxa, reference tree has 6 taxa
+Tree 961: found 6 taxa, reference tree has 6 taxa
+Tree 962: found 6 taxa, reference tree has 6 taxa
+Tree 963: found 6 taxa, reference tree has 6 taxa
+Tree 964: found 6 taxa, reference tree has 6 taxa
+Tree 965: found 6 taxa, reference tree has 6 taxa
+Tree 966: found 6 taxa, reference tree has 6 taxa
+Tree 967: found 6 taxa, reference tree has 6 taxa
+Tree 968: found 6 taxa, reference tree has 6 taxa
+Tree 969: found 6 taxa, reference tree has 6 taxa
+Tree 970: found 6 taxa, reference tree has 6 taxa
+Tree 971: found 6 taxa, reference tree has 6 taxa
+Tree 972: found 6 taxa, reference tree has 6 taxa
+Tree 973: found 6 taxa, reference tree has 6 taxa
+Tree 974: found 6 taxa, reference tree has 6 taxa
+Tree 975: found 6 taxa, reference tree has 6 taxa
+Tree 976: found 6 taxa, reference tree has 6 taxa
+Tree 977: found 6 taxa, reference tree has 6 taxa
+Tree 978: found 6 taxa, reference tree has 6 taxa
+Tree 979: found 6 taxa, reference tree has 6 taxa
+Tree 980: found 6 taxa, reference tree has 6 taxa
+Tree 981: found 6 taxa, reference tree has 6 taxa
+Tree 982: found 6 taxa, reference tree has 6 taxa
+Tree 983: found 6 taxa, reference tree has 6 taxa
+Tree 984: found 6 taxa, reference tree has 6 taxa
+Tree 985: found 6 taxa, reference tree has 6 taxa
+Tree 986: found 6 taxa, reference tree has 6 taxa
+Tree 987: found 6 taxa, reference tree has 6 taxa
+Tree 988: found 6 taxa, reference tree has 6 taxa
+Tree 989: found 6 taxa, reference tree has 6 taxa
+Tree 990: found 6 taxa, reference tree has 6 taxa
+Tree 991: found 6 taxa, reference tree has 6 taxa
+Tree 992: found 6 taxa, reference tree has 6 taxa
+Tree 993: found 6 taxa, reference tree has 6 taxa
+Tree 994: found 6 taxa, reference tree has 6 taxa
+Tree 995: found 6 taxa, reference tree has 6 taxa
+Tree 996: found 6 taxa, reference tree has 6 taxa
+Tree 997: found 6 taxa, reference tree has 6 taxa
+Tree 998: found 6 taxa, reference tree has 6 taxa
+Tree 999: found 6 taxa, reference tree has 6 taxa
+All trees in tree set have the same size, executing standard IC/TC algorithm ... 
+
+
+Found 1 tree in File /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.treefile
+
+Support for split number 2 in tree: 0.994000
+Support for conflicting split number 0: 0.006000
+All Newick-formatted splits for this bipartition have been written to file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/ic/RAxML_verboseIC.ic.2
+
+
+Tree certainty for this tree: 2.947085
+Relative tree certainty for this tree: 0.982362
+
+Tree certainty including all conflicting bipartitions (TCA) for this tree: 2.947085
+Relative tree certainty including all conflicting bipartitions (TCA) for this tree: 0.982362
+
+Verbose PHYLIP-style formatted bipartition information written to file: /sciclone/home/iadanforth/scr10/data/kbrevis/tree/ic/RAxML_verboseSplits.ic
+
+
+
+Time for Computation of TC and IC scores 0.503285
+
+Tree with IC scores as branch labels written to file:  /sciclone/home/iadanforth/scr10/data/kbrevis/tree/ic/RAxML_IC_Score_BranchLabels.ic
+Execution information file written to :  /sciclone/home/iadanforth/scr10/data/kbrevis/tree/ic/RAxML_info.ic
+
+project:            kbrevis_gvmags
+date:               Thu Nov 12 05:17:18 PM EST 2026
+alignment:          /sciclone/home/iadanforth/scr10/data/kbrevis/tree_smoketest/tree6.aln
+model requested:    MFP
+model chosen:       rtREV+F+I+R5 chosen according to BIC
+log-likelihood:     -20020.086
+bootstrap reps:     1000 (ultrafast UFBoot, --bnni)
+threads:            8
+taxa in tree:       6
+
+UFBoot support distribution (branch support values):
+  3 internal branches; median 100
+  >=95 (well supported): 3 (100%)
+  <70  (poorly supported): 0
+
+[tree] done. Key outputs in /sciclone/home/iadanforth/scr10/data/kbrevis/tree:
+  kbrevis_gvmags.treefile          the ML tree with UFBoot support (Newick)
+  kbrevis_gvmags.iqtree            human-readable report: model, likelihood, parameters
+  kbrevis_gvmags.log               full IQ-TREE log
+  kbrevis_gvmags.ufboot            the bootstrap trees
+  kbrevis_gvmags.IC_TC_info.txt    RAxML internode/tree certainty scores
+  kbrevis_gvmags.tree_summary.txt  this summary
+
+The tree is UNROOTED. Booker et al. midpoint-rooted theirs; do that in iTOL,
+FigTree or PearTree, or with ape::midpoint in R, before interpreting it.

@@ -53,9 +53,9 @@ for R1 in "${R1_FILES[@]}"; do
     OUT1="$OUT_DIR/${NAME}_1_CLEAN.fastq"
     OUT2="$OUT_DIR/${NAME}_2_CLEAN.fastq"
 
-    if [[ -e "$OUT1" || -e "$OUT2" ]]; then
-        echo "Output already exists for $NAME; choose another output directory or move the existing files." >&2
-        exit 1
+    if [[ -e "$OUT1" && -e "$OUT2" ]]; then
+        echo "Both output files exist for $NAME; skipping." >&2
+        continue
     fi
 
     echo "Screening $NAME against contaminating genomes..."

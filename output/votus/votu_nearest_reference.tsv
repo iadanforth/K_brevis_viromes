@@ -1,0 +1,20 @@
+votu	representative	n_members	length_bp	checkv_completeness	nearest_reference	ani_percent	aligned_fraction_percent	ref_phylum	ref_class	ref_order	ref_family	ref_genus	ref_length_bp	ref_gc_percent	ref_order_completeness	ref_ecosystem
+vOTU01	SRR28004148__SRR28004148_bin_1	1	2187896	100.00	SRX802077-79	90.71	35.52	Nucleocytoviricota	Megaviricetes	Imitervirales	f_Mimiviridae	g226	815063	23.69	77.53	NA
+vOTU02	SRR28004154__SRR28004154_bin_22	2	1226811	100.00	bin_3206	79.34	48.85	NA	Megaviricetes	Imitervirales	f_Mimiviridae	g243	1174831	20.58	68.54	Freshwater
+vOTU03	SRR28004137__SRR28004137_bin_6	2	530439	100.00	IMGM3300017967_BIN561	78.55	2.53	NA	Megaviricetes	Imitervirales	f_Mesomimiviridae	n_685	53348	34.15	20.22	Marine
+vOTU04	SRR34748664__SRR34748664_bin_2	1	348214	100.00	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
+vOTU05	SRR28004151__SRR28004151_bin_29	1	203021	100.00	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
+vOTU06	SRR28004144__SRR28004144_bin_70	1	421742	82.18	IMGM3300040751_BIN751	89.22	13.77	NA	Megaviricetes	Imitervirales	f_Mesomimiviridae	n_706	74026	45.85	11.24	Marine
+vOTU07	SRR28004154__SRR28004154_bin_7	1	495517	77.75	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
+vOTU08	SRR28004139__SRR28004139_bin_22	3	857067	73.43	IMGM3300024256_BIN200	78.82	29.18	NA	Megaviricetes	Imitervirales	f_Mimiviridae	g244	437128	18.24	58.43	Marine
+vOTU09	SRR28004154__SRR28004154_bin_24	1	361245	71.28	IMGM3300004096_BIN14	75.67	2.00	NA	Megaviricetes	Imitervirales	f_Mesomimiviridae	n_713	34441	30.95	14.61	Freshwater
+vOTU10	SRR28004148__SRR28004148_bin_93	1	351669	70.58	IMGM3300020408_BIN215	94.25	45.56	NA	Megaviricetes	Imitervirales	f_Mesomimiviridae	g335	224049	26.56	68.54	Marine
+vOTU11	SRR28004138__SRR28004138_bin_37	1	671956	65.31	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
+vOTU12	SRR28004154__SRR28004154_bin_8	2	343608	64.79	IMGM3300037329_BIN195	74.44	0.92	NA	Megaviricetes	Imitervirales	f_Allomimiviridae	g303	20900	31.8	14.61	Non-marine Saline and Alkaline
+vOTU13	SRR28004137__SRR28004137_bin_11	1	309356	60.77	IMGM3300023179_BIN729	74.60	21.59	NA	Megaviricetes	Imitervirales	f_Mimiviridae	n_463	1251309	16.74	78.65	Freshwater
+vOTU14	SRR28004151__SRR28004151_bin_1	1	261816	58.58	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
+vOTU15	SRR28004152__SRR28004152_bin_36	1	295015	48.65	IMGM3300020469_BIN799	76.10	18.18	NA	Megaviricetes	Algavirales	f_AG_04	g173	217873	22.15	69.09	Marine
+vOTU16	SRR28004148__SRR28004148_bin_29	1	555967	47.83	IMGM3300046734_BIN24	97.95	25.60	NA	Megaviricetes	Imitervirales	f_Mimiviridae	g215	179541	23.42	46.07	Marine
+vOTU17	SRR28004154__SRR28004154_bin_6	2	399831	46.62	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA
+vOTU18	SRR28004138__SRR28004138_bin_51	2	510911	43.70	IMGM3300020187_BIN340	77.01	5.13	NA	NA	NA	f_Mimiviridae	NA	100085	24.23	25.84	Marine
+vOTU19	SRR28004139__SRR28004139_bin_7	1	216065	NA	none_above_fastani_threshold	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA

@@ -1,0 +1,25 @@
+# Marker-gene phylogenomics of giant viruses (step 10).
+#
+# ncldv_markersearch.py is a GitHub script, not a conda package, so this environment
+# supplies everything it imports or shells out to:
+#   pandas, numpy, natsort, biopython  -> its Python imports
+#   hmmer                              -> hmmsearch, to find the marker genes
+#   clustalo                           -> per-marker alignment (its default aligner)
+#   muscle                             -> optional alternative aligner (-g muscle)
+# plus:
+#   trimal 1.5.1   -> alignment trimming (newest release; the paper used 1.4.22)
+#   pyrodigal-gv   -> predicting proteins for our own vOTU genomes in Prodigal
+#                     header format (contig_1, contig_2, ...), which markersearch requires
+name: phylo-env
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.12
+  - pandas
+  - numpy
+  - natsort
+  - biopython
+  - hmmer=3.4
+  - clustalo=1.2.4
+  - muscle=5.3
+  - trimal=1.5.1
+  - pyrodigal-gv

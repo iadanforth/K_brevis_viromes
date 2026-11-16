@@ -1,0 +1,33 @@
+=== headers of test input:
+==> /sciclone/home/iadanforth/scr10/data/kbrevis/nms_smoketest/proteins/medusavirus.faa <==
+>medusavirus.fna|AP018495.1_1 # 2 # 430 # -1 # ID=1_1;partial=10;start_type=GTG;rbs_motif=ACA;rbs_spacer=3bp;gc_cont=0.655
+
+==> /sciclone/home/iadanforth/scr10/data/kbrevis/nms_smoketest/proteins/megavirus.faa <==
+>GCA_000893915.1_ViralProj74349|JN258408.1_1 # 952 # 2109 # 1 # ID=1_1;partial=00;start_type=ATG;rbs_motif=ATA;rbs_spacer=4bp;gc_cont=0.279
+
+==> /sciclone/home/iadanforth/scr10/data/kbrevis/nms_smoketest/proteins/tupanvirus.faa <==
+>GCA_002966485.1_ASM296648v1|KY523104.1_1 # 171 # 1367 # -1 # ID=1_1;partial=00;start_type=ATG;rbs_motif=TATATA;rbs_spacer=3bp;gc_cont=0.363
+Performing HMM search...
+Compiling results...
+Generating multi-sequence alignments...
+=== outputs:
+hmm
+log_file.txt
+smoke_alignments
+smoke.cogs.txt
+smoke.concat.aln
+smoke.faa
+smoke.full_output.txt
+smoke.rawout.txt
+smoke.table.tsv
+=== concat alignment:
+>tupanvirus concatenated alignment of GVOGm0890,GVOGm0760,GVOGm0461,GVOGm0172,GVOGm0054,GVOGm0023,GVOGm0013
+>megavirus concatenated alignment of GVOGm0890,GVOGm0760,GVOGm0461,GVOGm0172,GVOGm0054,GVOGm0023,GVOGm0013
+>medusavirus concatenated alignment of GVOGm0890,GVOGm0760,GVOGm0461,GVOGm0172,GVOGm0054,GVOGm0023,GVOGm0013
+columns before trimming: 6671
+columns after trimming : 4106
+=== marker occupancy table:
+genome	GVOGm0013	GVOGm0023	GVOGm0054	GVOGm0172	GVOGm0461	GVOGm0760	GVOGm0890
+medusavirus	0.0	0.0	1.0	0.0	0.0	1.0	1.0
+megavirus	1.0	1.0	1.0	1.0	1.0	1.0	1.0
+tupanvirus	1.0	1.0	1.0	1.0	1.0	1.0	1.0

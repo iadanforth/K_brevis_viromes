@@ -1,0 +1,15 @@
+# Tree inference from the step 10 trimmed alignment (step 11).
+#
+# iqtree 2.3.6: the paper used IQ-TREE v2.2.2.6, which is not on bioconda (available 2.x
+# releases are 2.2.3, 2.2.5, 2.2.6, 2.3.0-2.3.6). 2.3.6 is the newest 2.x, so it keeps the
+# paper's command-line interface. IQ-TREE 3.x exists but is a major release, so it is
+# avoided here for comparability with the published tree.
+#
+# raxml 8.2.12: exactly the version the paper used, needed only for the internode/tree
+# certainty scores (-f i), which IQ-TREE does not compute.
+name: tree-env
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.12   # the job script's inline alignment and support-value checks
+  - iqtree=2.3.6
+  - raxml=8.2.12

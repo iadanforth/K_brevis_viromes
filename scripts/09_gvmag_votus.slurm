@@ -52,6 +52,14 @@ shopt -s nullglob
 n_samples=0
 for sample_dir in "$GVMAG_ROOT"/*/; do
     sample=$(basename "$sample_dir")
+    # Only pool directories that step 08 actually finished. Without this, ANY directory
+    # under gvmags/ holding a gvmags/*.fna is pooled as an extra genome - which is how the
+    # 08 smoke-test directory (_tailtest, a bacterial bin used to exercise CheckV/geNomad)
+    # would have entered the vOTU analysis as a 27th "GVMAG" with no summary row.
+    if [[ ! -f "${sample_dir}.done" ]]; then
+        echo "[votus] skipping $sample: no .done marker from step 08"
+        continue
+    fi
     found=0
     for g in "$sample_dir"gvmags/*.fna; do
         cp "$g" "$OUT/gvmags/${sample}__$(basename "$g")"
@@ -76,7 +84,18 @@ for s in "$GVMAG_ROOT"/*/*_gvmag_summary.tsv; do
         NR==1 { if (first) print; next }
         { $2 = s "__" $2; print }' OFS='\t' "$s" >> "$COMBINED"
 done
-echo "[votus] combined summary rows: $(( $(wc -l < "$COMBINED") - 1 ))"
+# A sample with no GVMAG writes no *_gvmag_summary.tsv at all (step 08 exits early), so
+# the glob above simply matches fewer files - that is expected and harmless. The counts
+# should still agree, because such a sample contributes no genomes either; if they do not,
+# say so, but do not fail: votu_cluster.py ranks a GVMAG with no summary row last
+# (completeness defaults to -1) and reports its completeness as NA.
+N_ROWS=0
+[[ -s "$COMBINED" ]] && N_ROWS=$(( $(wc -l < "$COMBINED") - 1 ))
+echo "[votus] combined summary rows: $N_ROWS (pooled GVMAGs: ${#GVMAGS[@]})"
+if (( N_ROWS != ${#GVMAGS[@]} )); then
+    echo "[votus] WARNING: ${#GVMAGS[@]} GVMAGs pooled but $N_ROWS summary rows found." >&2
+    echo "[votus] Clustering still runs; the unmatched genomes get completeness=NA." >&2
+fi
 
 # ---- 2. All-vs-all ANI (fastANI) ----------------------------------------------
 # fastANI compares whole genomes without aligning them base by base, and handles

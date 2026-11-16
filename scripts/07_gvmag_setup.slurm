@@ -16,6 +16,8 @@
 #   3. CheckV database v1.5 (for CheckV 1.1.1 in checkv-env)
 #   4. geNomad database
 #   5. GVMAGs V2 metadata table (Vasquez et al. 2025); full 1.18 GB bundle optional
+#   6. ncldv_markersearch (GitHub script) for the marker-gene phylogeny, step 10
+#      (tree-env, with IQ-TREE + RAxML for step 11, is created by the loop above)
 # Runs on a compute node because environment solves and downloads are too heavy for dev.
 # Safe to re-run: finished steps are skipped.
 #
@@ -43,7 +45,7 @@ module load miniforge3
 eval "$(conda shell.bash hook)"
 
 # ---- 1. conda environments ----------------------------------------------------
-for ENV in gvmag-bin-env checkv-env genomad-env aniclustermap-env; do
+for ENV in gvmag-bin-env checkv-env genomad-env aniclustermap-env phylo-env tree-env; do
     if conda env list | awk '{print $1}' | grep -qx "$ENV"; then
         echo "[setup] $ENV already exists"
     else
@@ -150,12 +152,40 @@ echo "[setup] GVMAGs V2 metadata: $(wc -l < "$GVMAGS_V2_DIR/GVDB_stats.tsv") lin
 # compare our GVMAGs against the 8,508 reference representatives by ANI
 # (09_gvmag_votus.slurm --with-refs). Download it by resubmitting this script with
 #   sbatch --export=ALL,GVMAGS_V2_FULL=1 ...
-if [[ "${GVMAGS_V2_FULL:-0}" == "1" && ! -d "$GVMAGS_V2_DIR/database" ]]; then
+# The tarball unpacks to 000_GVMAGS_V2/{fna_files,faa_files,GVMAGS_V2_STATS.tsv}. The
+# guard tests for the fna_files directory that 09_gvmag_votus.slurm actually looks for,
+# NOT for a "database" directory - the bundle never creates one, so the old guard was
+# always true and a re-run re-downloaded all 1.18 GB (verified on job 92893, 2026-11-16).
+if [[ "${GVMAGS_V2_FULL:-0}" == "1" && -z "$(find "$GVMAGS_V2_DIR" -maxdepth 3 -type d -name 'fna*' 2>/dev/null)" ]]; then
     echo "[setup] downloading the full GVMAGs V2 database (1.18 GB)"
     curl -fL -o "$GVMAGS_V2_DIR/GVMAGS_V2_database.gz" \
         https://portal.nersc.gov/cfs/nelli/gvmagsV2/GVMAGS_V2_database.gz
     tar -xzf "$GVMAGS_V2_DIR/GVMAGS_V2_database.gz" -C "$GVMAGS_V2_DIR"
     rm "$GVMAGS_V2_DIR/GVMAGS_V2_database.gz"
 fi
+if [[ -n "$(find "$GVMAGS_V2_DIR" -maxdepth 3 -type d -name 'fna*' 2>/dev/null)" ]]; then
+    echo "[setup] GVMAGs V2 reference genomes: $(find "$GVMAGS_V2_DIR" -maxdepth 4 -name '*.fna' | wc -l) .fna files"
+fi
+
+# ---- 6. ncldv_markersearch (step 10 phylogeny) --------------------------------
+# A standalone script from the Aylward lab, not a conda package. It carries the giant
+# virus marker HMMs in its hmm/ folder, and hardcodes that path RELATIVE to the working
+# directory, so 10_gvmag_phylogeny.slurm symlinks hmm/ into its own work directory.
+NMS_DIR="$PROG_DIR/ncldv_markersearch"
+if [[ ! -d "$NMS_DIR/hmm" ]]; then
+    echo "[setup] cloning ncldv_markersearch"
+    rm -rf "$NMS_DIR"
+    git clone --depth 1 https://github.com/faylward/ncldv_markersearch.git "$NMS_DIR"
+fi
+# Record the commit, since this repo is unversioned (no releases/tags).
+( cd "$NMS_DIR" && git rev-parse --short HEAD > "$NMS_DIR/INSTALLED_COMMIT" 2>/dev/null ) || true
+echo "[setup] ncldv_markersearch at $NMS_DIR (commit $(cat "$NMS_DIR/INSTALLED_COMMIT" 2>/dev/null || echo unknown))"
+conda activate phylo-env
+for tool in hmmsearch clustalo muscle trimal pyrodigal-gv; do
+    command -v "$tool" >/dev/null 2>&1 || { echo "[setup] $tool missing from phylo-env" >&2; exit 1; }
+done
+python -I -c "import pandas, numpy, natsort, Bio" || { echo "[setup] phylo-env python deps missing" >&2; exit 1; }
+echo "[setup] phylo-env OK: trimal $(trimal --version 2>&1 | head -1)"
+conda deactivate
 
 echo "[setup] done"

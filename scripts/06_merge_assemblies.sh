@@ -2,7 +2,17 @@
 # Submit one 06_merge_assemblies.slurm job per sample that has BOTH a
 # metaviralSPAdes assembly (contigs/) and a metaSPAdes assembly (contigs_no_v/).
 # Run this after the 05_metaspades_nov.sh jobs have finished.
+#
+# Exception: the samples listed in MV_ONLY_SAMPLES have no metaSPAdes assembly and never
+# will (their metaSPAdes jobs were cancelled for time - README "05b-fix-c"), so they are
+# submitted with MV_ONLY=1 and their metaviralSPAdes contigs are used as-is. Any OTHER
+# sample missing a metaSPAdes assembly is still skipped, because that means step 05b has
+# not finished for it yet. If one of these samples is ever reassembled with metaSPAdes, the
+# slurm script refuses MV_ONLY=1 and the sample should be taken off this list for a normal
+# merge. Override for a one-off run with, e.g., MV_ONLY_SAMPLES="" bash 06_merge_assemblies.sh
 set -euo pipefail
+
+MV_ONLY_SAMPLES="${MV_ONLY_SAMPLES-SRR28004142 SRR28004143}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
@@ -19,7 +29,12 @@ for MV in "$MV_DIR"/*_contigs.fasta; do
     NAME="${FILE_NAME%_contigs.fasta}"
     MS="$MS_DIR/${NAME}_contigs.fasta"
 
-    if [[ ! -s "$MS" ]]; then
+    MV_ONLY=0
+    if [[ " $MV_ONLY_SAMPLES " == *" $NAME "* ]]; then
+        MV_ONLY=1
+    fi
+
+    if [[ ! -s "$MS" ]] && ((!MV_ONLY)); then
         echo "[$NAME] no metaSPAdes assembly yet ($MS), skipping"
         continue
     fi
@@ -28,6 +43,11 @@ for MV in "$MV_DIR"/*_contigs.fasta; do
         continue
     fi
 
-    echo "[$NAME] submitting merge job"
-    sbatch --job-name="merge_${NAME}" "$SLURM_SCRIPT" "$NAME"
+    if ((MV_ONLY)); then
+        echo "[$NAME] submitting metaviralSPAdes-only job (no metaSPAdes assembly)"
+        sbatch --job-name="merge_${NAME}" --export=ALL,MV_ONLY=1 "$SLURM_SCRIPT" "$NAME"
+    else
+        echo "[$NAME] submitting merge job"
+        sbatch --job-name="merge_${NAME}" "$SLURM_SCRIPT" "$NAME"
+    fi
 done

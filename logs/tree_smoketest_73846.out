@@ -1,0 +1,481 @@
+[tree] 3 taxa, 4106 alignment columns
+[tree] worst padding/gap fraction: 84.8% (medusavirus)
+[tree] WARNING: 1 taxa are >=70% X/gap and are placed unreliably:
+[tree]    84.8%  medusavirus
+[tree] Consider removing them (see phylogeny/*.table.tsv) and re-running step 10.
+[tree] iqtree2 -s /sciclone/home/iadanforth/scr10/data/kbrevis/nms_smoketest/work/smoke.trimmed.aln -m MFP -B 1000 --bnni --wbtl -T 8 --prefix /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags --seed 12345 --mem 13G
+IQ-TREE multicore version 2.3.6 for Linux x86 64-bit built Dec 11 2024
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor, Heiko Schmidt,
+Dominik Schrempf, Michael Woodhams, Ly Trong Nhan, Thomas Wong
+
+Host:    astral.sciclone.wm.edu (AVX512, FMA3, 250 GB RAM)
+Command: iqtree2 -s /sciclone/home/iadanforth/scr10/data/kbrevis/nms_smoketest/work/smoke.trimmed.aln -m MFP -B 1000 --bnni --wbtl -T 8 --prefix /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags --seed 12345 --mem 13G
+Seed:    12345 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Thu Nov 12 17:14:32 2026
+Kernel:  AVX+FMA - 8 threads (8 CPU cores detected)
+
+Reading alignment file /sciclone/home/iadanforth/scr10/data/kbrevis/nms_smoketest/work/smoke.trimmed.aln ... Fasta format detected
+Reading fasta file: done in 0.000168808 secs using 29.03% CPU
+Alignment most likely contains protein sequences
+Alignment has 3 sequences with 4106 columns, 501 distinct patterns
+0 parsimony-informative, 1371 singleton sites, 2735 constant sites
+             Gap/Ambiguity  Composition  p-value
+Analyzing sequences: done in 7.20099e-06 secs using 83.32% CPU
+   1  tupanvirus     0.19%    passed     98.95%
+   2  megavirus      0.34%    passed     95.58%
+   3  medusavirus   84.78%    failed      0.00%
+WARNING: 1 sequences contain more than 50% gaps/ambiguity
+****  TOTAL         28.44%  1 sequences failed composition chi2 test (p-value<5%; df=19)
+
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.000 seconds
+WARNING: Too low -mem, automatically increased to 3.307 MB
+Perform fast likelihood tree search using LG+I+G model...
+Estimate model parameters (epsilon = 5.000)
+Perform nearest neighbor interchange...
+Estimate model parameters (epsilon = 1.000)
+1. Initial log-likelihood: -17943.293
+2. Current log-likelihood: -17939.517
+3. Current log-likelihood: -17936.498
+4. Current log-likelihood: -17933.989
+5. Current log-likelihood: -17931.878
+6. Current log-likelihood: -17930.083
+7. Current log-likelihood: -17928.542
+8. Current log-likelihood: -17927.211
+9. Current log-likelihood: -17926.051
+10. Current log-likelihood: -17925.036
+Optimal log-likelihood: -17924.065
+Proportion of invariable sites: 0.160
+Gamma shape alpha: 998.766
+Parameters optimization took 10 rounds (0.012 sec)
+Time for fast ML tree search: 0.022 seconds
+
+WARNING: Too low -mem, automatically increased to 5.241 MB
+NOTE: ModelFinder requires 5 MB RAM!
+ModelFinder will test up to 1232 protein models (sample size: 4106 epsilon: 0.100) ...
+ No. Model         -LnL         df  AIC          AICc         BIC
+WARNING: Too low -mem, automatically increased to 2.336 MB
+  1  LG            17915.791    3   35837.581    35837.587    35856.542
+WARNING: Too low -mem, automatically increased to 2.336 MB
+  2  LG+I          17915.049    4   35838.099    35838.109    35863.380
+WARNING: Too low -mem, automatically increased to 3.307 MB
+  3  LG+G4         17914.583    4   35837.165    35837.175    35862.446
+WARNING: Too low -mem, automatically increased to 3.307 MB
+  4  LG+I+G4       17916.912    5   35843.825    35843.839    35875.426
+WARNING: Too low -mem, automatically increased to 2.660 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+  5  LG+R2         17914.606    5   35839.211    35839.226    35870.812
+WARNING: Too low -mem, automatically increased to 2.983 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
++R3 reinitialized from +R2 with factor 0.500
+WARNING: Too low -mem, automatically increased to 2.336 MB
+  6  LG+R3         17914.640    7   35843.281    35843.308    35887.522
+WARNING: Too low -mem, automatically increased to 2.660 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 14  LG+I+R2       17916.079    6   35844.157    35844.178    35882.079
+WARNING: Too low -mem, automatically increased to 2.983 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 15  LG+I+R3       17915.757    8   35847.513    35847.548    35898.075
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 23  LG+F          17659.226    22  35362.452    35362.700    35501.496
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 24  LG+F+I        17657.909    23  35361.818    35362.089    35507.183
+WARNING: Too low -mem, automatically increased to 3.307 MB
+ 25  LG+F+G4       17657.538    23  35361.076    35361.347    35506.441
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 45  WAG           18022.583    3   36051.165    36051.171    36070.126
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 46  WAG+I         18022.555    4   36053.109    36053.119    36078.390
+WARNING: Too low -mem, automatically increased to 3.307 MB
+ 47  WAG+G4        18022.568    4   36053.135    36053.145    36078.416
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 67  WAG+F         17671.804    22  35387.607    35387.855    35526.652
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 68  WAG+F+I       17671.803    23  35389.605    35389.876    35534.970
+WARNING: Too low -mem, automatically increased to 3.307 MB
+ 69  WAG+F+G4      17671.812    23  35389.624    35389.894    35534.989
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 89  JTT           18042.156    3   36090.312    36090.318    36109.272
+WARNING: Too low -mem, automatically increased to 2.336 MB
+ 90  JTT+I         18041.557    4   36091.113    36091.123    36116.394
+WARNING: Too low -mem, automatically increased to 3.307 MB
+ 91  JTT+G4        18041.800    4   36091.601    36091.611    36116.882
+WARNING: Too low -mem, automatically increased to 2.336 MB
+111  JTT+F         17705.415    22  35454.831    35455.079    35593.875
+WARNING: Too low -mem, automatically increased to 2.336 MB
+112  JTT+F+I       17703.533    23  35453.067    35453.337    35598.431
+WARNING: Too low -mem, automatically increased to 3.307 MB
+113  JTT+F+G4      17704.068    23  35454.137    35454.407    35599.502
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+133  Q.pfam        18004.470    3   36014.940    36014.946    36033.901
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+134  Q.pfam+I      18004.257    4   36016.513    36016.523    36041.794
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+135  Q.pfam+G4     18004.158    4   36016.317    36016.327    36041.598
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+155  Q.pfam+F      17681.767    22  35407.533    35407.781    35546.578
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+156  Q.pfam+F+I    17680.745    23  35407.491    35407.761    35552.856
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+157  Q.pfam+F+G4   17680.656    23  35407.311    35407.582    35552.676
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+177  Q.bird        18343.971    3   36693.943    36693.949    36712.903
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+178  Q.bird+I      18321.436    4   36650.872    36650.882    36676.153
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+179  Q.bird+G4     18295.567    4   36599.133    36599.143    36624.414
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+199  Q.bird+F      17910.016    22  35864.032    35864.280    36003.077
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+200  Q.bird+F+I    17882.230    23  35810.460    35810.730    35955.825
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+201  Q.bird+F+G4   17853.055    23  35752.111    35752.381    35897.475
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+221  Q.mammal      18343.318    3   36692.635    36692.641    36711.596
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+222  Q.mammal+I    18334.470    4   36676.941    36676.950    36702.221
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+223  Q.mammal+G4   18324.709    4   36657.417    36657.427    36682.698
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+243  Q.mammal+F    17849.726    22  35743.452    35743.700    35882.497
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+244  Q.mammal+F+I  17836.519    23  35719.037    35719.308    35864.402
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+245  Q.mammal+F+G4 17824.904    23  35695.808    35696.078    35841.172
+WARNING: Too low -mem, automatically increased to 2.336 MB
+265  Q.insect      17906.701    3   35819.403    35819.409    35838.364
+WARNING: Too low -mem, automatically increased to 2.336 MB
+266  Q.insect+I    17904.232    4   35816.464    35816.474    35841.745
+WARNING: Too low -mem, automatically increased to 3.307 MB
+267  Q.insect+G4   17902.548    4   35813.096    35813.105    35838.376
+WARNING: Too low -mem, automatically increased to 2.336 MB
+287  Q.insect+F    17714.951    22  35473.902    35474.150    35612.946
+WARNING: Too low -mem, automatically increased to 2.336 MB
+288  Q.insect+F+I  17711.846    23  35469.692    35469.963    35615.057
+WARNING: Too low -mem, automatically increased to 3.307 MB
+289  Q.insect+F+G4 17710.838    23  35467.676    35467.947    35613.041
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+309  Q.plant       18055.265    3   36116.529    36116.535    36135.490
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+310  Q.plant+I     18042.218    4   36092.437    36092.447    36117.718
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+311  Q.plant+G4    18028.043    4   36064.087    36064.097    36089.368
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+331  Q.plant+F     17778.325    22  35600.651    35600.899    35739.695
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+332  Q.plant+F+I   17762.097    23  35570.194    35570.465    35715.559
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+333  Q.plant+F+G4  17747.282    23  35540.564    35540.834    35685.929
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+353  Q.yeast       17869.293    3   35744.586    35744.592    35763.547
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+354  Q.yeast+I     17866.695    4   35741.389    35741.399    35766.670
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+355  Q.yeast+G4    17864.907    4   35737.814    35737.824    35763.095
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+375  Q.yeast+F     17693.529    22  35431.057    35431.305    35570.102
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+376  Q.yeast+F+I   17690.568    23  35427.135    35427.405    35572.500
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+377  Q.yeast+F+G4  17689.273    23  35424.545    35424.816    35569.910
+WARNING: Too low -mem, automatically increased to 2.336 MB
+397  JTTDCMut      18042.415    3   36090.830    36090.836    36109.791
+WARNING: Too low -mem, automatically increased to 2.336 MB
+398  JTTDCMut+I    18041.871    4   36091.743    36091.753    36117.024
+WARNING: Too low -mem, automatically increased to 3.307 MB
+399  JTTDCMut+G4   18042.115    4   36092.229    36092.239    36117.510
+WARNING: Too low -mem, automatically increased to 2.336 MB
+419  JTTDCMut+F    17704.352    22  35452.704    35452.951    35591.748
+WARNING: Too low -mem, automatically increased to 2.336 MB
+420  JTTDCMut+F+I  17702.431    23  35450.862    35451.132    35596.226
+WARNING: Too low -mem, automatically increased to 3.307 MB
+421  JTTDCMut+F+G4 17702.955    23  35451.910    35452.180    35597.274
+WARNING: Too low -mem, automatically increased to 2.336 MB
+441  DCMut         18243.417    3   36492.834    36492.840    36511.794
+WARNING: Too low -mem, automatically increased to 2.336 MB
+442  DCMut+I       18238.899    4   36485.798    36485.808    36511.079
+WARNING: Too low -mem, automatically increased to 3.307 MB
+443  DCMut+G4      18238.073    4   36484.145    36484.155    36509.426
+WARNING: Too low -mem, automatically increased to 2.336 MB
+463  DCMut+F       17778.465    22  35600.931    35601.179    35739.975
+WARNING: Too low -mem, automatically increased to 2.336 MB
+464  DCMut+F+I     17771.872    23  35589.743    35590.014    35735.108
+WARNING: Too low -mem, automatically increased to 3.307 MB
+465  DCMut+F+G4    17770.458    23  35586.916    35587.187    35732.281
+WARNING: Too low -mem, automatically increased to 2.336 MB
+485  VT            17982.156    3   35970.311    35970.317    35989.272
+WARNING: Too low -mem, automatically increased to 2.336 MB
+486  VT+I          17982.120    4   35972.241    35972.250    35997.521
+WARNING: Too low -mem, automatically increased to 3.307 MB
+487  VT+G4         17982.148    4   35972.296    35972.306    35997.577
+WARNING: Too low -mem, automatically increased to 2.336 MB
+507  VT+F          17699.733    22  35443.466    35443.714    35582.510
+WARNING: Too low -mem, automatically increased to 2.336 MB
+508  VT+F+I        17699.733    23  35445.466    35445.736    35590.831
+WARNING: Too low -mem, automatically increased to 3.307 MB
+509  VT+F+G4       17699.767    23  35445.534    35445.804    35590.898
+WARNING: Too low -mem, automatically increased to 2.336 MB
+529  PMB           18147.563    3   36301.126    36301.132    36320.087
+WARNING: Too low -mem, automatically increased to 2.336 MB
+530  PMB+I         18147.554    4   36303.107    36303.117    36328.388
+WARNING: Too low -mem, automatically increased to 3.307 MB
+531  PMB+G4        18147.595    4   36303.190    36303.199    36328.470
+WARNING: Too low -mem, automatically increased to 2.336 MB
+551  PMB+F         17753.355    22  35550.711    35550.959    35689.755
+WARNING: Too low -mem, automatically increased to 2.336 MB
+552  PMB+F+I       17753.355    23  35552.709    35552.980    35698.074
+WARNING: Too low -mem, automatically increased to 3.307 MB
+553  PMB+F+G4      17753.394    23  35552.788    35553.059    35698.153
+WARNING: Too low -mem, automatically increased to 2.336 MB
+573  Blosum62      18024.763    3   36055.525    36055.531    36074.486
+WARNING: Too low -mem, automatically increased to 2.336 MB
+574  Blosum62+I    18024.763    4   36057.525    36057.535    36082.806
+WARNING: Too low -mem, automatically increased to 3.307 MB
+575  Blosum62+G4   18024.803    4   36057.605    36057.615    36082.886
+WARNING: Too low -mem, automatically increased to 2.336 MB
+595  Blosum62+F    17741.765    22  35527.529    35527.777    35666.574
+WARNING: Too low -mem, automatically increased to 2.336 MB
+596  Blosum62+F+I  17741.763    23  35529.526    35529.796    35674.890
+WARNING: Too low -mem, automatically increased to 3.307 MB
+597  Blosum62+F+G4 17741.798    23  35529.595    35529.866    35674.960
+WARNING: Too low -mem, automatically increased to 2.336 MB
+617  Dayhoff       18243.360    3   36492.721    36492.726    36511.681
+WARNING: Too low -mem, automatically increased to 2.336 MB
+618  Dayhoff+I     18238.693    4   36485.385    36485.395    36510.666
+WARNING: Too low -mem, automatically increased to 3.307 MB
+619  Dayhoff+G4    18237.777    4   36483.554    36483.564    36508.835
+WARNING: Too low -mem, automatically increased to 2.336 MB
+639  Dayhoff+F     17778.561    22  35601.122    35601.370    35740.167
+WARNING: Too low -mem, automatically increased to 2.336 MB
+640  Dayhoff+F+I   17771.733    23  35589.467    35589.737    35734.831
+WARNING: Too low -mem, automatically increased to 3.307 MB
+641  Dayhoff+F+G4  17770.187    23  35586.374    35586.645    35731.739
+WARNING: Too low -mem, automatically increased to 2.336 MB
+661  mtREV         19252.530    3   38511.060    38511.066    38530.021
+WARNING: Too low -mem, automatically increased to 2.336 MB
+662  mtREV+I       19235.529    4   38479.059    38479.068    38504.340
+WARNING: Too low -mem, automatically increased to 3.307 MB
+663  mtREV+G4      19211.187    4   38430.374    38430.383    38455.654
+WARNING: Too low -mem, automatically increased to 2.336 MB
+683  mtREV+F       17872.097    22  35788.194    35788.442    35927.238
+WARNING: Too low -mem, automatically increased to 2.336 MB
+684  mtREV+F+I     17856.419    23  35758.837    35759.108    35904.202
+WARNING: Too low -mem, automatically increased to 3.307 MB
+685  mtREV+F+G4    17839.414    23  35724.828    35725.098    35870.192
+WARNING: Too low -mem, automatically increased to 2.336 MB
+705  mtART         19472.283    3   38950.565    38950.571    38969.526
+WARNING: Too low -mem, automatically increased to 2.336 MB
+706  mtART+I       19399.916    4   38807.831    38807.841    38833.112
+WARNING: Too low -mem, automatically increased to 3.307 MB
+707  mtART+G4      19263.120    4   38534.240    38534.249    38559.520
+WARNING: Too low -mem, automatically increased to 2.336 MB
+727  mtART+F       18044.240    22  36132.479    36132.727    36271.524
+WARNING: Too low -mem, automatically increased to 2.336 MB
+728  mtART+F+I     17993.669    23  36033.339    36033.609    36178.703
+WARNING: Too low -mem, automatically increased to 3.307 MB
+729  mtART+F+G4    17906.245    23  35858.490    35858.760    36003.855
+WARNING: Too low -mem, automatically increased to 2.336 MB
+749  mtZOA         19274.924    3   38555.848    38555.854    38574.809
+WARNING: Too low -mem, automatically increased to 2.336 MB
+750  mtZOA+I       19242.186    4   38492.372    38492.381    38517.653
+WARNING: Too low -mem, automatically increased to 3.307 MB
+751  mtZOA+G4      19185.659    4   38379.317    38379.327    38404.598
+WARNING: Too low -mem, automatically increased to 2.336 MB
+771  mtZOA+F       17859.377    22  35762.755    35763.002    35901.799
+WARNING: Too low -mem, automatically increased to 2.336 MB
+772  mtZOA+F+I     17836.836    23  35719.673    35719.943    35865.038
+WARNING: Too low -mem, automatically increased to 3.307 MB
+773  mtZOA+F+G4    17806.384    23  35658.769    35659.039    35804.133
+WARNING: Too low -mem, automatically increased to 2.336 MB
+793  mtMet         19052.127    3   38110.254    38110.260    38129.215
+WARNING: Too low -mem, automatically increased to 2.336 MB
+794  mtMet+I       19028.596    4   38065.192    38065.202    38090.473
+WARNING: Too low -mem, automatically increased to 3.307 MB
+795  mtMet+G4      18996.954    4   38001.907    38001.917    38027.188
+WARNING: Too low -mem, automatically increased to 2.336 MB
+815  mtMet+F       17875.870    22  35795.740    35795.988    35934.785
+WARNING: Too low -mem, automatically increased to 2.336 MB
+816  mtMet+F+I     17858.342    23  35762.685    35762.955    35908.049
+WARNING: Too low -mem, automatically increased to 3.307 MB
+817  mtMet+F+G4    17840.837    23  35727.673    35727.943    35873.038
+WARNING: Too low -mem, automatically increased to 2.336 MB
+837  mtVer         19445.346    3   38896.693    38896.698    38915.653
+WARNING: Too low -mem, automatically increased to 2.336 MB
+838  mtVer+I       19392.118    4   38792.237    38792.247    38817.518
+WARNING: Too low -mem, automatically increased to 3.307 MB
+839  mtVer+G4      19327.583    4   38663.166    38663.176    38688.447
+WARNING: Too low -mem, automatically increased to 2.336 MB
+859  mtVer+F       18010.667    22  36065.335    36065.582    36204.379
+WARNING: Too low -mem, automatically increased to 2.336 MB
+860  mtVer+F+I     17962.895    23  35971.789    35972.060    36117.154
+WARNING: Too low -mem, automatically increased to 3.307 MB
+861  mtVer+F+G4    17913.502    23  35873.005    35873.275    36018.369
+WARNING: Too low -mem, automatically increased to 2.336 MB
+881  mtInv         19109.156    3   38224.311    38224.317    38243.272
+WARNING: Too low -mem, automatically increased to 2.336 MB
+882  mtInv+I       19097.314    4   38202.627    38202.637    38227.908
+WARNING: Too low -mem, automatically increased to 3.307 MB
+883  mtInv+G4      19082.466    4   38172.933    38172.943    38198.214
+WARNING: Too low -mem, automatically increased to 2.336 MB
+903  mtInv+F       17808.096    22  35660.192    35660.440    35799.236
+WARNING: Too low -mem, automatically increased to 2.336 MB
+904  mtInv+F+I     17800.381    23  35646.763    35647.033    35792.128
+WARNING: Too low -mem, automatically increased to 3.307 MB
+905  mtInv+F+G4    17795.125    23  35636.249    35636.519    35781.614
+WARNING: Too low -mem, automatically increased to 2.336 MB
+925  mtMAM         19581.264    3   39168.527    39168.533    39187.488
+WARNING: Too low -mem, automatically increased to 2.336 MB
+926  mtMAM+I       19483.653    4   38975.306    38975.315    39000.586
+WARNING: Too low -mem, automatically increased to 3.307 MB
+927  mtMAM+G4      19345.333    4   38698.666    38698.676    38723.947
+WARNING: Too low -mem, automatically increased to 2.336 MB
+947  mtMAM+F       18117.401    22  36278.803    36279.051    36417.847
+WARNING: Too low -mem, automatically increased to 2.336 MB
+948  mtMAM+F+I     18043.387    23  36132.775    36133.045    36278.139
+WARNING: Too low -mem, automatically increased to 3.307 MB
+949  mtMAM+F+G4    17944.067    23  35934.135    35934.405    36079.499
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+969  FLAVI         18566.277    3   37138.553    37138.559    37157.514
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+970  FLAVI+I       18512.034    4   37032.068    37032.078    37057.349
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+971  FLAVI+G4      18431.697    4   36871.394    36871.404    36896.675
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+991  FLAVI+F       18056.805    22  36157.609    36157.857    36296.654
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 2.336 MB
+992  FLAVI+F+I     17994.484    23  36034.969    36035.239    36180.334
+WARNING: Normalizing state frequencies so that sum of them equals to 1
+WARNING: Too low -mem, automatically increased to 3.307 MB
+993  FLAVI+F+G4    17916.235    23  35878.470    35878.740    36023.834
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1013  HIVb          18283.861    3   36573.722    36573.728    36592.682
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1014  HIVb+I        18258.901    4   36525.803    36525.812    36551.084
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1015  HIVb+G4       18226.973    4   36461.946    36461.956    36487.227
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1035  HIVb+F        17907.523    22  35859.045    35859.293    35998.090
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1036  HIVb+F+I      17876.253    23  35798.506    35798.777    35943.871
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1037  HIVb+F+G4     17838.699    23  35723.398    35723.668    35868.763
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1057  HIVw          18433.424    3   36872.848    36872.854    36891.809
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1058  HIVw+I        18383.485    4   36774.969    36774.979    36800.250
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1059  HIVw+G4       18326.680    4   36661.360    36661.369    36686.640
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1079  HIVw+F        18057.396    22  36158.791    36159.039    36297.836
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1080  HIVw+F+I      18008.354    23  36062.709    36062.979    36208.073
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1081  HIVw+F+G4     17950.884    23  35947.767    35948.038    36093.132
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1101  FLU           18086.571    3   36179.142    36179.148    36198.102
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1102  FLU+I         18071.251    4   36150.503    36150.513    36175.784
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1103  FLU+G4        18052.055    4   36112.109    36112.119    36137.390
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1123  FLU+F         17828.549    22  35701.099    35701.347    35840.143
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1124  FLU+F+I       17807.096    23  35660.192    35660.462    35805.556
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1125  FLU+F+G4      17781.371    23  35608.742    35609.012    35754.106
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1145  rtREV         18101.970    3   36209.941    36209.947    36228.901
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1146  rtREV+I       18100.587    4   36209.174    36209.184    36234.455
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1147  rtREV+G4      18100.103    4   36208.207    36208.217    36233.488
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1167  rtREV+F       17713.211    22  35470.422    35470.670    35609.467
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1168  rtREV+F+I     17711.242    23  35468.484    35468.755    35613.849
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1169  rtREV+F+G4    17710.391    23  35466.783    35467.053    35612.148
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1189  cpREV         18075.508    3   36157.017    36157.023    36175.977
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1190  cpREV+I       18074.899    4   36157.797    36157.807    36183.078
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1191  cpREV+G4      18075.061    4   36158.123    36158.133    36183.404
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1211  cpREV+F       17738.475    22  35520.950    35521.198    35659.994
+WARNING: Too low -mem, automatically increased to 2.336 MB
+1212  cpREV+F+I     17735.797    23  35517.595    35517.865    35662.959
+WARNING: Too low -mem, automatically increased to 3.307 MB
+1213  cpREV+F+G4    17735.650    23  35517.299    35517.570    35662.664
+Akaike Information Criterion:           LG+F+G4
+Corrected Akaike Information Criterion: LG+F+G4
+Bayesian Information Criterion:         LG+F
+Best-fit model: LG+F chosen according to BIC
+
+All model information printed to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.model.gz
+CPU time for ModelFinder: 4.783 seconds (0h:0m:4s)
+Wall-clock time for ModelFinder: 0.655 seconds (0h:0m:0s)
+Generating 1000 samples for ultrafast bootstrap (seed: 12345)...

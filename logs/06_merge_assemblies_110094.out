@@ -1,0 +1,4 @@
+[SRR28004148] blastn: metaviralSPAdes contigs vs metaSPAdes contigs
+[SRR28004148] metaviralSPAdes contigs: 212 (156 matched a metaSPAdes contig)
+[SRR28004148] metaSPAdes contigs (after length filter): 110671
+[SRR28004148] merged clusters: 110615 (both=155, metaviralspades_only=56, metaspades_only=110404)

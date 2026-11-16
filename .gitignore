@@ -1,0 +1,16 @@
+# Analysis outputs copied out of scratch by scripts/copy_results.slurm (~5 GB).
+# These are data, not code: git would store every byte forever and the repo would
+# become unclonable. They live in the working tree so they survive the 90-day scratch
+# purge and sit beside the scripts that made them, but they are deliberately untracked.
+# To track one specific small file anyway: git add -f output/votus/gvmags_votus.tsv
+output/
+
+# Slurm logs are kept (AGENTS.md requires them in logs/), so logs/ is NOT ignored here.
+
+# Python bytecode, created whenever a script here is imported (e.g. the step 10 dry run).
+__pycache__/
+*.pyc
+
+# Backup copies of scripts. Git history is the real backup; a committed .bak alongside
+# the fixed file is noise. scripts/select_refs.py.bak is kept on disk, untracked.
+*.bak

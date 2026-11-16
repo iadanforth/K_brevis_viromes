@@ -1,0 +1,16 @@
+[votus] pooled 26 GVMAGs from 9 samples
+[votus] combined summary rows: 26 (pooled GVMAGs: 26)
+[votus] fastANI pairs: 97
+# Step1: Run fastANI between all-vs-all 26 genomes.
+# Step2: Clustering fastANI matrix by scipy's UPGMA method.
+# Step3: Using clustered matrix, draw ANI clustermap by seaborn.
+
+26 GVMAGs -> 19 vOTUs (6 found in more than one sample/bin, 13 singletons) at >=95.0% ANI over >=85.0% of the shorter genome
+[votus] comparing vOTU representatives to 8508 references
+19 vOTU representatives: 12 with a GVMAGs V2 relative, 7 with none (no close relative sequenced)
+[votus] done. Results in /sciclone/home/iadanforth/scr10/data/kbrevis/votus:
+  gvmags_votus.tsv            vOTU of every GVMAG
+  gvmags_representatives.txt  one representative genome per vOTU
+  votu_summary.txt            how many vOTUs were formed
+  heatmap/                    clustered ANI heatmap
+  votu_nearest_reference.tsv  closest GVMAGs V2 relative per vOTU

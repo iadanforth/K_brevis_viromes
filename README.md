@@ -128,6 +128,8 @@ and this README ever disagree, the script in `scripts/` is what actually runs.
 | 07 | one-time setup: environments, GVClass, databases | `07_gvmag_setup.slurm` | pixi, GVClass 1.1.1, CheckV 1.1.1, geNomad 1.7.4 | creates `gvmag-bin-env`, `genomad-env`, `aniclustermap-env` | `~/data10/databases/`, `~/data10/programs/` | done (jobs 73832, 73834, 73835) |
 | 08 | giant-virus genomes (GVMAGs) following Booker et al. | `08_gvmags.sh/.slurm`, `select_gvmags.py`, `summarize_gvmags.py` | MetaBAT 2.15, GVClass 1.1.1, CheckV 1.1.1 (db v1.5), geNomad 1.7.4 (predicts genes with pyrodigal-gv) | `gvmag-bin-env`, `checkv-env`, `genomad-env` | `gvmags/` | written + tested on mock data; waiting for step 06 |
 | 09 | group GVMAGs into viral OTUs ("viral species") | `09_gvmag_votus.slurm`, `votu_cluster.py`, `votu_nearest_ref.py` | fastANI 1.33, ANIclustermap 1.1.0 | `aniclustermap-env`, `checkv-env` | `votus/` | written + tested on mock data; waiting for step 08 |
+| 10 | concatenated marker-gene alignment for a phylogeny | `10_gvmag_phylogeny.slurm`, `select_refs.py` | ncldv_markersearch, HMMER 3.4, Clustal Omega 1.2.4, trimAl 1.5.1 | `phylo-env` | `phylogeny/` | written + partly tested; waiting for step 09 |
+| 11 | maximum-likelihood tree from that alignment | `11_gvmag_tree.slurm` | IQ-TREE 2.3.6, RAxML 8.2.12 | `tree-env` | `tree/` | written + tested end to end on small alignments; waiting for step 10 |
 
 ## A. Where everything lives
 
@@ -166,6 +168,7 @@ touched for 90 days are deleted**, so copy anything important to `~/data10`.
 ~/data10/databases/genomad_db                   geNomad database (step 07)
 ~/data10/databases/gvmagsV2/GVDB_stats.tsv      GVMAGs V2 metadata, 18,725 giant virus genomes (step 07)
 ~/data10/programs/gvclass-v1.1.1                GVClass + its database, installed with pixi (step 07)
+~/data10/programs/ncldv_markersearch            giant virus marker-gene search + concatenation (step 07; step 10 uses it)
 ~/programs/fastp                                 fastp 1.3.7 binary (on PATH via ~/.bashrc)
 ```
 
@@ -207,7 +210,9 @@ conda activate <env-name>
 | `readcorr-env` | BBMap 40.05, bfc r181, seqtk 1.5 | earlier attempt only | `envs/readcorr-env.yml` |
 | `gvmag-bin-env` | BBMap 35.85, samtools 1.15.1, MetaBAT 2.15, seqkit | 08 (created by step 07) | `envs/gvmag-bin-env.yml` |
 | `genomad-env` | geNomad 1.7.4, pyrodigal 3.5.1, pyrodigal-gv (used via geNomad) | 08 (created by step 07) | `envs/genomad-env.yml` |
-| `aniclustermap-env` | ANIclustermap 1.1.0, fastANI 1.33, matplotlib <3.9 | 09 | `envs/aniclustermap-env.yml` | `envs/aniclustermap-env.yml` |
+| `aniclustermap-env` | ANIclustermap 1.1.0, fastANI 1.33, matplotlib <3.9 | 09 | `envs/aniclustermap-env.yml` |
+| `phylo-env` | HMMER 3.4, Clustal Omega 1.2.4, MUSCLE 5.3, trimAl 1.5.1, pyrodigal-gv, pandas/numpy/natsort/biopython | 10 | `envs/phylo-env.yml` |
+| `tree-env` | IQ-TREE 2.3.6, RAxML 8.2.12, Python 3.12 | 11 | `envs/tree-env.yml` | `envs/aniclustermap-env.yml` |
 
 How the environment files were made:
 - The three `gvmag-bin`/`genomad`/`aniclustermap` files were **written by hand** (by Claude, prompt
@@ -1227,6 +1232,30 @@ set -euo pipefail
 THREADS="${SLURM_CPUS_PER_TASK:?Submit with sbatch}"
 export OMP_NUM_THREADS="$THREADS"
 
+# SPAdes' -m is a cap, in GB, that SPAdes applies to its OWN allocator. It used to be
+# hardcoded at 340 while #SBATCH --mem said 360G, and the two have to be kept consistent:
+# Slurm's cgroup refuses any allocation past --mem, and SPAdes' internal accounting runs
+# roughly 10% below its true RSS (job 92248 reported "325G / 340G" at the moment the
+# kernel refused it at 360 GiB RSS). So derive -m from the actual allocation and keep 10%
+# headroom. That way raising --mem on the sbatch command line is enough, and SPAdes aborts
+# with its own "memory limit exceeded" message instead of dying inside mimalloc.
+if [[ -n "${SLURM_MEM_PER_NODE:-}" ]]; then
+    SPADES_MEM=$(( SLURM_MEM_PER_NODE / 1024 * 9 / 10 ))
+elif [[ -n "${SLURM_MEM_PER_CPU:-}" ]]; then
+    SPADES_MEM=$(( SLURM_MEM_PER_CPU * THREADS / 1024 * 9 / 10 ))
+else
+    echo "Cannot read the Slurm memory allocation; submit with --mem." >&2
+    exit 1
+fi
+(( SPADES_MEM >= 16 )) || { echo "Allocation too small: -m would be ${SPADES_MEM}G" >&2; exit 1; }
+
+# Resume a run that died part-way instead of starting over. Set to a SPAdes check-point
+# ('k21', 'k33', 'k55', 'last'); 'k55' redoes only the final k-mer iteration and keeps the
+# finished K21/K33 output in $SAMPLE_OUT. -o, -t and -m may be changed on a restart, the
+# input reads may not, so the same SAMPLE/R1/R2 arguments must be passed again. Example:
+#   RESTART_FROM=k55 sbatch --export=ALL,RESTART_FROM --mem=950G ... 05_metaspades_nov.slurm ...
+RESTART_FROM="${RESTART_FROM:-}"
+
 if (($# != 3)); then
     echo "Usage: sbatch $0 SAMPLE_NAME R1.fastq R2.fastq" >&2
     exit 2
@@ -1253,9 +1282,16 @@ if [[ -s "$OUT_DIR/${NAME}_contigs.fasta" ]]; then
     echo "[$NAME] already assembled, skipping"
     exit 0
 fi
-if [[ -e "$SAMPLE_OUT" ]]; then
+if [[ -n "$RESTART_FROM" ]]; then
+    [[ -d "$SAMPLE_OUT" ]] || {
+        echo "RESTART_FROM=$RESTART_FROM needs the previous run's output directory," >&2
+        echo "but $SAMPLE_OUT does not exist. Drop RESTART_FROM to start from scratch." >&2
+        exit 1
+    }
+elif [[ -e "$SAMPLE_OUT" ]]; then
     echo "Output directory already exists for $NAME: $SAMPLE_OUT" >&2
-    echo "Move or remove it before resubmitting this sample." >&2
+    echo "Move or remove it before resubmitting this sample," >&2
+    echo "or set RESTART_FROM=<check-point> to resume it." >&2
     exit 1
 fi
 
@@ -1269,14 +1305,37 @@ command -v metaspades.py >/dev/null 2>&1 || {
 }
 
 # Assemble paired metagenomic DNA reads with metaSPAdes.
-echo "[$NAME] assembling paired reads"
-metaspades.py \
-    --only-assembler \
-    -1 "$R1" \
-    -2 "$R2" \
-    -o "$SAMPLE_OUT" \
-    -t "$THREADS" \
-    -m 340
+#
+# A restart takes a DIFFERENT argument list, not an extra flag. SPAdes reads the original
+# command line back out of $SAMPLE_OUT/params.txt and refuses to be handed it a second
+# time: passing -1/-2 aborts with "you cannot specify input data (-1, -2, -12, --pe-1,
+# --pe-2 ...) with --restart-from option!" and --only-assembler aborts the same way (see
+# check_options_for_restart_from() in spades_pipeline/options_parser.py). Only -o, -t and
+# -m may be given; SPAdes logs them as "with updated parameters", which is what makes the
+# new -m take effect. The reads still come from params.txt, so the R1/R2 arguments to this
+# script are only used for the sanity checks above on a restart.
+if [[ -n "$RESTART_FROM" ]]; then
+    [[ -s "$SAMPLE_OUT/params.txt" ]] || {
+        echo "No $SAMPLE_OUT/params.txt, so there is no run to restart from." >&2
+        echo "Remove $SAMPLE_OUT and resubmit without RESTART_FROM." >&2
+        exit 1
+    }
+    echo "[$NAME] resuming from check-point $RESTART_FROM with ${THREADS} threads, -m ${SPADES_MEM}G"
+    metaspades.py \
+        --restart-from "$RESTART_FROM" \
+        -o "$SAMPLE_OUT" \
+        -t "$THREADS" \
+        -m "$SPADES_MEM"
+else
+    echo "[$NAME] assembling paired reads with ${THREADS} threads, -m ${SPADES_MEM}G"
+    metaspades.py \
+        --only-assembler \
+        -1 "$R1" \
+        -2 "$R2" \
+        -o "$SAMPLE_OUT" \
+        -t "$THREADS" \
+        -m "$SPADES_MEM"
+fi
 
 cp "$SAMPLE_OUT/contigs.fasta" "$OUT_DIR/${NAME}_contigs.fasta"
 ```
@@ -1291,7 +1350,9 @@ step the full set of contigs it needs to rebuild large, fragmented giant-virus g
 with three changes: `metaspades.py` instead of `metaviralspades.py`; output to
 `~/scr10/data/kbrevis/contigs_no_v/`; job names `metaspades_no_v_<SAMPLE>`. Same reads
 (`clean/*_1_CLEAN.fastq` + `*_2_CLEAN.fastq`), same `--only-assembler`, 32 cores, 360 GB,
-`-m 340`. The only edit Claude made (prompt 2) was a typo in the stdout log name:
+`-m 340`. (The listing above is the current version, after the memory fix described in
+"Step 05b-fix" below replaced the hardcoded `-m 340` with a value derived from `--mem`.)
+The only edit Claude made (prompt 2) was a typo in the stdout log name:
 
 ```
 # before
@@ -1326,6 +1387,435 @@ sample.
 folder per sample. The three CH1 samples will take the longest (the metaviralSPAdes runs
 took 10–25 h on kuro).
 
+# Step 05b-fix. Why job 92248 (SRR28004143) ran out of memory
+
+Diagnosed by Claude Code on 2026-11-13 (prompt 30 in `PROMPT_LOG.md`).
+
+**What happened.** 17 of the 20 metaSPAdes jobs finished. One failed:
+
+```
+module purge; module load slurm/gulf
+sacct -u $USER -j 92248 -o jobid,jobname%26,partition,state,elapsed,reqmem,maxrss,exitcode,nodelist
+# 92248        metaspades_no_v_SRR280041+   gz   FAILED   13:36:47   360G              68:0   gz01
+# 92248.batch  batch                             FAILED   13:36:47          377484792K  68:0   gz01
+```
+
+MaxRSS was 377,484,792 KB = **360.0 GiB**, i.e. exactly the `--mem=360G` the job asked
+for. The end of `logs/05_metaspades_no_v_92248.out` shows the allocator, not Slurm,
+reporting the refusal:
+
+```
+mimalloc: error: thread 0x14f5fdbf2640: unable to allocate OS memory
+          (67108864 bytes, error code: 12 [Cannot allocate memory], ...)
+    rss: current: 456906416128, peak: 363720421376
+== Error == system call for: [... spades-core ... K55/configs/config.info ...]
+            finished abnormally, OS return value: 68
+```
+
+So this is a genuine out-of-memory, not a crash: SPAdes asked the kernel for another 64 MB
+and the job's cgroup, capped at 360 GiB, said no. SPAdes' own last progress line read
+`310G / 325G`, below its `-m 340` ceiling, which is why its internal limiter never fired —
+SPAdes' accounting tracks the memory it has deliberately allocated and runs about 10% below
+true RSS, so the cgroup was reached first.
+
+**Which stage.** The job died in `Preliminary Distance Estimation` for the K=55 k-mer
+iteration, at the line `Using SMOOTHING distance estimator`, having just logged
+`Paired info stats: missing = 358921965`. Distance estimation holds the paired-read
+distance histograms for the whole assembly graph in memory, and the smoothing estimator is
+the most memory-hungry step in metaSPAdes. K=21 and K=33 had already completed:
+
+```
+ls ~/scr10/data/kbrevis/contigs_no_v/SRR28004143/
+# K21 (541M, complete)  K33 (486M, complete)  K55 (104K, only configs/)
+```
+
+**Why metaviralSPAdes managed the same reads in 106 GB.** This was the puzzling part, and
+the answer is that the two programs do not do the same amount of work, even though they
+share the same `spades-core` binary. Compare the config files each one loads (first lines
+of each `spades.log`):
+
+```bash
+grep -m1 "== Running" ~/scr10/data/kbrevis/contigs/SRR28004143/spades.log       # metaviralSPAdes
+# ... K21/configs/config.info  mda_mode.info  meta_mode.info  plasmid_mode.info  metaviral_mode.info
+grep -m1 "== Running" ~/scr10/data/kbrevis/contigs_no_v/SRR28004143/spades.log  # metaSPAdes
+# ... K21/configs/config.info  mda_mode.info  meta_mode.info
+```
+
+metaviralSPAdes layers `plasmid_mode` and `metaviral_mode` on top of metagenomic mode, and
+those add a **chromosome removal** stage that runs *before* repeat resolving. Listing the
+stages of each run makes the consequence obvious:
+
+```bash
+grep -E "STAGE ==" ~/scr10/data/kbrevis/contigs/SRR28004143/spades.log | sed 's/.*STAGE ==/STAGE ==/'
+```
+
+The metaviralSPAdes run goes `... Repeat Resolving -> Contig Output -> Chromosome Removal
+-> Repeat Resolving -> Contig Output -> Chromosome Removal -> ...`, whereas the metaSPAdes
+run goes `... Preliminary Simplification -> Preliminary Paired Information Counting ->
+Preliminary Distance Estimation` and then the same three stages again for real. In plain
+terms: **metaviralSPAdes throws away the cellular (chromosomal) part of the assembly graph
+early and does its expensive graph work on the small viral remainder, while metaSPAdes
+keeps the entire metagenome graph and does distance estimation and repeat resolving twice
+over.** Peak memory for the two runs on this one sample:
+
+```bash
+for f in contigs contigs_no_v; do
+  grep -oE "^ *[0-9:.]+ +[0-9]+G / [0-9]+G" ~/scr10/data/kbrevis/$f/SRR28004143/spades.log \
+    | awk '{print $4}' | tr -d G | sort -n | tail -1
+done
+# 106   <- metaviralSPAdes (completed)
+# 325   <- metaSPAdes (killed, still rising)
+```
+
+So "metaviralSPAdes worked on this file" does not imply metaSPAdes can. Expect metaSPAdes
+to need several times the memory of metaviralSPAdes on the same reads, and more on a
+complex sample.
+
+**Why only this sample.** Three samples have roughly ten times as much sequence as the
+other 17:
+
+```bash
+ls -laS ~/scr10/data/kbrevis/clean/*_1_CLEAN.fastq | head -4
+# SRR28004144  145.5 GB
+# SRR28004142  125.9 GB
+# SRR28004143  118.0 GB
+# SRR28004148   13.7 GB   <- and everything below it
+```
+
+and those are exactly the three with high peak memory (178 GB, 120 GB-and-rising, 325 GB);
+every other sample peaked between 27 and 66 GB. Note that **SRR28004144 is the largest file
+and it finished** (job 92247, 14:29:50, 178 GB peak), so raw read count is not the whole
+story: assembly-graph complexity is, and SRR28004143 happens to produce a graph with
+~359 million unresolved paired-info records. That is why a per-sample memory request, not a
+single global one, is the right approach here.
+
+**Fix 1: derive SPAdes' `-m` from the Slurm allocation.** The old script hardcoded `-m 340`
+while `#SBATCH --mem` said `360G`. Two numbers that have to agree, in two places, is a bug
+waiting to happen, and raising `--mem` on the command line silently left `-m` at 340. The
+script now computes it:
+
+```bash
+# before
+    -m 340
+
+# after
+if [[ -n "${SLURM_MEM_PER_NODE:-}" ]]; then
+    SPADES_MEM=$(( SLURM_MEM_PER_NODE / 1024 * 9 / 10 ))
+elif [[ -n "${SLURM_MEM_PER_CPU:-}" ]]; then
+    SPADES_MEM=$(( SLURM_MEM_PER_CPU * THREADS / 1024 * 9 / 10 ))
+else
+    echo "Cannot read the Slurm memory allocation; submit with --mem." >&2
+    exit 1
+fi
+...
+    -m "$SPADES_MEM"
+```
+
+The 10% headroom is what closes the gap between SPAdes' accounting and its true RSS, so
+that SPAdes now hits its own limit and exits with a readable "memory limit exceeded"
+message instead of being refused inside mimalloc. Checked:
+
+```bash
+SLURM_MEM_PER_NODE=972800 bash -c 'echo $(( SLURM_MEM_PER_NODE / 1024 * 9 / 10 ))'  # 855
+SLURM_MEM_PER_NODE=368640 bash -c 'echo $(( SLURM_MEM_PER_NODE / 1024 * 9 / 10 ))'  # 324
+```
+
+The `#SBATCH --mem=360G` default is unchanged, because 17 of the 20 samples peak under
+70 GB and raising the default would make every job queue for a 1 TB node.
+
+**Fix 2: allow a restart instead of a 20-hour redo.** SPAdes can resume from a check-point,
+and K21 and K33 are intact on disk, so there is no reason to repeat the ~6.7 hours they
+took. `metaspades.py --continue` ignores every option except `-o` (so it would keep the old
+340 GB cap and be useless here), but `--restart-from <check-point>` accepts new `-o`, `-t`
+and `-m` values:
+
+```bash
+metaspades.py --help | grep -A2 restart-from
+#   --restart-from <cp>   restart run with updated options and from the specified
+#                         check-point ('ec', 'as', 'k<int>', 'mc', 'last')
+```
+
+A new `RESTART_FROM` environment variable exposes this, and relaxes the
+"output directory already exists" guard when it is set:
+
+```bash
+RESTART_FROM="${RESTART_FROM:-}"
+...
+if [[ -n "$RESTART_FROM" ]]; then
+    [[ -d "$SAMPLE_OUT" ]] || { ...exit 1; }
+elif [[ -e "$SAMPLE_OUT" ]]; then
+    ...exit 1
+fi
+```
+
+**A restart takes a different argument list, not an extra flag.** The first version of this
+change simply added `--restart-from` to the existing `metaspades.py --only-assembler -1
+"$R1" -2 "$R2" ...` call. That cannot work, and reading SPAdes' own source is what caught
+it before the job was submitted:
+
+```bash
+grep -n "cannot specify" ~/.conda/envs/metaspades-env/share/spades/spades_pipeline/options_parser.py
+#  906: "you cannot specify input data (-1, -2, -12, --pe-1, --pe-2 ...) with --restart-from option!"
+#  930: "you cannot specify --only-assembler with --restart-from option!"
+```
+
+`check_options_for_restart_from()` rejects the reads *and* `--only-assembler`, because
+SPAdes recovers the original command line from `$SAMPLE_OUT/params.txt` and will not be
+handed it twice. Only `-o`, `-t` and `-m` may be supplied. Both branches were then tested
+against a throwaway directory holding nothing but a copy of `params.txt`, so the real
+46 GB run directory could not be touched:
+
+```bash
+mkdir -p /tmp/restart_test
+cp ~/scr10/data/kbrevis/contigs_no_v/SRR28004143/params.txt /tmp/restart_test/
+conda activate metaspades-env
+
+# A. the wrong way - reads and --only-assembler passed again:
+metaspades.py --only-assembler --restart-from k55 -1 "$R1" -2 "$R2" -o /tmp/restart_test -t 1 -m 16
+# == Error == you cannot specify input data (-1, -2, -12, --pe-1, --pe-2 ...) with --restart-from option!
+# SPAdes finished with the following error code: 67.
+
+# B. the right way - only -o/-t/-m; 'k99' is a deliberately invalid check-point so SPAdes
+#    stops before doing any actual assembly:
+metaspades.py --restart-from k99 -o /tmp/restart_test -t 1 -m 16
+# Restored from Command line: ... metaspades.py --only-assembler -1 ... -2 ... -t 32 -m 340
+# Restart-from=k99
+# with updated parameters: -t 1 -m 16
+#   Memory limit (in Gb): 16          <- the new -m really does take effect
+# == Error == failed to restart from k99 because this stage was not specified!
+```
+
+Test B is the important one: it proves the restart reads the reads and `--only-assembler`
+back out of `params.txt` by itself, and that the **new `-m` overrides the stored 340**,
+which is the entire point of the exercise. The `k99` error also confirms the check-point
+name is validated against `k: [21, 33, 55]`, so `k55` is accepted.
+
+So the call is written as two separate branches rather than one call with an optional flag:
+
+```bash
+if [[ -n "$RESTART_FROM" ]]; then
+    [[ -s "$SAMPLE_OUT/params.txt" ]] || { ...exit 1; }
+    metaspades.py --restart-from "$RESTART_FROM" -o "$SAMPLE_OUT" -t "$THREADS" -m "$SPADES_MEM"
+else
+    metaspades.py --only-assembler -1 "$R1" -2 "$R2" -o "$SAMPLE_OUT" \
+        -t "$THREADS" -m "$SPADES_MEM"
+fi
+```
+
+On a restart the `R1`/`R2` arguments to the script are therefore used only for the
+existence checks near the top; the reads SPAdes actually assembles come from `params.txt`.
+`bash -n scripts/05_metaspades_nov.slurm` passes.
+
+**Fix 3: move this one sample to a 1 TB non-preemptible node.** Per `~/AGENTS.md` section 3:
+
+```bash
+~/hpc/best_cluster.sh -c 32 -m 950 -H 30
+# bora  hima  11-14 15:51  11-17 10:31  module load slurm/bora; sbatch -p hima -N 1 -c 32 \
+#       -C hi --exclude=hi04,hi05,hi07 --mem=950G -t 72:00:00   [32c/~251GB (hi03 ~1TB)]
+# gulf  gz    11-20 11:07  11-21 17:07  ... [64c/1TB; PREEMPTIBLE by gz_preempt QOS]
+# kuro serial NO-FIT ...  [64c/~376GB]
+```
+
+`hima` wins on both counts. `hi03` really does have 1 TB (`RealMemory=1031460` MB, versus
+257,317 MB on hi01–hi07's other nodes), `scontrol show partition hima` reports
+`PreemptMode=OFF` and `MaxTime=3-00:00:00`, and gz is booked out for a week. Preemption
+matters a great deal for a job of this length: a ~40 hour gz job spends 40 hours exposed to
+cancellation with no requeue, and this one has already burned 13.6 hours once. kuro
+`serial` (376 GB) and gulf `batch` highmem (`gu01-02`, 503 GB but only 16 cores) cannot fit
+950 GB at all, and astral's 503 GB node `as01` is a GPU node that CPU jobs must stay off
+(`~/AGENTS.md` rule 2).
+
+**Submitted** on 2026-11-13 at 11:35 as job **625965** (prompt 31):
+
+```bash
+cd ~/K_brevis_viromes
+R1=~/scr10/data/kbrevis/clean/SRR28004143_1_CLEAN.fastq
+R2=~/scr10/data/kbrevis/clean/SRR28004143_2_CLEAN.fastq
+( module purge; module load slurm/bora
+  sbatch --job-name=metaspades_no_v_SRR28004143 \
+         -p hima -N 1 -c 32 -C hi --exclude=hi04,hi05,hi07 \
+         --mem=950G -t 72:00:00 \
+         --export=ALL,RESTART_FROM=k55 \
+         scripts/05_metaspades_nov.slurm SRR28004143 "$R1" "$R2" )
+# Submitted batch job 625965
+```
+
+Checked immediately before submitting, `hi03` was completely free (`CPUAlloc=0`,
+`AllocMem=0`, `State=IDLE`, `RealMemory=1031460`) and `scontrol show reservation` listed no
+reservation covering `hi[01-07]` (the three standing bora reservations are on `bo11` and
+`bo23` only). The job went to `PD (Priority)` behind one pending 16 GB job. Track it with:
+
+```bash
+( module purge; module load slurm/bora; squeue -j 625965 -o "%.9i %.28j %.2t %.9M %R" )
+tail -f ~/K_brevis_viromes/logs/05_metaspades_no_v_625965.out
+```
+
+The first thing to look for in that log is the line
+`[SRR28004143] resuming from check-point k55 with 32 threads, -m 855G`, followed by
+`Restart-from=k55` and `with updated parameters:` in
+`~/scr10/data/kbrevis/contigs_no_v/SRR28004143/spades.log`. Anything else on the first
+screenful means the restart was rejected rather than started.
+
+> **This job did not run to completion.** The restart started correctly and ran for 5h55m,
+> then was cancelled on 2026-11-13 for time reasons along with SRR28004142. See
+> "05b-fix-c. Both remaining metaSPAdes jobs cancelled for time" below for what that means
+> for the rest of the pipeline.
+
+`--export=ALL,RESTART_FROM=k55` passes the restart point in without editing the script.
+`-c 32` matches hi03's 32 cores; `--mem=950G` leaves ~57 GB of the node's 1007 GB for the
+OS and gives SPAdes `-m 855`; `-t 72:00:00` is hima's maximum, chosen because bora's
+per-core speed is roughly 0.45 of gz's, so the ~15–20 hours of gz work still outstanding
+becomes ~35–45 hours there.
+
+**Caveats.**
+
+- 950 GB may still not be enough. The job died *entering* the smoothing distance estimator
+  at 360 GB, so 325 GB is a floor, not an estimate of the peak. If 950 GB also fails, the
+  remaining options are to subsample the reads for this sample (which changes what is
+  assembled and should be reported if done) or to run it with `--disable-rr`, which skips
+  repeat resolution entirely. `--disable-rr` is **not** recommended: it would make this
+  sample's contigs qualitatively different from the other 19 and invalidate the step 06
+  comparison. `--cov-cutoff` is not available, as metaSPAdes rejects it in metagenomic mode.
+- **SRR28004142 (job 92249) was heading for the same wall.** By 18 h in it had reached a
+  186 GB peak at the `Preliminary Simplification` milestone, where SRR28004143 had been at
+  105 GB and SRR28004144 (which finished) at 83 GB, so it needed ~400-640 GB against a
+  360 GB cap. It was cancelled before reaching that point; see 05b-fix-c below.
+- `seff` cannot be used to right-size a job that was killed for exceeding its limit; the
+  MaxRSS it reports is the cap, not the demand.
+- A restart re-runs the whole K=55 iteration, including the construction and simplification
+  that previously succeeded. It saves the K=21 and K=33 work (~6.7 hours of gz time), not
+  all 13.6 hours.
+
+### 05b-fix-c. Both remaining metaSPAdes jobs cancelled for time (2026-11-13)
+
+**Decision.** On 2026-11-13 the user chose to **cancel both outstanding metaSPAdes jobs
+rather than wait for them**, because the remaining runtime (an estimated ~23 h for
+SRR28004143 and ~12.5 h for SRR28004142) was more delay than the project could absorb
+before moving on to step 06 and beyond. This was a deliberate time-versus-completeness
+trade, not a technical failure, and it is recorded here because it changes what the
+downstream steps are computed from (prompt 32 in `PROMPT_LOG.md`).
+
+```bash
+( module purge; module load slurm/bora; scancel 625965 )   # SRR28004143, hi03
+( module purge; module load slurm/gulf; scancel 92249 )    # SRR28004142, gz02
+```
+
+Final states:
+
+```
+625965  metaspades_no_v_SRR28004143  CANCELLED  05:55:42   (bora hima, hi03)
+ 92249  metaspades_no_v_SRR28004142  CANCELLED  18:22:03   (gulf gz, gz02)
+ 92252  metaspades_no_v_SRR28004137  COMPLETED  02:01:12
+ 92253  metaspades_no_v_SRR28004138  COMPLETED  02:06:04
+ 92254  metaspades_no_v_SRR28004139  COMPLETED  01:48:16
+```
+
+**What the time estimates were based on.** Both numbers came from stage timings rather than
+the hardware table. The speed of `hi03` relative to `gz` was measured directly, because the
+restart re-ran K=55 stages the failed gz run had already done:
+
+| K=55 stage | gz01 | hi03 | ratio |
+|---|---|---|---|
+| de Bruijn graph construction | 1h35m | 2h24m | 1.51 |
+| Gap Closer (early) | 30m52s | 33m51s | 1.10 |
+| Raw Simplification | 4m12s | 7m21s | 1.75 |
+| block total | 2h10m | 3h05m | **1.42** |
+
+So `hi03` is about 1.4x slower than `gz` on this work, not the 2.2x implied by the per-core
+speeds in `~/AGENTS.md` section 4 — `hi03` was unshared, whereas `gz02` was running 60 of
+its 64 cores for other users. Worth remembering when planning future assemblies. The
+restart also paid a one-off 2h31m re-doing `Binary Read Conversion`, which the original
+K=55 had done in 0.1 s by reusing K21's `.bin` files.
+
+**SRR28004142 was also heading for the same out-of-memory failure.** Peak memory at the
+*same* K=55 milestone (`Preliminary Simplification`) for the three deep-sequenced samples:
+
+```bash
+# per-stage peak, extracted from each spades.log
+#                                     SRR28004144   SRR28004143   SRR28004142
+#  Gap Closer (early)                     71 GB         91 GB        156 GB
+#  Raw Simplification                     83 GB        105 GB        186 GB
+#  Preliminary Simplification             83 GB        105 GB        186 GB
+#  Gap Closer (preliminary)              117 GB        115 GB          -
+#  Preliminary Paired Information Count  117 GB        115 GB          -
+#  Preliminary Distance Estimation       136 GB        284 GB          -
+#  Preliminary Repeat Resolving          145 GB        360 GB (died)   -
+#  final                                 178 GB (OK)       -           -
+```
+
+SRR28004144 grew 83 → 178 GB (2.1x from that milestone) and finished; SRR28004143 grew
+105 → 360 GB (3.4x) and was killed. SRR28004142 begins that same climb from **186 GB**
+against a 360 GB cap, so it needs roughly 400 GB on SRR28004144's growth factor and
+~640 GB on SRR28004143's. It would have exceeded its limit on either trajectory, about four
+hours later, during `Preliminary Distance Estimation` — the stage where SRR28004143 jumped
+from 115 GB to 284 GB in one step. It was also still running with the old hardcoded
+`-m 340`, having been submitted before the fix above.
+
+**Consequence for the analysis: n = 18, not 20.**
+
+```bash
+ls ~/scr10/data/kbrevis/contigs/*_contigs.fasta       | wc -l   # 20  metaviralSPAdes
+ls ~/scr10/data/kbrevis/contigs_no_v/*_contigs.fasta  | wc -l   # 18  metaSPAdes
+```
+
+**SRR28004142 and SRR28004143 have a metaviralSPAdes assembly but no metaSPAdes
+assembly.** Every other sample has both. No script needs changing for this —
+`06_merge_assemblies.sh` already skips a sample that is missing one of the two:
+
+```bash
+        echo "[$NAME] no metaSPAdes assembly yet ($MS), skipping"
+        continue
+```
+
+**But note what that skip implies downstream.** Step 06 writes nothing for those two
+samples, and `08_gvmags.sh` builds its array from `contigs_merged/*_merged_contigs.fasta`:
+
+```bash
+for f in "$MERGED_DIR"/*_merged_contigs.fasta; do
+```
+
+so **SRR28004142 and SRR28004143 drop out of the pipeline entirely from step 06 onward**,
+and their existing metaviralSPAdes contigs are not used at all. That is more than a
+degradation of two samples: together with SRR28004144 they are the three most deeply
+sequenced libraries in the dataset (118-145 GB of cleaned reads each, versus 5-14 GB for
+the rest), so the GVMAG, vOTU and phylogeny results will be built from the 17 shallow
+libraries plus SRR28004144. **Any write-up of the results must state this**, and it should
+not be described as a re-analysis of all 20 runs.
+
+If those two samples should instead be carried forward on their metaviralSPAdes contigs
+alone, step 06 would need a documented fallback that copies the metaviralSPAdes contigs
+through as the "merged" set and labels them so they are never mistaken for two-assembler
+consensus. That has not been done, because it changes what the merged set means and is the
+user's call.
+
+**The partial runs were kept, not deleted:**
+
+```bash
+du -sh ~/scr10/data/kbrevis/contigs_no_v/SRR28004142   # 54G
+du -sh ~/scr10/data/kbrevis/contigs_no_v/SRR28004143   # 47G
+```
+
+Either can be resumed later without repeating K21 and K33, which is most of a day's work
+each. For SRR28004143, K=55 would restart from the beginning; for SRR28004142, likewise:
+
+```bash
+cd ~/K_brevis_viromes
+S=SRR28004143      # or SRR28004142
+R1=~/scr10/data/kbrevis/clean/${S}_1_CLEAN.fastq
+R2=~/scr10/data/kbrevis/clean/${S}_2_CLEAN.fastq
+( module purge; module load slurm/gulf
+  sbatch --job-name="metaspades_no_v_${S}" -p gz -N 1 -c 32 --mem=900G -t 3-00:00:00 \
+         --export=ALL,RESTART_FROM=k55 \
+         scripts/05_metaspades_nov.slurm "$S" "$R1" "$R2" )
+```
+
+`gz01`/`gz02` have ~1007 GB each, so `--mem=900G` fits there as well as on `hi03`; run
+`~/hpc/best_cluster.sh -c 32 -m 900 -H 20` first to see which will finish soonest, and
+remember `gz` is preemptible (`~/AGENTS.md` rule 1). **Two deadlines apply if these are to
+be revived:** `/sciclone/scr10` purges files not accessed for 90 days, and the cleaned
+reads in `clean/` are on the same filesystem, so both the partial run directories and their
+input reads expire around **2026-02-11** unless touched.
+
 # Step 06. Compare and merge the two assemblies
 
 Written by Claude Code on 2026-11-12 (prompt 2). Waiting for step 05b to finish; tested on
@@ -1338,7 +1828,17 @@ stand-in data only.
 # Submit one 06_merge_assemblies.slurm job per sample that has BOTH a
 # metaviralSPAdes assembly (contigs/) and a metaSPAdes assembly (contigs_no_v/).
 # Run this after the 05_metaspades_nov.sh jobs have finished.
+#
+# Exception: the samples listed in MV_ONLY_SAMPLES have no metaSPAdes assembly and never
+# will (their metaSPAdes jobs were cancelled for time - README "05b-fix-c"), so they are
+# submitted with MV_ONLY=1 and their metaviralSPAdes contigs are used as-is. Any OTHER
+# sample missing a metaSPAdes assembly is still skipped, because that means step 05b has
+# not finished for it yet. If one of these samples is ever reassembled with metaSPAdes, the
+# slurm script refuses MV_ONLY=1 and the sample should be taken off this list for a normal
+# merge. Override for a one-off run with, e.g., MV_ONLY_SAMPLES="" bash 06_merge_assemblies.sh
 set -euo pipefail
+
+MV_ONLY_SAMPLES="${MV_ONLY_SAMPLES-SRR28004142 SRR28004143}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
@@ -1355,7 +1855,12 @@ for MV in "$MV_DIR"/*_contigs.fasta; do
     NAME="${FILE_NAME%_contigs.fasta}"
     MS="$MS_DIR/${NAME}_contigs.fasta"
 
-    if [[ ! -s "$MS" ]]; then
+    MV_ONLY=0
+    if [[ " $MV_ONLY_SAMPLES " == *" $NAME "* ]]; then
+        MV_ONLY=1
+    fi
+
+    if [[ ! -s "$MS" ]] && ((!MV_ONLY)); then
         echo "[$NAME] no metaSPAdes assembly yet ($MS), skipping"
         continue
     fi
@@ -1364,8 +1869,13 @@ for MV in "$MV_DIR"/*_contigs.fasta; do
         continue
     fi
 
-    echo "[$NAME] submitting merge job"
-    sbatch --job-name="merge_${NAME}" "$SLURM_SCRIPT" "$NAME"
+    if ((MV_ONLY)); then
+        echo "[$NAME] submitting metaviralSPAdes-only job (no metaSPAdes assembly)"
+        sbatch --job-name="merge_${NAME}" --export=ALL,MV_ONLY=1 "$SLURM_SCRIPT" "$NAME"
+    else
+        echo "[$NAME] submitting merge job"
+        sbatch --job-name="merge_${NAME}" "$SLURM_SCRIPT" "$NAME"
+    fi
 done
 ```
 
@@ -1386,13 +1896,20 @@ done
 
 # Compare metaviralSPAdes and metaSPAdes contigs for one sample and merge them.
 # Same contig = >=95% ANI over >=85% of the shorter contig (blastn + CheckV anicalc).
+#
+# MV_ONLY=1 handles a sample with NO metaSPAdes assembly (SRR28004142, SRR28004143 - their
+# metaSPAdes jobs were cancelled for time; see README "05b-fix-c"). Nothing can be compared,
+# so the metaviralSPAdes contigs become that sample's final contig set unchanged. It has to
+# be asked for explicitly, not inferred from a missing file, so that running this step
+# before the metaSPAdes jobs finish can never silently throw an assembly away.
 
 set -euo pipefail
 
 THREADS="${SLURM_CPUS_PER_TASK:-4}"
 MIN_LEN="${MIN_LEN:-1000}"   # minimum metaSPAdes contig length kept
-MIN_ANI="${MIN_ANI:-95}"
+MIN_ANI="${MIN_ANI:-95}" # Average nucleotide identity threshold for merging contigs
 MIN_COV="${MIN_COV:-85}"
+MV_ONLY="${MV_ONLY:-0}"
 
 if (($# != 1)); then
     echo "Usage: sbatch $0 SAMPLE_NAME" >&2
@@ -1406,9 +1923,21 @@ MS_FASTA="$HOME/scr10/data/kbrevis/contigs_no_v/${NAME}_contigs.fasta"
 OUT_DIR="$HOME/scr10/data/kbrevis/contigs_merged"
 WORK="$OUT_DIR/$NAME"
 
-for f in "$MV_FASTA" "$MS_FASTA"; do
-    [[ -s "$f" ]] || { echo "Missing or empty: $f" >&2; exit 1; }
-done
+[[ -s "$MV_FASTA" ]] || { echo "Missing or empty: $MV_FASTA" >&2; exit 1; }
+
+if ((MV_ONLY)); then
+    # Refuse if a metaSPAdes assembly does exist: then a real merge is what is wanted, and
+    # passing MV_ONLY=1 by mistake would quietly discard half the data.
+    if [[ -s "$MS_FASTA" ]]; then
+        echo "MV_ONLY=1 was given but $MS_FASTA exists." >&2
+        echo "Drop MV_ONLY to merge both assemblies for $NAME." >&2
+        exit 1
+    fi
+    echo "[$NAME] ==== metaviralSPAdes-only mode ===="
+    echo "[$NAME] no metaSPAdes assembly; its contigs become the final set unchanged."
+else
+    [[ -s "$MS_FASTA" ]] || { echo "Missing or empty: $MS_FASTA" >&2; exit 1; }
+fi
 
 mkdir -p "$WORK"
 
@@ -1416,8 +1945,23 @@ module load miniforge3
 eval "$(conda shell.bash hook)"
 conda activate seqkit-env
 
-# Tag contig names with their assembler so the two sets can be told apart.
+# Tag contig names with their assembler so the two sets can be told apart. The MV_ prefix
+# is applied in both modes so contig IDs mean the same thing across all samples.
 seqkit replace -p '^' -r 'MV_' "$MV_FASTA" > "$WORK/mv.fasta"
+if ((MV_ONLY)); then
+    conda deactivate
+    conda activate checkv-env
+    # No --ms/--ani: merge_assemblies.py passes the contigs through as one cluster each and
+    # labels every record assembly_source=metaviralspades_only. No length filter is applied,
+    # which matches how metaviralSPAdes contigs are treated in the merged samples too
+    # (MIN_LEN only ever applied to the metaSPAdes side).
+    python -I "$SCRIPT_DIR/merge_assemblies.py" \
+        --sample "$NAME" \
+        --mv "$WORK/mv.fasta" \
+        --out-dir "$OUT_DIR" | tee "$OUT_DIR/${NAME}_merge_summary.txt"
+    exit 0
+fi
+
 seqkit seq -m "$MIN_LEN" "$MS_FASTA" | seqkit replace -p '^' -r 'MS_' > "$WORK/ms.fasta"
 
 conda deactivate
@@ -1468,9 +2012,17 @@ Ranking:
 Contigs are only compared across assemblers; nothing is deduplicated within
 one assembler's output.
 
+metaviralSPAdes-only mode: omit --ms and --ani for a sample that has no metaSPAdes
+assembly (SRR28004142 and SRR28004143, whose metaSPAdes jobs were cancelled; see
+README "05b-fix-c"). The metaviralSPAdes contigs are then passed through unchanged, one
+cluster each, and every record is labelled assembly_source=metaviralspades_only so it is
+never mistaken for a two-assembler result. Nothing is compared or deduplicated, which is
+correct: duplicates can only arise BETWEEN assemblers, and there is only one here.
+
 Outputs (in OUT_DIR):
     SAMPLE_merged_contigs.fasta   one sequence per cluster (union of both)
     SAMPLE_shared_contigs.fasta   only clusters found by BOTH assemblers
+                                  (empty in metaviralSPAdes-only mode)
     SAMPLE_clusters.tsv           cluster membership and match statistics
 """
 import argparse
@@ -1510,33 +2062,49 @@ def main():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--sample", required=True)
     p.add_argument("--mv", required=True, help="metaviralSPAdes contigs, headers prefixed MV_")
-    p.add_argument("--ms", required=True, help="metaSPAdes contigs, headers prefixed MS_")
-    p.add_argument("--ani", required=True, help="anicalc output (MV queries vs MS subjects)")
+    p.add_argument("--ms", help="metaSPAdes contigs, headers prefixed MS_. "
+                                "Omit (with --ani) for metaviralSPAdes-only mode.")
+    p.add_argument("--ani", help="anicalc output (MV queries vs MS subjects)")
     p.add_argument("--out-dir", required=True)
     p.add_argument("--min-ani", type=float, default=95.0)
     p.add_argument("--min-cov", type=float, default=85.0)
     a = p.parse_args()
 
+    # --ms and --ani go together: with both, the two assemblies are merged; with neither,
+    # the sample has no metaSPAdes assembly and its metaviralSPAdes contigs are passed
+    # through unchanged. One without the other is always a mistake, so refuse it rather
+    # than silently dropping a whole assembly.
+    if bool(a.ms) != bool(a.ani):
+        sys.exit("--ms and --ani must be given together (or both omitted for "
+                 "metaviralSPAdes-only mode)")
+    merged_mode = bool(a.ms)
+    assembly_source = "merged" if merged_mode else "metaviralspades_only"
+
     mv = read_fasta(a.mv)
-    ms = read_fasta(a.ms)
+    ms = read_fasta(a.ms) if merged_mode else {}
     seqs = {**mv, **ms}
     if len(seqs) != len(mv) + len(ms):
         sys.exit("Duplicate contig names between assemblies; expected MV_/MS_ prefixes")
+    if not seqs:
+        sys.exit(f"No contigs read for {a.sample}")
 
     # Cross-assembler matches: edges[contig] -> {other: (ani, cov_of_shorter)}
+    # In metaviralSPAdes-only mode there is nothing to compare against, so every contig
+    # keeps an empty edge set and becomes its own cluster below.
     edges = {n: {} for n in seqs}
-    with open(a.ani) as fh:
-        next(fh)  # header: qname tname num_alns pid qcov tcov
-        for line in fh:
-            q, t, _, pid, qcov, tcov = line.rstrip("\n").split("\t")
-            if q not in mv or t not in ms:
-                continue
-            pid, qcov, tcov = float(pid), float(qcov), float(tcov)
-            cov = qcov if len(seqs[q]) <= len(seqs[t]) else tcov
-            if pid >= a.min_ani and cov >= a.min_cov:
-                prev = edges[q].get(t)
-                if prev is None or (pid, cov) > prev:
-                    edges[q][t] = edges[t][q] = (pid, cov)
+    if merged_mode:
+        with open(a.ani) as fh:
+            next(fh)  # header: qname tname num_alns pid qcov tcov
+            for line in fh:
+                q, t, _, pid, qcov, tcov = line.rstrip("\n").split("\t")
+                if q not in mv or t not in ms:
+                    continue
+                pid, qcov, tcov = float(pid), float(qcov), float(tcov)
+                cov = qcov if len(seqs[q]) <= len(seqs[t]) else tcov
+                if pid >= a.min_ani and cov >= a.min_cov:
+                    prev = edges[q].get(t)
+                    if prev is None or (pid, cov) > prev:
+                        edges[q][t] = edges[t][q] = (pid, cov)
 
     def rank(n):
         is_mv = n in mv
@@ -1563,8 +2131,8 @@ def main():
          open(f"{out}_clusters.tsv", "w") as tsv:
         tsv.write("\t".join([
             "contig_id", "representative", "rep_assembler", "rep_length",
-            "mv_topology", "found_by", "n_matched", "matched_contigs",
-            "matched_ani", "matched_cov_shorter"]) + "\n")
+            "mv_topology", "assembly_source", "found_by", "n_matched",
+            "matched_contigs", "matched_ani", "matched_cov_shorter"]) + "\n")
         for rep, members in clusters:
             rep_is_mv = rep in mv
             if members:
@@ -1579,7 +2147,12 @@ def main():
             mv_topo = ",".join(topos) if topos else "NA"
 
             cid = f"{s}_{rep}"
-            header = (f">{cid} sample={s} found_by={found_by} "
+            # assembly_source distinguishes "metaSPAdes ran and did not find this contig"
+            # (merged) from "metaSPAdes was never run for this sample"
+            # (metaviralspades_only). Without it, found_by=metaviralspades would be
+            # ambiguous between the two, which matters for SRR28004142 and SRR28004143.
+            header = (f">{cid} sample={s} assembly_source={assembly_source} "
+                      f"found_by={found_by} "
                       f"rep_assembler={'metaviralspades' if rep_is_mv else 'metaspades'} "
                       f"mv_topology={mv_topo} n_matched={len(members)}")
             rec = f"{header}\n{wrap(seqs[rep])}\n"
@@ -1589,19 +2162,26 @@ def main():
             tsv.write("\t".join([
                 cid, rep,
                 "metaviralspades" if rep_is_mv else "metaspades",
-                str(len(seqs[rep])), mv_topo, found_by, str(len(members)),
+                str(len(seqs[rep])), mv_topo, assembly_source, found_by, str(len(members)),
                 ",".join(m for m, _, _ in members) or "NA",
                 ",".join(f"{pid:.2f}" for _, pid, _ in members) or "NA",
                 ",".join(f"{cov:.2f}" for _, _, cov in members) or "NA",
             ]) + "\n")
 
-    mv_shared = sum(1 for n in mv if edges[n])
-    print(f"[{s}] metaviralSPAdes contigs: {len(mv)} "
-          f"({mv_shared} matched a metaSPAdes contig)")
-    print(f"[{s}] metaSPAdes contigs (after length filter): {len(ms)}")
-    print(f"[{s}] merged clusters: {len(clusters)} "
-          f"(both={counts['both']}, metaviralspades_only={counts['metaviralspades']}, "
-          f"metaspades_only={counts['metaspades']})")
+    if merged_mode:
+        mv_shared = sum(1 for n in mv if edges[n])
+        print(f"[{s}] metaviralSPAdes contigs: {len(mv)} "
+              f"({mv_shared} matched a metaSPAdes contig)")
+        print(f"[{s}] metaSPAdes contigs (after length filter): {len(ms)}")
+        print(f"[{s}] merged clusters: {len(clusters)} "
+              f"(both={counts['both']}, metaviralspades_only={counts['metaviralspades']}, "
+              f"metaspades_only={counts['metaspades']})")
+    else:
+        print(f"[{s}] assembly_source=metaviralspades_only "
+              f"(no metaSPAdes assembly for this sample)")
+        print(f"[{s}] metaviralSPAdes contigs passed through: {len(mv)}")
+        print(f"[{s}] clusters: {len(clusters)} (one per contig; nothing was compared "
+              f"or deduplicated, and {s}_shared_contigs.fasta is empty by definition)")
 
 
 if __name__ == "__main__":
@@ -1667,6 +2247,35 @@ metaviralSPAdes contigs with renamed headers (should all match), SRR28004137's c
 merged into its full-length circular contig (kept as representative); 154 unmatched contigs
 were kept as `metaspades` only. SRR28004137's NODE_4 also merged: it's identical to
 SRR28004141's NODE_4, so the same phage was assembled in both samples.
+
+**Where these commands come from (asked 2026-11-13, prompt 29).** Three things in this
+script look odd until you know their provenance, so to be explicit:
+
+1. **`checkv-env` is activated for `anicalc`, not for CheckV.** No `checkv` command runs in
+   this step. `anicalc` is a *separate executable installed by the CheckV conda package* -
+   its file manifest puts exactly `bin/checkv`, `bin/anicalc` and `bin/aniclust` on the
+   PATH - so it never shows up in `checkv --help`, which is why it is easy to conclude it
+   does not exist. Activating `checkv-env` is simply how you get `anicalc`.
+2. **The whole `makeblastdb` -> `blastn` -> `anicalc` chain is CheckV's own documented
+   recipe**, from the section "Supporting code: Rapid genome clustering based on pairwise
+   ANI" near the end of the CheckV README. Read it as the raw file
+   (https://bitbucket.org/berkeleylab/checkv/raw/master/README.md); Bitbucket's rendered
+   view needs JavaScript and returns an empty shell to command-line fetches. The flags here
+   match that recipe exactly, including `-outfmt '6 std qlen slen'` and
+   `-max_target_seqs 10000`, and the recipe is also the source of the 95% ANI / 85% AF
+   thresholds, which it describes as "the MIUViG recommended-parameters".
+3. **`blastn`/`makeblastdb` come from BLAST+, which is NOT a CheckV dependency.** CheckV
+   depends on DIAMOND and HMMER, not BLAST+. BLAST+ is in `checkv-env` from earlier work, so
+   this is a convenient coincidence rather than a designed dependency. `envs/checkv-env.yml`
+   pins `blast=2.16.0`, so a rebuild from that file keeps it; a rebuild from CheckV's own
+   dependencies alone would break this script with `makeblastdb: command not found`.
+
+**A deliberate deviation from that recipe:** CheckV's version ends with `aniclust`, which
+dereplicates *one* set of sequences into vOTUs. This step is doing something different -
+matching contigs *between two assemblers* and keeping both sets, including contigs unique to
+one - so `merge_assemblies.py` does the clustering itself using the same thresholds.
+(`aniclust` is used nowhere in this pipeline; step 09 reimplements the same greedy centroid
+algorithm for multi-contig genomes.)
 
 **What this step does NOT do (common misreading, clarified 2026-11-12, prompt 21).** No
 virus identification happens here. `anicalc` is a small helper script that ships alongside
@@ -1994,6 +2603,154 @@ The fixes needed:
 
 Never re-run; the script was removed on 2026-11-12 (prompt 17).
 
+#### 06d. metaviralSPAdes-only fallback for SRR28004142 and SRR28004143
+
+Added 2026-11-13 (prompt 33 in `PROMPT_LOG.md`). Section 05b-fix-c above explains that
+those two samples have no metaSPAdes assembly, and warned that `06_merge_assemblies.sh`
+would therefore skip them and drop them out of the pipeline from step 06 onward. This
+change keeps them in: for those two samples the **metaviralSPAdes contigs become the final
+contig set unchanged**, while all 18 other samples still get the full two-assembler merge
+(the union of both, with contigs found by both counted once).
+
+**Why nothing needs deduplicating in that mode.** The merge exists to stop a contig that
+both assemblers recovered from being counted twice. Duplicates can therefore only arise
+*between* the two assemblers; neither `merge_assemblies.py` nor anything upstream
+deduplicates within a single assembler's output, because SPAdes already emits one contig per
+assembly-graph path. With only one assembler's output in hand there is nothing to compare,
+so the contigs pass straight through, one cluster each. No length filter is applied either,
+which matches the merged samples: `MIN_LEN` (1000 bp) has only ever been applied to the
+metaSPAdes side, never to metaviralSPAdes contigs.
+
+**Three scripts changed.**
+
+1. **`scripts/merge_assemblies.py`** — `--ms` and `--ani` became optional. Giving neither
+selects metaviralSPAdes-only mode; giving one without the other is refused rather than
+silently dropping an assembly. Putting the fallback here rather than writing a separate
+shell path means both modes share one code path, so the FASTA headers and the
+`_clusters.tsv` columns cannot drift apart between samples:
+
+```python
+    if bool(a.ms) != bool(a.ani):
+        sys.exit("--ms and --ani must be given together (or both omitted for "
+                 "metaviralSPAdes-only mode)")
+    merged_mode = bool(a.ms)
+    assembly_source = "merged" if merged_mode else "metaviralspades_only"
+...
+    ms = read_fasta(a.ms) if merged_mode else {}
+...
+    edges = {n: {} for n in seqs}
+    if merged_mode:
+        with open(a.ani) as fh:
+            ...
+```
+
+In metaviralSPAdes-only mode every contig keeps an empty edge set, so the existing greedy
+clustering loop makes each one its own cluster with no special-casing.
+
+2. **A new `assembly_source` field**, in both the FASTA headers and `_clusters.tsv`, with
+values `merged` or `metaviralspades_only`. This is the important part for interpreting the
+results later. Without it, `found_by=metaviralspades` would mean two completely different
+things: "metaSPAdes ran on this sample and did not recover this contig" for the 18 merged
+samples, versus "metaSPAdes never ran" for these two. Those must not be conflated in any
+downstream comparison of assemblers. All 20 samples carry the field so the schema is
+uniform; nothing had been merged yet when this was added, so no existing output needed
+regenerating.
+
+3. **`scripts/06_merge_assemblies.slurm`** — an `MV_ONLY` switch:
+
+```bash
+MV_ONLY="${MV_ONLY:-0}"
+...
+if ((MV_ONLY)); then
+    if [[ -s "$MS_FASTA" ]]; then
+        echo "MV_ONLY=1 was given but $MS_FASTA exists." >&2
+        echo "Drop MV_ONLY to merge both assemblies for $NAME." >&2
+        exit 1
+    fi
+    ...
+```
+
+and a short branch that prefixes the contigs with `MV_` (as in the merged path, so contig
+IDs mean the same thing in every sample) and calls `merge_assemblies.py` with no
+`--ms`/`--ani`. `blastn`, `makeblastdb` and `anicalc` are skipped, since there is nothing to
+align against.
+
+4. **`scripts/06_merge_assemblies.sh`** — an explicit list rather than an inference:
+
+```bash
+MV_ONLY_SAMPLES="${MV_ONLY_SAMPLES-SRR28004142 SRR28004143}"
+...
+    if [[ ! -s "$MS" ]] && ((!MV_ONLY)); then
+        echo "[$NAME] no metaSPAdes assembly yet ($MS), skipping"
+        continue
+    fi
+```
+
+**Why a named list instead of just "use MV only when the metaSPAdes file is absent".** The
+automatic rule is tempting and would be correct today, but it fails unsafely: run step 06
+while the step 05b jobs are still queued and every unfinished sample would quietly get a
+metaviralSPAdes-only result that looks like a finished one. The named list makes the two
+exceptions deliberate and visible, keeps the old protective skip for every other sample, and
+the guard in the `.slurm` script means that if either sample is ever reassembled with
+metaSPAdes the job refuses to run until the sample is taken off the list. Override the list
+for a one-off run with `MV_ONLY_SAMPLES="" bash scripts/06_merge_assemblies.sh`.
+
+**Tested** before any job was submitted.
+
+*Test 1 — metaviralSPAdes-only mode on the real SRR28004143 contigs:*
+
+```
+[SRR28004143] assembly_source=metaviralspades_only (no metaSPAdes assembly for this sample)
+[SRR28004143] metaviralSPAdes contigs passed through: 828
+[SRR28004143] clusters: 828 (one per contig; nothing was compared or deduplicated, and
+              SRR28004143_shared_contigs.fasta is empty by definition)
+in: 828  out: 828          # no contigs lost
+SRR28004143_shared_contigs.fasta -> 0 bytes   # correct: nothing was found by both
+>SRR28004143_MV_NODE_1_length_3352221_cov_184.007226_cutoff_0_type_circular sample=SRR28004143 \
+   assembly_source=metaviralspades_only found_by=metaviralspades \
+   rep_assembler=metaviralspades mv_topology=circular n_matched=0
+```
+
+*Test 2 — regression test of the merged path on a synthetic 2-vs-2 dataset* (two MV contigs,
+two MS contigs, a hand-written `anicalc` table with one pair at 98% ANI / 90% coverage and
+one at 80% / 45%), run with a fixed seed so it is reproducible and needs no `blastn`:
+
+```
+[TEST] metaviralSPAdes contigs: 2 (1 matched a metaSPAdes contig)
+[TEST] metaSPAdes contigs (after length filter): 2
+[TEST] merged clusters: 3 (both=1, metaviralspades_only=1, metaspades_only=1)
+```
+
+That is the behaviour the merge is supposed to have: the 98%/90% pair collapsed into one
+cluster (`found_by=both`, counted once, not twice), the 80%/45% pair correctly stayed apart
+as below the 95%/85% thresholds, and the unmatched contig from each assembler was kept. All
+three rows carried `assembly_source=merged`.
+
+*Test 3 — the misuse guard:* `MV_ONLY=1 bash scripts/06_merge_assemblies.slurm SRR28004144`
+(a sample that does have a metaSPAdes assembly) exited 1 with
+"MV_ONLY=1 was given but ... exists. Drop MV_ONLY to merge both assemblies".
+
+*Test 4 — the submitter, with `sbatch` stubbed out so nothing was queued:* 18 normal merge
+jobs, 2 metaviralSPAdes-only jobs (`--export=ALL,MV_ONLY=1`), 0 skipped, 20 total.
+`bash -n` passes on both shell scripts.
+
+**Caveats.**
+
+- SRR28004142 and SRR28004143 are now in the pipeline, but **not on equal footing with the
+  other 18**. Their contigs come from one assembler, so for them the metaviralSPAdes
+  chromosome-removal filter is the only thing that shaped the contig set, and there is no
+  second-assembler corroboration. They are also two of the three most deeply sequenced
+  libraries. Any comparison of per-sample contig counts, GVMAG yields or vOTU membership has
+  to account for this, and `assembly_source` in the headers and `_clusters.tsv` is how to do
+  it. It should be stated in any write-up.
+- metaviralSPAdes reports far fewer contigs than metaSPAdes by design (364 and 828 for these
+  two samples, against thousands for a metaSPAdes assembly), because it discards the
+  cellular fraction of the graph. Expect these two samples to contribute proportionally
+  fewer bins at step 08 for that reason alone, independently of their biology.
+- `_shared_contigs.fasta` is empty for these samples by construction. Any downstream script
+  that treats "found by both assemblers" as a confidence filter will select nothing from
+  them, which is correct but is a silent zero, not an error.
+
 # Step 07. One-time setup for the GVMAG pipeline (environments, GVClass, databases)
 
 `07_gvmag_setup.slurm`, `08_gvmags.slurm`, `select_gvmags.py` and the four environment
@@ -2270,7 +3027,11 @@ Job **73832** (astral). Logs: `logs/09_gvmag_setup_73832.out/.err` (written unde
 
 ----------------------------------------------------------------------------------------
 
-# Step 08. Giant virus genomes (GVMAGs), following Booker et al. — written, not run yet
+# Step 08. Giant virus genomes (GVMAGs), following Booker et al. — COMPLETE (2026-11-16)
+
+> All 20 samples finished: **848 bins, 26 GVMAGs in 9 of 20 samples**, almost all
+> Imitervirales. See section 08h for the results, 08f for the `JAVA_HOME` fix and node
+> choice, and 08g for the two timeouts and the bbmap fix.
 
 Runs once per sample on the merged contigs from step 06, as a Slurm array submitted by
 `08_gvmags.sh`. Needs step 07 to have finished first. Scripts: `08_gvmags.slurm`,
@@ -2338,8 +3099,21 @@ mkdir -p "$OUT"/{binning,bins,gvclass_in,gvmags,checkv,genomad}
 module load miniforge3
 eval "$(conda shell.bash hook)"
 
+# conda's per-package activation hooks are not written to survive `set -u`. openjdk's
+# etc/conda/activate.d/java_home.sh starts with
+#     export JAVA_HOME_CONDA_BACKUP=$JAVA_HOME
+# which aborts immediately with "JAVA_HOME: unbound variable" when JAVA_HOME is not
+# already set in the environment - and `sbatch` jobs start from a bare environment, so it
+# never is. Job 110103 died this way after 2 seconds, before doing any work. gvmag-bin-env
+# is affected because MetaBAT2/bbmap pull in openjdk (checkv-env and genomad-env are fine:
+# their hooks use "${VAR:-}"). Relax `set -u` for the duration of the activate/deactivate
+# calls only, rather than editing files inside the conda packages, which would be undone by
+# any `conda env create` and would make the environment non-reproducible from its .yml.
+conda_on()  { set +u; conda activate "$1"; set -u; }
+conda_off() { set +u; conda deactivate;    set -u; }
+
 # ---- 1-2. Map reads, compute depth, bin (gvmag-bin-env) -----------------------
-conda activate gvmag-bin-env
+conda_on gvmag-bin-env
 # Contig names only (drop the "found_by=..." descriptions) so names match the BAM.
 CONTIGS="$OUT/binning/${NAME}_contigs.fna"
 seqkit seq -i "$CONTIGS_IN" > "$CONTIGS"
@@ -2362,7 +3136,7 @@ jgi_summarize_bam_contig_depths --outputDepth "$OUT/binning/${NAME}_depth.txt" "
 # so re-runs give identical bins.
 metabat2 -i "$CONTIGS" -a "$OUT/binning/${NAME}_depth.txt" \
     -o "$OUT/bins/${NAME}_bin" -t "$THREADS" --seed 1
-conda deactivate
+conda_off
 
 # GVClass wants .fna files with no "." in the base name: SAMPLE_bin.3.fa -> SAMPLE_bin_3.fna
 shopt -s nullglob
@@ -2384,13 +3158,13 @@ rm -rf "$OUT/gvclass"
 
 # Giant virus bins = GVClass domain-level call is NCLDV (phylum Nucleocytoviricota),
 # the classification shared by all GVMAGs in the paper (Supplemental Data 4).
-conda activate checkv-env   # any env with python3 works for the helper
+conda_on checkv-env   # any env with python3 works for the helper
 python -I "$REPO/scripts/select_gvmags.py" \
     --gvclass "$OUT/gvclass/gvclass_summary.tsv" \
     --bin-dir "$OUT/gvclass_in" \
     --out-dir "$OUT/gvmags" \
     --sample "$NAME"
-conda deactivate
+conda_off
 
 GVMAGS=("$OUT"/gvmags/*.fna)
 echo "[$NAME] ${#GVMAGS[@]} giant virus bins (GVMAGs)"
@@ -2401,7 +3175,7 @@ fi
 # ---- 4b. CheckV 1.1.1 with database v1.5 -------------------------------------
 # CheckV scores single sequences, so each GVMAG's contigs are joined into one record
 # (separated by 100 Ns) to get one completeness/quality value per GVMAG.
-conda activate checkv-env
+conda_on checkv-env
 JOINED="$OUT/checkv/gvmags_joined.fna"
 : > "$JOINED"
 for g in "${GVMAGS[@]}"; do
@@ -2412,14 +3186,14 @@ for g in "${GVMAGS[@]}"; do
         END   { print "" }' "$g" >> "$JOINED"
 done
 checkv end_to_end "$JOINED" "$OUT/checkv/out" -t "$THREADS" -d "$CHECKV_DB" --remove_tmp
-conda deactivate
+conda_off
 
 # ---- 5. Gene prediction + annotation (geNomad) --------------------------------
 # `genomad annotate` predicts the genes with pyrodigal-gv itself (the paper's gene caller)
 # and writes them to <gvmag>_annotate/<gvmag>_proteins.faa, so pyrodigal-gv is NOT called
 # separately here: that would predict the same genes twice with the same tool. --cleanup
 # only deletes geNomad's mmseqs2 scratch directory, so the proteins are kept.
-conda activate genomad-env
+conda_on genomad-env
 for g in "${GVMAGS[@]}"; do
     gname=$(basename "$g" .fna)
     genomad annotate --cleanup --threads "$THREADS" "$g" "$OUT/genomad/$gname" "$GENOMAD_DB"
@@ -2429,10 +3203,10 @@ for g in "${GVMAGS[@]}"; do
         'NR==1{for(i=1;i<=NF;i++) if($i=="bitscore") c=i; print; next} c && $c!="NA" && $c>=min' \
         "$GENES_TSV" > "$OUT/genomad/${gname}_genes_bitscore${MIN_BITSCORE}.tsv"
 done
-conda deactivate
+conda_off
 
 # ---- Summary table (like the paper's Supplemental Data 4) ---------------------
-conda activate checkv-env
+conda_on checkv-env
 python -I "$REPO/scripts/summarize_gvmags.py" \
     --sample "$NAME" \
     --gvclass "$OUT/gvclass/gvclass_summary.tsv" \
@@ -2441,7 +3215,7 @@ python -I "$REPO/scripts/summarize_gvmags.py" \
     --genomad-dir "$OUT/genomad" \
     --min-bitscore "$MIN_BITSCORE" \
     --out "$OUT/${NAME}_gvmag_summary.tsv"
-conda deactivate
+conda_off
 
 touch "$OUT/.done"
 echo "[$NAME] done: $OUT/${NAME}_gvmag_summary.tsv"
@@ -2899,9 +3673,378 @@ scratchpad:
 Not tested: the real GVClass, CheckV and geNomad outputs, so check the first finished
 sample's summary table by eye.
 
-**Not yet written** (remaining steps from the paper): the concatenated marker-gene
-phylogeny (`ncldv_markersearch`, trimAl, IQ-TREE, RAxML) and GVMAG prevalence across the
-field samples with CoverM. The vOTU and ANI steps are now step 09, below.
+**Not yet written** (remaining step from the paper): GVMAG prevalence across the field
+samples with CoverM. The vOTU and ANI steps are step 09 and the marker-gene phylogeny is
+step 10, both below.
+
+----------------------------------------------------------------------------------------
+
+#### 08f. Running step 08 for real: the `JAVA_HOME` crash, the pilot, and the array (2026-11-13)
+
+Written by Claude Code on 2026-11-13 (prompt 34 in `PROMPT_LOG.md`). Everything above in
+step 08 was written but never executed; this is the first real run.
+
+**What was run, in order.** Step 06 had just finished for all 20 samples, so step 08 became
+runnable. Rather than launch all 20 array tasks at once, one sample was run alone first as a
+pilot, so that any mistake would cost one job instead of twenty:
+
+```bash
+# pilot attempt 1 (FAILED after 2 seconds)
+( module purge; module load slurm/kuro; sbatch -p serial -N 1 -c 16 --mem=96G -t 48:00:00 \
+    -o /sciclone/home/iadanforth/K_brevis_viromes/logs/08_gvmags_pilot_%j.out \
+    -e /sciclone/home/iadanforth/K_brevis_viromes/logs/08_gvmags_pilot_%j.err \
+    scripts/08_gvmags.slurm SRR28004149 )
+# Submitted batch job 110103
+
+# after the fix below
+rm -rf ~/scr10/data/kbrevis/gvmags/SRR28004149      # remove the half-built output dir
+( module purge; module load slurm/kuro; sbatch -p serial -N 1 -c 16 --mem=96G -t 48:00:00 \
+    -o /sciclone/home/iadanforth/K_brevis_viromes/logs/08_gvmags_pilot_%j.out \
+    -e /sciclone/home/iadanforth/K_brevis_viromes/logs/08_gvmags_pilot_%j.err \
+    scripts/08_gvmags.slurm SRR28004149 )
+# Submitted batch job 110104   -> COMPLETED, 1:12:54, MaxRSS 26.74 GB
+
+# the remaining 19 samples, as one array
+( module purge; module load slurm/kuro; MAX_PARALLEL=6 bash scripts/08_gvmags.sh -p serial -t 12:00:00 )
+# Submitted batch job 110120   (array 1-19%6)
+
+# smoke test for the part the pilot could not reach (see "The pilot's blind spot" below)
+( module purge; module load slurm/kuro; sbatch -p serial \
+    <scratch>/tailtest.slurm )
+# Submitted batch job 110122
+```
+
+**Bug 1: every task would have died in 2 seconds (`JAVA_HOME: unbound variable`).**
+Job 110103 failed immediately with
+
+```
+/sciclone/home/iadanforth/.conda/envs/gvmag-bin-env/etc/conda/activate.d/java_home.sh: line 1: JAVA_HOME: unbound variable
+```
+
+The cause is a collision between two things that are each individually reasonable.
+`08_gvmags.slurm` runs under `set -euo pipefail`, where `-u` aborts the script if it ever
+reads a variable that was never set — a good safety net that catches typos in variable
+names instead of silently using an empty string. But conda's *per-package activation
+hooks* are not written to survive `-u`. When `gvmag-bin-env` is activated, conda sources
+every file in `$CONDA_PREFIX/etc/conda/activate.d/`, and openjdk ships one whose first line
+is:
+
+```bash
+export JAVA_HOME_CONDA_BACKUP=$JAVA_HOME
+```
+
+Its intent is to save any pre-existing `JAVA_HOME` so it can be restored on deactivation.
+If `JAVA_HOME` was never set, that read is exactly what `-u` is designed to abort on. Jobs
+submitted with `sbatch` do not source `~/.bashrc` and start from a nearly bare environment,
+so `JAVA_HOME` is never set, and the failure is deterministic. `gvmag-bin-env` is the only
+one of the five environments affected, because MetaBAT2 and bbmap are Java tools and pull
+in openjdk; `checkv-env` and `genomad-env` activate cleanly (geNomad's libxml2 hook writes
+`${VAR:-}`, the `-u`-safe form). This was latent rather than new: nothing in this project
+had ever activated that environment under `set -u` before.
+
+The fix adds two one-line helpers to `scripts/08_gvmags.slurm` and routes all ten
+activate/deactivate calls through them, so `-u` is lifted only for the duration of the
+activation itself and is back in force for the actual pipeline commands:
+
+```bash
+conda_on()  { set +u; conda activate "$1"; set -u; }
+conda_off() { set +u; conda deactivate;    set -u; }
+```
+
+The alternative — editing `java_home.sh` inside the conda package to use `${JAVA_HOME:-}` —
+was rejected deliberately. It would work today, but any `conda env create`/`conda install`
+that rewrites the environment silently undoes it, and the environment would no longer be
+reproducible from `envs/gvmag-bin-env.yml`, so anyone rebuilding this project from the repo
+would hit the same crash with no clue why. Keeping the workaround in our own script makes it
+visible and version-controlled. Verified before resubmitting, in a `set -euo pipefail`
+subshell: the environment activates, `JAVA_HOME` is set to
+`/sciclone/home/iadanforth/.conda/envs/gvmag-bin-env`, all five binning tools
+(`bbmap.sh`, `samtools`, `metabat2`, `jgi_summarize_bam_contig_depths`, `seqkit`) are on
+`PATH`, and deactivation returns cleanly while still under `-u`.
+
+**Pilot result (job 110104, SRR28004149): the pipeline works, and the sample has no giant
+viruses.** 1 h 12 min 54 s wall, 26.74 GB peak RSS of the 96 GB requested. bbmap mapped
+40.7 % of the 42.5 M clean reads to that sample's merged contigs (11.5 M reads "well
+mapped" per `jgi_summarize_bam_contig_depths`), MetaBAT2 produced 21 bins, and GVClass
+classified all 21. GVClass itself took 68 m 50 s of the 73 min, i.e. this step is almost
+entirely GVClass, and its runtime scales with the number of bins rather than the number of
+contigs.
+
+**Zero of the 21 bins are NCLDV, so SRR28004149 yields no GVMAGs.** Because this is a
+negative result that silently skips the rest of the script, it was checked three ways
+rather than taken at face value:
+
+1. `select_gvmags.py` keys off `taxonomy_majority` beginning with `d_NCLDV`. That is the
+   right column and the right string: GVClass's `src/core/summarize_full.py:92` comments
+   *"For domain level, use the full domain name (e.g. "NCLDV" -> "d_NCLDV")"*. Note the
+   separate `domain` column is **not** a plain label but a vote string such as
+   `BAC:7(100.00%)`, so a selector written against `domain` would need to parse votes;
+   ours does not use it.
+2. Not one line of `gvclass_summary.tsv` contains the substring `NCLDV` at all, and no bin
+   has a single `MIRUS` vote. There is therefore no borderline bin that a stricter or
+   looser rule would have treated differently.
+3. `mcp_total` is 0 for all 21 bins. The major capsid protein is the defining structural
+   marker of Nucleocytoviricota, so its complete absence is the strongest available
+   evidence that no giant virus genome is present.
+
+The bins do carry a few giant-virus orthologous groups (`gvog4_unique` 0–4 of 4,
+`gvog8_unique` 1–6 of 8), which at a glance looks like giant-virus signal. It is not: every
+such bin also carries 16–70 unique *cellular* markers (`cellular_unique`), and the taxonomy
+votes are 73–100 % bacterial. GVOGs are orthologous groups that are *enriched* in giant
+viruses, not exclusive to them, so a few hits in a 0.5–3.5 Mb bacterial bin are the
+expected background. Reading `gvog4`/`gvog8` as a GVMAG criterion would have produced a
+large number of false giant viruses; GVClass's majority-rule taxonomy is what the paper
+used and what is used here.
+
+This is a biologically plausible outcome, not a failure. Giant virus MAGs are rare, the
+paper recovered relatively few across all its samples, and a single sample yielding none is
+unremarkable. It does mean the per-sample GVMAG count is a real result worth tabulating
+once the array finishes.
+
+**The pilot's blind spot, and the extra smoke test.** Because GVMAGs = 0, `08_gvmags.slurm`
+took its early exit (`touch "$OUT/.done"; exit 0`) and therefore **never executed CheckV,
+geNomad, the bitscore filter, or `summarize_gvmags.py`** — roughly the last 40 % of the
+script, including several exact CheckV column names (`contig_id`, `completeness`,
+`checkv_quality`, …) and geNomad's nested output path
+`<gvmag>/<gvmag>_annotate/<gvmag>_genes.tsv`. A mistake in any of those would only surface
+on the first sample that *does* have a GVMAG, after hours of mapping and GVClass.
+
+So a separate one-off smoke test (job 110122, script kept in the session scratchpad, not in
+the repo) runs exactly those commands using one existing MetaBAT2 bin
+(`SRR28004149_bin_7`, 65 contigs, 212 kb — the smallest, so it is fast) as a stand-in
+GVMAG. CheckV and geNomad do not inspect taxonomy, so a bacterial bin exercises the same
+code paths: the 100-N joining `awk`, `checkv end_to_end`, `genomad annotate`, the bitscore
+≥ 50 filter, and the summary table's joins against both CheckV and GVClass. It validates
+the *plumbing* — commands, databases, file layout, column names, parsing — and explicitly
+**not** the biology, since the stand-in is not a giant virus. It is run in parallel with
+the array rather than before it, because the array's long pole (bbmap + GVClass) is already
+proven and does not depend on the tail.
+
+**Array submission (job 110120).** `08_gvmags.sh` built a dated sample list
+(`~/scr10/data/kbrevis/gvmags/sample_list_20261113_190844.txt`), skipped SRR28004149 on its
+`.done` marker, and submitted the other 19 samples as `--array=1-19%6`.
+
+| setting | value | why |
+|---|---|---|
+| cluster/partition | kuro `serial` | see below |
+| cores | 16 | as the pilot; GVClass runs 4 workers × 4 threads |
+| memory | 96 GB | **not** reduced — see below |
+| walltime | 12 h | ~10× the pilot's 73 min, leaving room for samples with more bins plus CheckV/geNomad; also short enough to backfill well. Kuro's maximum is 48 h |
+| concurrency | 6 (`MAX_PARALLEL=6`) | 6 × 16 = 96 cores, ~19 % of the 512-core partition |
+
+`~/hpc/best_cluster.sh -c 16 -m 64 -H 1.5` ranked gulf `gz` first and kuro `serial` second,
+about 10 minutes apart in estimated finish. Kuro was chosen anyway: `gz` is preemptible
+under the `normal` QOS, so a `gz_preempt` job **cancels** our task outright with no requeue
+(AGENTS.md §3 rule 1). Each task represents up to ~2 h of mapping and GVClass, and across
+19 tasks the expected loss from preemption far outweighs a 10-minute scheduling gain. Kuro
+`serial` is also shared rather than `ExclusiveUser`, so a 16-core task does not idle a
+whole 64-core node, and `MAX_PARALLEL` was lowered from the script's default of 10 to 6 to
+leave most of a shared partition for other users.
+
+**Memory was deliberately *not* shrunk**, even though the pilot peaked at 26.74 GB of 96 GB
+and AGENTS.md §5 says to shrink over-requested jobs. bbmap's heap is derived from the
+allocation (`-Xmx` = 80 % of `SLURM_MEM_PER_NODE`) and its reference index scales with the
+assembly size, and SRR28004149 is a mid-sized sample: SRR28004148 (110,615 merged contigs),
+SRR34748664 (100,610) and SRR28004145 (100,369) are considerably larger. Sizing 19 jobs
+from one mid-sized sample's peak is precisely the mistake that killed the metaSPAdes job
+92248 (see "Step 05b-fix"), and 96 GB of a 376 GB node still allows three tasks per node, so
+there is nothing to be gained by trimming it. Re-check with `seff` once samples of all sizes
+have finished.
+
+**Caveats.**
+- The array is running at the time of writing; only task 1 (SRR28004137, on ku60) had
+  started. Nothing below step 08 has been verified against real GVMAGs yet.
+- CheckV, geNomad and `summarize_gvmags.py` have been exercised only by the stand-in smoke
+  test, never on a genuine NCLDV bin. The first sample that produces a GVMAG should still
+  have its `SAMPLE_gvmag_summary.tsv` read by eye.
+- The smoke-test script lives in the session scratchpad, so it will not survive. If that
+  tail ever needs re-testing, it has to be rewritten; the commands in it are copies of the
+  ones in `08_gvmags.slurm` and would drift if that script changes.
+- A sample with 0 GVMAGs still gets a `.done` marker and **no** `_gvmag_summary.tsv`. Step
+  09 must therefore tolerate missing summary files rather than assume one per sample.
+- `conda_on`/`conda_off` only exist in `08_gvmags.slurm`. The other scripts
+  (`09_gvmag_votus.slurm`, `10_gvmag_phylogeny.slurm`, `11_gvmag_tree.slurm`) use
+  `aniclustermap-env`, `checkv-env`, `phylo-env` and `tree-env`, none of which depend on
+  openjdk, so none is exposed today. If any of them ever gains a Java dependency, the same
+  two helpers will be needed there.
+
+
+----------------------------------------------------------------------------------------
+
+#### 08g. Why tasks 110120_6 and _7 timed out, and the bbmap fix (2026-11-14)
+
+Written by Claude Code on 2026-11-14 (prompt 35 in `PROMPT_LOG.md`).
+
+Array tasks `110120_6` (SRR28004142) and `110120_7` (SRR28004143) both ended in `TIMEOUT`
+at 2:00:19, killed by the 2 h limit set on them in section 08f. Neither reached MetaBAT2 or
+GVClass: the last line of both logs is `mapping reads to merged contigs (bbmap)`.
+
+**The mistake was treating contig count as a proxy for sample size.** Those two samples were
+given a short limit because their merged contig files hold only 364 and 828 contigs, which
+looked like minutes of work. But those files are small only because their metaSPAdes jobs
+were cancelled for time (section 05b-fix-c), leaving them metaviralSPAdes-only (section
+06d) - the *samples* are among the largest in the study:
+
+| sample | clean R1 | merged contigs | note |
+|---|---|---|---|
+| SRR28004144 | 145.5 GB | 38,954 | largest read set (array task 8) |
+| **SRR28004142** | **125.9 GB** | **364** | metaviralSPAdes-only; timed out |
+| **SRR28004143** | **118.0 GB** | **828** | metaviralSPAdes-only; timed out |
+| typical sample | ~13.4 GB | 17k-110k | |
+
+bbmap's runtime is driven by the number of **reads**, not the size of the reference, so
+these are roughly 9x the mapping work of a normal sample. A 2 h limit was never plausible.
+
+**An inefficiency that made it much worse.** The mapping command piped bbmap's `out=`
+(which emits *every* read, mapped or not) straight into `samtools sort`:
+
+```bash
+# before
+bbmap.sh -Xmx$(( SLURM_MEM_PER_NODE * 8 / 10 / 1024 ))g \
+    ref="$CONTIGS" nodisk=t in1="$R1" in2="$R2" \
+    out=stdout.sam threads="$THREADS" 2> ...log |
+    samtools sort -@ "$THREADS" -m 2G -o "$BAM" -
+```
+
+Unmapped reads have no reference position, so `jgi_summarize_bam_contig_depths` ignores
+them and they cannot influence binning - but `samtools sort` still has to sort them. For a
+sample whose reference is a few hundred viral contigs, almost nothing maps, so nearly the
+entire 126 GB read set was being sorted to no purpose. The two killed tasks had already
+written 32 and 112 sort temp fragments (13 GB and 44 GB, 57 GB total, since deleted).
+
+The fix is `outm=` instead of `out=`, which makes bbmap emit mapped reads only. Verified
+with a tiny single-threaded smoke test on dev (a 3 kb reference, 2 mappable and 2
+unmappable read pairs): `out=` produced 8 SAM records, `outm=` produced 4. The depth table
+and the bins are unchanged, because the discarded records contributed nothing to either.
+
+The same edit fixes a latent **memory over-commit** in that command. bbmap's heap was 8/10
+of `--mem` and `samtools sort` took `-m 2G` per thread, so with `--mem=96G` and 16 threads
+the pipeline could ask for 76 GB + 32 GB = 108 GB inside a 96 GB allocation. It had not
+bitten yet only because bbmap never used its full heap (the pilot peaked at 26.74 GB), but
+a large sample could have hit it. Now 6/10 plus `-m 1G` = 57 GB + 16 GB = 73 GB.
+
+```bash
+# after
+bbmap.sh -Xmx$(( SLURM_MEM_PER_NODE * 6 / 10 / 1024 ))g \
+    ref="$CONTIGS" nodisk=t in1="$R1" in2="$R2" \
+    outm=stdout.sam threads="$THREADS" 2> ...log |
+    samtools sort -@ "$THREADS" -m 1G -o "$BAM" -
+```
+
+**Binning is still worth doing for both samples**, so they were resubmitted rather than
+dropped. Despite the small contig counts they hold substantial assembled sequence:
+SRR28004142 has 227 contigs >= 2,500 bp totalling 16.08 Mb (longest 1.24 Mb) and
+SRR28004143 has 561 totalling 14.28 Mb (longest 3.35 Mb), so MetaBAT2's 2,500 bp contig
+minimum and 200 kb bin minimum are both reachable. (A 3.35 Mb contig is larger than any
+known giant virus genome and is far more likely a bacterial chromosome or a mis-assembly;
+GVClass will decide.)
+
+```bash
+# orphaned sort fragments from the killed tasks
+rm -f ~/scr10/data/kbrevis/gvmags/SRR2800414{2,3}/binning/*.tmp.*.bam   # 57 GB
+
+# resubmitted as standalone jobs, 24 h instead of 2 h
+( module purge; module load slurm/kuro; for s in SRR28004142 SRR28004143; do
+    sbatch -p serial -N 1 -c 16 --mem=96G -t 24:00:00 \
+      -o /sciclone/home/iadanforth/K_brevis_viromes/logs/08_gvmags_bigreads_%j.out \
+      -e /sciclone/home/iadanforth/K_brevis_viromes/logs/08_gvmags_bigreads_%j.err \
+      -J "08_gv_$s" scripts/08_gvmags.slurm "$s"
+  done )
+# Submitted batch job 110921   (SRR28004142)
+# Submitted batch job 110922   (SRR28004143)
+
+# keep the total footprint near the 6 slots agreed in 08f
+( module purge; module load slurm/kuro; scontrol update JobId=110120 ArrayTaskThrottle=4 )
+```
+
+**Caveats.**
+- **Slurm snapshots a batch script at submit time**, so the `outm` fix applies only to jobs
+  110921/110922 and to future submissions. Array tasks 8-19 of job 110120 still run the old
+  `out=` command and will sort their unmapped reads. They are normal-sized samples where
+  ~40 % of reads map, so the waste is tolerable and they were left alone rather than
+  cancelled and resubmitted.
+- The BAMs produced from here on contain **mapped reads only**. That is equivalent for depth
+  and binning, but the BAMs are no longer a complete record of the read set, so they cannot
+  be reused to compute an overall mapping rate. The rate is still in each
+  `<sample>_bbmap.log`.
+- 24 h is an estimate, not a measurement: ~2 h of mapping at 9x a normal sample plus GVClass
+  on an unknown number of bins. If these two time out again, raise to kuro's 48 h maximum.
+
+----------------------------------------------------------------------------------------
+
+#### 08h. Step 08 results: 848 bins, 26 GVMAGs (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 36 in `PROMPT_LOG.md`). All 20 samples are
+finished and every output was checked; no job failed and no log contains an error.
+
+**Jobs.** Pilot 110104 (SRR28004149), array 110120 tasks 1-19, and standalone 110921/110922
+replacing the two tasks that timed out (section 08g). Elapsed times ran from 1 h 01 m to
+10 h 47 m per sample. Smoke test 110122 - the stand-in GVMAG that exercised CheckV,
+geNomad, the bitscore filter and `summarize_gvmags.py` - **passed** in 1 m 53 s, so the
+part of the script the pilot could not reach is now known to work.
+
+**Yield.**
+
+| | count |
+|---|---|
+| samples | 20 |
+| MetaBAT2 bins | 848 |
+| GVMAGs (GVClass `d_NCLDV`) | **26** |
+| samples with >= 1 GVMAG | **9** of 20 |
+| GVMAGs per positive sample | 1-7 |
+
+Eleven samples yielded no GVMAG at all. That is a real result, not a failure: giant virus
+MAGs are rare, and only 3.1 % of bins (26/848) were NCLDV. The samples with the most GVMAGs
+are SRR28004154 (7) and SRR28004137 (6); SRR28004144, SRR28004152 and SRR34748664 have one
+each.
+
+**Taxonomy.** 24 of the 26 are dominated by **Imitervirales**, the order that contains
+Mimiviridae and Mesomimiviridae - the expected group for algal-associated giant viruses and
+the same group that dominates Booker et al. The other two are
+`SRR28004151_bin_1` (Pimascovirales) and `SRR28004139_bin_7` (Pandoravirales).
+`SRR28004152_bin_36` is majority Algavirales.
+
+**Quality (CheckV 1.1.1, db v1.5).**
+
+| CheckV quality | n |
+|---|---|
+| High-quality | 5 |
+| Medium-quality | 14 |
+| Low-quality | 6 |
+| Not-determined | 1 |
+
+Sizes run from 203 kb to 2.19 Mb. The five high-quality GVMAGs are `SRR28004148_bin_1`
+(2.19 Mb), `SRR28004154_bin_22` (1.23 Mb), `SRR28004137_bin_6` (530 kb),
+`SRR34748664_bin_2` (348 kb) and `SRR28004151_bin_29` (203 kb). CheckV contamination is
+0.00 % for all but two GVMAGs (`SRR28004151_bin_1` 1.23 %, `SRR28004148_bin_29` 0.49 %) and
+no GVMAG carries a CheckV warning.
+
+**Memory: the decision not to "right-size" was correct.** Section 08f kept `--mem=96G`
+rather than shrinking to the pilot's 26.74 GB peak, on the argument that the pilot was
+mid-sized and bbmap's index scales with the assembly. The finished jobs confirm it: peak RSS
+reached the full 96 GB on SRR28004144 (task 8, the largest read set) and on both standalone
+jobs, with 73.0, 71.1, 63.5 and 62.4 GB on other tasks. Shrinking to 32 or 48 GB, as the
+pilot alone would have suggested, would have killed a large part of the run. Do **not**
+reduce this request. Note that the 96 GB figures mean those jobs ran with no headroom at
+all; if a future sample is larger, raise the allocation rather than hoping.
+
+**Caveats.**
+- Peak RSS equalling the allocation exactly is the cgroup ceiling, so the true demand of
+  those jobs is unknown - it is at least 96 GB. They completed correctly, but the margin
+  is zero.
+- Eleven samples have a `.done` marker and **no** `_gvmag_summary.tsv`, because the script
+  exits early when a sample has no GVMAG. Step 09 must tolerate missing summary files
+  rather than assume one per sample.
+- `SRR28004139_bin_7` has CheckV quality `Not-determined` and no completeness value; it is
+  counted as a GVMAG because GVClass called it Pandoravirales, but nothing is known about
+  how complete it is.
+- Several GVMAGs are many small contigs (`SRR28004148_bin_1` is 463 contigs, `SRR28004137_bin_21`
+  is 139). CheckV scored them as one joined sequence, so a high completeness value does not
+  mean a contiguous genome.
+- Bins whose GVClass vote is only partly NCLDV (e.g. `SRR28004148_bin_1` at 55.6 % NCLDV
+  with 22 % bacterial votes) still pass the majority-rule test. Their bacterial contigs have
+  not been removed; CheckV's contamination estimate for that GVMAG is nevertheless 0.00 %,
+  which is worth treating sceptically for a 463-contig bin.
 
 ----------------------------------------------------------------------------------------
 
@@ -2946,6 +4089,123 @@ vOTU1-6 are the six giant viruses they report.
 "vOTU" rather than "species" because viral species boundaries are not settled; the 95% ANI
 cut-off is an operational convention from MIUViG (Roux et al. 2019), the same standard used
 in step 06 to decide when the two assemblers had found the same contig.
+
+#### 09a-bis. GVMAGs V2 bundle installed, and step 09 checked against missing summary files (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 37 in `PROMPT_LOG.md`). Two things were asked
+for: install the GVMAGs V2 reference bundle so `--with-refs` works, and prove that step 09
+copes with the 11 samples that have no `_gvmag_summary.tsv` because they produced no GVMAG.
+
+**1. GVMAGs V2 bundle (job 92893).**
+
+```bash
+( module purge; module load slurm/gulf; sbatch -p gz -N 1 -c 4 --mem=16G -t 2:00:00 \
+    --export=ALL,GVMAGS_V2_FULL=1 scripts/07_gvmag_setup.slurm )
+# Submitted batch job 92893   -> COMPLETED in 2 m 25 s
+```
+
+Run on gulf `gz` although that partition is preemptible (AGENTS.md §3 rule 1), because the
+job is short and fully restartable - every step of `07_gvmag_setup.slurm` is guarded and
+skipped if already done, so a preemption costs only a resubmission. It was not preempted.
+
+The bundle unpacks to `~/data10/databases/gvmagsV2/000_GVMAGS_V2/` containing `fna_files/`
+(**8,508** reference genomes - the ANI-clustered representatives of Vasquez et al. 2025),
+`faa_files/` and `GVMAGS_V2_STATS.tsv`. Total on disk is now 2.7 GB, in data10 because it
+is a reference database that must survive scratch purges.
+
+Three things were verified rather than assumed, because a silent mismatch here would make
+`--with-refs` produce a table of `NA`s instead of failing:
+
+- `09_gvmag_votus.slurm` finds the genomes with
+  `find "$GVMAGS_V2_DIR" -maxdepth 3 -type d -name 'fna*'`, which matches
+  `000_GVMAGS_V2/fna_files`. **Works as written, no change needed.**
+- `votu_nearest_ref.py` joins hits to metadata on `meta[row["genome"]]`, keyed by the
+  fastANI filename stem. 8,507 of the 8,508 `.fna` stems are present in the `genome` column
+  of `GVDB_stats.tsv`. The one exception (`IMGM3300006193_BIN97`) falls through
+  `meta.get(ref, {})` and would simply report `NA` metadata, so it cannot crash the step.
+- All nine metadata columns the script reads (`Phylum`, `Class`, `Order`, `gvclass_family`,
+  `new_genus`, `LENbp`, `GCperc`, `order_completeness`, `Ecosystem`) exist in
+  `GVDB_stats.tsv`.
+
+**A bug was found and fixed in `07_gvmag_setup.slurm`.** The download was guarded by
+`! -d "$GVMAGS_V2_DIR/database"`, but the tarball never creates a `database/` directory, so
+the test was always true and **every re-run with `GVMAGS_V2_FULL=1` would re-download the
+full 1.18 GB**. The guard now tests for the same `fna*` directory that step 09 looks for,
+and the script reports how many reference genomes are installed:
+
+```bash
+# before
+if [[ "${GVMAGS_V2_FULL:-0}" == "1" && ! -d "$GVMAGS_V2_DIR/database" ]]; then
+# after
+if [[ "${GVMAGS_V2_FULL:-0}" == "1" && -z "$(find "$GVMAGS_V2_DIR" -maxdepth 3 -type d -name 'fna*' 2>/dev/null)" ]]; then
+```
+
+**2. A real contamination bug, caused by the step 08 smoke test.** Step 09 pooled GVMAGs
+with `for sample_dir in "$GVMAG_ROOT"/*/`, i.e. *every* directory under `gvmags/`. The
+smoke test of section 08f had left `~/scr10/data/kbrevis/gvmags/_tailtest/`, whose
+`gvmags/SRR28004149_bin_7.fna` is a **bacterial** bin used only to exercise CheckV and
+geNomad. Step 09 would have pooled it as a 27th "GVMAG" named
+`_tailtest__SRR28004149_bin_7`, with no summary row, and clustered it alongside the real
+ones - silently corrupting the vOTU table. The directory was moved out of the GVMAG root:
+
+```bash
+mv ~/scr10/data/kbrevis/gvmags/_tailtest ~/scr10/data/kbrevis/_tailtest_smoketest
+```
+
+and the pooling loop now refuses any directory that step 08 did not finish:
+
+```bash
+    if [[ ! -f "${sample_dir}.done" ]]; then
+        echo "[votus] skipping $sample: no .done marker from step 08"
+        continue
+    fi
+```
+
+`.done` is the right test because `08_gvmags.slurm` writes it on every successful sample,
+including the 11 that produced no GVMAG, so all 20 real samples still pass.
+
+**3. Missing summary files: tested, not assumed.** Eleven of the 20 samples have a `.done`
+marker and no `*_gvmag_summary.tsv`. Three facts make this safe, and all three were checked
+by replaying the real step 09 logic against the real data:
+
+- A sample with no GVMAG contributes **neither** a `.fna` **nor** a summary row, so the two
+  counts stay consistent. Replaying the pooling and combining loops gave *26 pooled GVMAGs
+  from 9 samples, 26 combined summary rows*, with the header written exactly once and
+  `_tailtest` correctly skipped.
+- `votu_cluster.py` only uses the summary for **ranking**: `completeness.get(n, -1.0)`
+  sorts a genome with no row last, and the output reports its completeness as `NA`. The
+  summary file is optional (`if a.summary and Path(a.summary).exists()`), so even a
+  completely absent one is fine.
+- Running `votu_cluster.py` on the 26 real GVMAGs with a synthetic fastANI table, under
+  three scenarios - full 26-row summary, a summary with 3 rows deliberately removed, and no
+  summary file at all - produced **25 vOTUs with identical cluster membership in all
+  three**. Only the vOTU numbering changed. Rows with no completeness correctly showed
+  `NA` (1, 4 and 26 rows respectively; the single `NA` in the full-summary case is
+  `SRR28004139_bin_7`, whose CheckV quality is `Not-determined`).
+
+The step now also prints both counts and warns, without failing, if they disagree:
+
+```
+[votus] combined summary rows: 26 (pooled GVMAGs: 26)
+```
+
+**Caveats.**
+- Cluster *membership* is unaffected by missing completeness, but the **representative
+  chosen within a multi-member vOTU can change**, because ranking is
+  (completeness, length, name). With completeness unknown a genome ranks last, so it is
+  less likely to be picked as the representative. For this dataset only one vOTU has more
+  than one member, and both members have completeness, so nothing is affected today.
+- The dry run used a **synthetic** fastANI table (one forced pair at 97.5 % ANI / 90 % AF)
+  purely to exercise the code paths. The real clustering will differ; the 25 vOTUs above
+  are not a result.
+- `_tailtest_smoketest` is kept outside the GVMAG root as a record of the 08 validation.
+  Anything else written under `~/scr10/data/kbrevis/gvmags/` must either be a real sample
+  directory or will now be skipped for lack of a `.done` marker.
+- The bundle's own `GVMAGS_V2_STATS.tsv` (2.2 MB, inside `000_GVMAGS_V2/`) is a different
+  file from the top-level `GVDB_stats.tsv` (4.9 MB) that `votu_nearest_ref.py` reads. The
+  script uses the latter, which is correct; do not swap them.
+
+----------------------------------------------------------------------------------------
 
 #### 09b. SCRIPT: `scripts/09_gvmag_votus.slurm`
 
@@ -3097,7 +4357,8 @@ echo "  gvmags_representatives.txt  one representative genome per vOTU"
 echo "  votu_summary.txt            how many vOTUs were formed"
 echo "  heatmap/                    clustered ANI heatmap"
 ((WITH_REFS)) && echo "  votu_nearest_reference.tsv  closest GVMAGs V2 relative per vOTU"
-exit 0```
+exit 0
+```
 
 **What each tool does and why.**
 - **fastANI** computes average nucleotide identity between two whole genomes without
@@ -3439,6 +4700,1332 @@ names with the sample) was tested separately on two mock summary files.
 
 ----------------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------------------
+
+#### 09f. Running step 09: the production run and its results (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 38 in `PROMPT_LOG.md`).
+
+**Pre-flight checks.** Three things were confirmed before submitting, because step 09 is
+cheap to run but its inputs are easy to get silently wrong:
+
+```bash
+# 1. every sample finished step 08, and the smoke-test directory is gone
+ls -d ~/scr10/data/kbrevis/gvmags/*/ | wc -l          # 20
+ls ~/scr10/data/kbrevis/gvmags/*/.done | wc -l        # 20  (all finished)
+ls ~/scr10/data/kbrevis/gvmags/*/gvmags/*.fna | wc -l # 26  (the GVMAGs)
+ls -d ~/scr10/data/kbrevis/gvmags/_tailtest           # absent (moved out, see 09a-bis)
+
+# 2. the GVMAGs V2 reference bundle is present
+ls ~/data10/databases/gvmagsV2/000_GVMAGS_V2/fna_files | wc -l   # 8508
+
+# 3. both conda environments activate cleanly under `set -euo pipefail`
+#    (step 08 job 110103 died in 2 s on openjdk's JAVA_HOME hook; see 08f)
+for e in aniclustermap-env checkv-env; do ls ~/.conda/envs/$e/etc/conda/activate.d; done
+#   -> neither environment has an activate.d hook, so the bare `conda activate`
+#      calls in 09_gvmag_votus.slurm are safe and the script needed no change
+```
+
+The third check is the one worth keeping. Step 08 needed `set +u` wrappers around every
+`conda activate` because the openjdk package (pulled in for bbmap, which needs Java) ships
+an activation hook starting `export JAVA_HOME_CONDA_BACKUP=$JAVA_HOME`, which aborts
+instantly when `JAVA_HOME` is unset and `set -u` is on. Step 09's two environments
+(`aniclustermap-env`, `checkv-env`) contain no Java and have no activation hooks at all, so
+the same fix was not needed here. This was verified by actually running the activations
+rather than by reading the package list.
+
+**Choosing where to run it.** `~/hpc/best_cluster.sh -c 16 -m 64 -H 2` ranked gulf `gz`
+first (estimated finish 13:51) and kuro `serial` second (14:04). **kuro was chosen anyway.**
+The `gz` nodes belong to another group and are preemptible: this account holds only the
+`normal` QOS, so a `gz_preempt` job cancels ours outright (`PreemptMode=CANCEL`, no
+requeue). Thirteen minutes of estimated finish time is not worth having the all-vs-all
+fastANI and the 8,508-genome reference comparison killed partway through (AGENTS.md rule 1).
+
+**Submitted:**
+
+```bash
+( module purge; module load slurm/kuro; \
+  sbatch -p serial -N 1 -c 16 --mem=64G -t 4:00:00 \
+         scripts/09_gvmag_votus.slurm --with-refs )
+# Submitted batch job 111457
+```
+
+The walltime was cut from the script's own `#SBATCH --time=12:00:00` to 4 h on the command
+line (flags override `#SBATCH` lines). A shorter request schedules sooner and is better
+behaviour on a shared queue; 4 h was still a large overestimate, as it turned out.
+
+**It finished in 1 minute 7 seconds.**
+
+```
+JobID        JobName            State      Elapsed   MaxRSS   ExitCode
+111457       09_gvmag_votus     COMPLETED  00:01:07           0:0
+111457.batch batch              COMPLETED  00:01:07 15000164K 0:0
+```
+
+Peak memory was **14.3 GB** of the 64 GB requested, and the whole job used about 1/200th of
+its walltime. `seff` is not installed on kuro (`seff: command not found`), so these figures
+come from `sacct -o jobid,jobname,state,elapsed,maxrss,exitcode`. **For any re-run, `-c 8
+--mem=24G -t 30:00` is ample.** The 8,508-reference comparison is cheap because fastANI
+sketches the reference set once and streams the 19 queries past it.
+
+**Results.** All of these are in `~/scr10/data/kbrevis/votus` (and copied into
+`output/votus`, see Step 12):
+
+```
+[votus] pooled 26 GVMAGs from 9 samples
+[votus] combined summary rows: 26 (pooled GVMAGs: 26)
+[votus] fastANI pairs: 97
+26 GVMAGs -> 19 vOTUs (6 found in more than one sample/bin, 13 singletons)
+            at >=95.0% ANI over >=85.0% of the shorter genome
+19 vOTU representatives: 12 with a GVMAGs V2 relative, 7 with none
+```
+
+The missing-summary handling predicted in 09a-bis behaved exactly as tested in production:
+26 GVMAGs pooled, 26 summary rows found, counts agreed, no warning fired, and the eleven
+samples with no `_gvmag_summary.tsv` contributed neither a genome nor a row. One GVMAG
+(`SRR28004139_bin_7`, CheckV completeness "Not-determined") has no numeric completeness; it
+was ranked last and reported as `NA`, which is the designed behaviour, not a failure.
+
+**The six multi-member vOTUs.** These are the biologically interesting rows, because a vOTU
+with more than one member is the same viral "species" recovered independently more than
+once. Every one of the six spans **different samples**, not two bins of a single assembly:
+
+| vOTU | members | samples | representative | rep. completeness |
+|---|---|---|---|---|
+| vOTU02 | 2 | SRR28004137, SRR28004154 | SRR28004154_bin_22 | 100.00 |
+| vOTU03 | 2 | SRR28004137, SRR28004154 | SRR28004137_bin_6  | 100.00 |
+| vOTU08 | 3 | SRR28004137, SRR28004139, SRR28004154 | SRR28004139_bin_22 | 73.43 |
+| vOTU12 | 2 | SRR28004137, SRR28004154 | SRR28004154_bin_8  | 64.79 |
+| vOTU17 | 2 | SRR28004137, SRR28004154 | SRR28004154_bin_6  | 46.62 |
+| vOTU18 | 2 | SRR28004138, SRR28004139 | SRR28004138_bin_51 | 43.70 |
+
+This reproduces the pattern Booker et al. report, where one vOTU (their vOTU5) was recovered
+from two samples and reported once. SRR28004137 and SRR28004154 share four vOTUs, which is
+the strongest cross-sample signal in the data.
+
+**Novelty against GVMAGs V2.** `votu_nearest_reference.tsv` gives each representative's
+closest relative among the 8,508 reference genomes:
+
+| vOTU | n | completeness | nearest reference | ANI % | AF % | ref. family | ref. ecosystem |
+|---|---|---|---|---|---|---|---|
+| vOTU01 | 1 | 100.00 | SRX802077-79 | 90.71 | 35.52 | f_Mimiviridae | NA |
+| vOTU02 | 2 | 100.00 | bin_3206 | 79.34 | 48.85 | f_Mimiviridae | Freshwater |
+| vOTU03 | 2 | 100.00 | IMGM3300017967_BIN561 | 78.55 | 2.53 | f_Mesomimiviridae | Marine |
+| vOTU04 | 1 | 100.00 | *none* | NA | NA | NA | NA |
+| vOTU05 | 1 | 100.00 | *none* | NA | NA | NA | NA |
+| vOTU06 | 1 | 82.18 | IMGM3300040751_BIN751 | 89.22 | 13.77 | f_Mesomimiviridae | Marine |
+| vOTU07 | 1 | 77.75 | *none* | NA | NA | NA | NA |
+| vOTU08 | 3 | 73.43 | IMGM3300024256_BIN200 | 78.82 | 29.18 | f_Mimiviridae | Marine |
+| vOTU09 | 1 | 71.28 | IMGM3300004096_BIN14 | 75.67 | 2.00 | f_Mesomimiviridae | Freshwater |
+| vOTU10 | 1 | 70.58 | IMGM3300020408_BIN215 | 94.25 | 45.56 | f_Mesomimiviridae | Marine |
+| vOTU11 | 1 | 65.31 | *none* | NA | NA | NA | NA |
+| vOTU12 | 2 | 64.79 | IMGM3300037329_BIN195 | 74.44 | 0.92 | f_Allomimiviridae | Non-marine Saline/Alkaline |
+| vOTU13 | 1 | 60.77 | IMGM3300023179_BIN729 | 74.60 | 21.59 | f_Mimiviridae | Freshwater |
+| vOTU14 | 1 | 58.58 | *none* | NA | NA | NA | NA |
+| vOTU15 | 1 | 48.65 | IMGM3300020469_BIN799 | 76.10 | 18.18 | f_AG_04 (Algavirales) | Marine |
+| vOTU16 | 1 | 47.83 | IMGM3300046734_BIN24 | 97.95 | 25.60 | f_Mimiviridae | Marine |
+| vOTU17 | 2 | 46.62 | *none* | NA | NA | NA | NA |
+| vOTU18 | 2 | 43.70 | IMGM3300020187_BIN340 | 77.01 | 5.13 | f_Mimiviridae | Marine |
+| vOTU19 | 1 | NA | *none* | NA | NA | NA | NA |
+
+**The headline result: not one of the 19 vOTUs matches a known genome at species level.**
+Applying the same MIUViG criteria used to form the vOTUs (>=95% ANI over >=85% of the
+shorter genome) to the reference comparison returns nothing:
+
+```bash
+awk -F'\t' 'NR>1 && $7!="NA" && $7+0>=95 && $8+0>=85' votu_nearest_reference.tsv
+#   -> no rows
+```
+
+This needs care in interpretation, because ANI and aligned fraction must be read together.
+vOTU16's 97.95% ANI looks like a species-level match until you see it covers only 25.60% of
+the genome: the two genomes share a quarter of their sequence almost exactly and differ
+elsewhere, which is a relative, not the same virus. vOTU10 (94.25% ANI over 45.56%) is the
+closest thing to a known virus in the set. At the other extreme, vOTU12's nearest relative
+aligns over 0.92% of the genome, which is barely evidence of anything.
+
+The seven vOTUs with no hit at all are **not** suspect. fastANI reports nothing below about
+80% ANI, so "none" means only that no sequenced giant virus is within ~80% ANI. Most
+environmental giant viruses have no close sequenced relative, which is exactly why GVMAGs V2
+exists. Combined with the step 08 taxonomy (23 Imitervirales, 1 Pimascovirales,
+1 Pandoravirales), the picture is a set of novel *Imitervirales*, mostly nearest to marine
+Mimiviridae and Mesomimiviridae, which is what a *Karenia brevis* bloom virome should look
+like.
+
+**The heatmap.** `output/votus/heatmap/` holds `ANIclustermap.png`, `ANIclustermap.svg`,
+the UPGMA dendrogram (`ANIclustermap_dendrogram.nwk`) and the underlying ANI matrix
+(`ANIclustermap_matrix.tsv`), the equivalent of the paper's Supplemental Figure 3.
+
+**Caveats.**
+
+- The 19 vOTUs come from 26 GVMAGs recovered from only 9 of 20 samples. This describes the
+  giant viruses that **assembled and binned well enough to be recovered**, not the
+  diversity that was present. A virus at low abundance leaves no bin.
+- Six of 19 representatives have CheckV completeness below 70%, and one is undetermined.
+  A fragmentary genome has less sequence available to align, which depresses both ANI and
+  aligned fraction against the references, so novelty is partly confounded with
+  incompleteness. The highest-completeness vOTUs (01-05, all 100%) are the ones to trust
+  most, and three of those five have no reference relative at all.
+- Clustering used the MIUViG defaults (`--min-ani 95 --min-af 85`) because Booker et al.
+  state only that they grouped GVMAGs "based on their average nucleotide identity" without
+  giving a cut-off. A different cut-off would give a different vOTU count; 95/85 is the
+  community standard and CheckV `aniclust`'s default.
+- Missing completeness changes which genome **represents** a multi-member vOTU (ranking is
+  completeness, then length, then name), though not which genomes group together. That was
+  demonstrated in 09a-bis and does not affect this run: the one GVMAG with no completeness
+  value is a singleton.
+- A vOTU is a convention, not a species. These numbers also say nothing about whether any
+  GVMAG is actually an endogenous viral element inside the *K. brevis* genome; that check
+  is still outstanding.
+
+----------------------------------------------------------------------------------------
+
+# Step 10. Concatenated marker-gene phylogeny of the vOTUs (RUNNING, submitted 2026-11-16)
+
+Written by Claude Code on 2026-11-12 (prompt 26 in `PROMPT_LOG.md`). Files:
+`scripts/10_gvmag_phylogeny.slurm`, `scripts/select_refs.py`, `envs/phylo-env.yml`.
+**Submitted 2026-11-16 as job 111459** (kuro `serial`, 32 cores, 128 GB, 24 h) on the 19
+vOTU representatives from step 09, after fixing an order-parsing bug in `select_refs.py`
+that would have silently built the tree with no in-order references at all - see 10i for
+the bug, the fix and the run.
+
+#### 10a. What this step is for
+
+Steps 08 and 09 tell you *what* your giant viruses are (GVClass taxonomy) and *which are
+the same virus* (vOTUs). Neither tells you how your viruses are **related** to each other
+and to known giant viruses. That needs a phylogenetic tree, and for giant viruses the
+standard way to build one is a **concatenated marker-gene tree**.
+
+Why concatenated markers rather than whole genomes? Giant virus genomes share almost no
+gene content across orders - there is no alignable "whole genome" to compare. But a small
+set of genes is present in nearly all of them, mostly involved in replication and
+transcription. Aligning those genes separately, then joining the alignments end to end into
+one long alignment per genome, gives enough phylogenetic signal to place a new genome in the
+*Nucleocytoviricota* tree. This is the approach used by the field's reference phylogenies
+and by Booker et al.
+
+The seven default markers (`ncldv_markersearch`'s defaults, which are exactly the seven the
+paper lists):
+
+| GVOG | gene | why it is useful |
+|---|---|---|
+| GVOGm0890 | Poxvirus late transcription factor VLTF3 | near-universal in NCLDV |
+| GVOGm0760 | A32 packaging ATPase | packages DNA into the capsid |
+| GVOGm0461 | DNA topoisomerase II | DNA replication |
+| GVOGm0172 | Transcription initiation factor IIB | transcription |
+| GVOGm0054 | DNA polymerase family B | the classic NCLDV phylogenetic marker |
+| GVOGm0023 | DNA-directed RNA polymerase alpha subunit | transcription |
+| GVOGm0013 | DEAD/SNF2-like helicase | DNA/RNA remodelling |
+
+Two further markers exist in the HMM set but are **not** in the default seven, matching the
+paper: GVOGm0003 (major capsid protein) and GVOGm0022 (RNA polymerase beta subunit). Add
+them with `-m` if you want, but then the tree is no longer directly comparable to published
+ones.
+
+#### 10b. SCRIPT: `scripts/10_gvmag_phylogeny.slurm`
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=10_gvmag_phylogeny
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=2-00:00:00
+#SBATCH --mail-type=FAIL,END
+#SBATCH --mail-user=iadanforth@wm.edu
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/10_gvmag_phylogeny_%j.out
+#SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/10_gvmag_phylogeny_%j.err
+
+# Build a trimmed, concatenated giant virus marker-gene alignment from the step 09 vOTU
+# representatives plus GVMAGs V2 reference genomes, following Booker et al. 2026
+# (Supplemental Methods, "GVMAG comparisons"):
+#   1. predict proteins for each vOTU representative       (pyrodigal-gv, Prodigal headers)
+#   2. choose reference genomes from GVMAGs V2             (select_refs.py)
+#   3. find, extract, concatenate and align the 7 default
+#      giant virus marker genes                            (ncldv_markersearch.py -c)
+#   4. trim the concatenated alignment                      (trimAl 1.5.1 -automated1)
+# The output *.trimmed.aln is the input for tree inference (IQ-TREE; see
+# README step 10).
+#
+# Needs: step 09 finished, and 07_gvmag_setup.slurm run with GVMAGS_V2_FULL=1 so the
+# 1.18 GB reference bundle is present.
+#
+# Submit (16+ cores REQUIRED: ncldv_markersearch hardcodes `hmmsearch --cpu 16`):
+#   ( module purge; module load slurm/kuro;   sbatch -p serial scripts/10_gvmag_phylogeny.slurm )
+#   ( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/10_gvmag_phylogeny.slurm )
+#
+# Options (all optional, after the script name):
+#   --tier mcl|skani     reference tier: 2,606 (default) or 8,507 representatives
+#   --orders LIST        'auto' (default: the orders of our own GVMAGs), 'all', or e.g.
+#                        Imitervirales,Algavirales
+#   --max-refs N         cap in-order references (useful to keep the alignment small;
+#                        0 = no cap, the default)
+#   --aligner clustalo|muscle   per-marker aligner (default clustalo, as in the paper)
+#   --no-refs            our vOTUs only, no reference genomes
+
+set -euo pipefail
+
+THREADS="${SLURM_CPUS_PER_TASK:?Submit with sbatch}"
+REPO="/sciclone/home/iadanforth/K_brevis_viromes"
+DATA="$HOME/scr10/data/kbrevis"
+VOTU_DIR="$DATA/votus"
+GVMAG_ROOT="$DATA/gvmags"
+OUT="$DATA/phylogeny"
+NMS_DIR="$HOME/data10/programs/ncldv_markersearch"
+GVMAGS_V2_DIR="$HOME/data10/databases/gvmagsV2"
+PROJECT="kbrevis_gvmags"
+
+TIER=mcl; ORDERS=auto; MAX_REFS=0; ALIGNER=clustalo; USE_REFS=1
+while (($#)); do
+    case "$1" in
+        --tier) TIER="$2"; shift 2 ;;
+        --orders) ORDERS="$2"; shift 2 ;;
+        --max-refs) MAX_REFS="$2"; shift 2 ;;
+        --aligner) ALIGNER="$2"; shift 2 ;;
+        --no-refs) USE_REFS=0; shift ;;
+        *) echo "Unknown option: $1" >&2; exit 2 ;;
+    esac
+done
+
+if ((THREADS < 16)); then
+    echo "WARNING: ncldv_markersearch hardcodes 'hmmsearch --cpu 16'. With only $THREADS" >&2
+    echo "cores allocated, hmmsearch will oversubscribe the node. Submit with -c 16 or more." >&2
+fi
+
+REPS="$VOTU_DIR/gvmags_representatives.txt"
+[[ -s "$REPS" ]] || { echo "No vOTU representatives ($REPS); run step 09 first." >&2; exit 1; }
+[[ -d "$NMS_DIR/hmm" ]] || {
+    echo "ncldv_markersearch not installed ($NMS_DIR); run 07_gvmag_setup.slurm." >&2; exit 1; }
+
+mkdir -p "$OUT"/{proteins,work}
+
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate phylo-env
+
+# ---- 1. Proteins for each vOTU representative ---------------------------------
+# ncldv_markersearch requires Prodigal-style protein IDs (contigname_1, contigname_2, ...)
+# because it joins split marker genes that sit near each other on the same contig; giant
+# virus genes are often fragmented across a MAG, so this is essential, not cosmetic.
+# It takes the taxon name from the .faa file name, so names must contain no dots.
+rm -f "$OUT"/proteins/*.faa
+n_q=0
+while read -r fna; do
+    [[ -s "$fna" ]] || continue
+    base=$(basename "$fna" .fna)
+    # name the taxon by its vOTU, so tree tips are readable: vOTU003__SRR28004141_bin_2
+    votu=$(awk -F'\t' -v g="$base" '$2==g && $4=="yes" {print $1}' \
+             "$VOTU_DIR/gvmags_votus.tsv" | head -1)
+    name=$(echo "${votu:-noVOTU}__${base}" | tr -c 'A-Za-z0-9_-' '_')
+    pyrodigal-gv -i "$fna" -a "$OUT/proteins/${name}.faa" -p meta -j "$THREADS" -o /dev/null
+    n_q=$((n_q + 1))
+done < "$REPS"
+echo "[phylo] predicted proteins for $n_q vOTU representatives"
+
+# ---- 2. Reference genomes from GVMAGs V2 --------------------------------------
+if ((USE_REFS)); then
+    REF_FAA_DIR=$(find "$GVMAGS_V2_DIR" -maxdepth 3 -type d -name 'faa*' | head -1)
+    if [[ -z "$REF_FAA_DIR" ]]; then
+        echo "The GVMAGs V2 protein bundle is not downloaded." >&2
+        echo "Get it with: ( module purge; module load slurm/astral; sbatch -p batch \\" >&2
+        echo "  --exclude=as01 --export=ALL,GVMAGS_V2_FULL=1 scripts/07_gvmag_setup.slurm )" >&2
+        exit 1
+    fi
+    python -I "$REPO/scripts/select_refs.py" \
+        --metadata "$GVMAGS_V2_DIR/GVDB_stats.tsv" \
+        --faa-dir "$REF_FAA_DIR" \
+        --out-dir "$OUT/proteins" \
+        --tier "$TIER" --orders "$ORDERS" --max-refs "$MAX_REFS" \
+        --gvclass-summaries "$GVMAG_ROOT"/*/*_gvmag_summary.tsv
+else
+    echo "[phylo] --no-refs: building the alignment from our vOTUs alone"
+fi
+
+N_TAXA=$(ls "$OUT"/proteins/*.faa | wc -l)
+echo "[phylo] $N_TAXA taxa in the alignment ($n_q ours + $((N_TAXA - n_q)) references)"
+
+# Reference .faa files come from the GVMAGs V2 bundle and were not necessarily produced by
+# Prodigal. If their headers are not contigname_N, markersearch cannot join split genes for
+# those taxa (it still finds single-copy hits, so the run succeeds but fragmented reference
+# genes may be missed). Report rather than fail.
+BAD=$(for f in "$OUT"/proteins/*.faa; do
+          head -1 "$f" | grep -qE '^>[^ ]+_[0-9]+' || basename "$f"; done | wc -l)
+((BAD == 0)) && echo "[phylo] all taxa have Prodigal-style protein IDs" \
+             || echo "[phylo] NOTE: $BAD of $N_TAXA .faa files lack Prodigal-style IDs; split marker genes in those genomes may not be joined" >&2
+
+# ---- 3. ncldv_markersearch: find, extract, concatenate, align -----------------
+# Two quirks drive the directory juggling below:
+#  * the script hardcodes a RELATIVE HMM path ("hmm/gvogs.common.hmm"), so it must run from
+#    a directory containing `hmm/` - we symlink the installed copy;
+#  * it writes all outputs into the current directory, so that same directory is the output.
+# Default marker set is exactly the paper's seven: VLTF3 (GVOGm0890), A32 packaging ATPase
+# (0760), DNA topoisomerase II (0461), TFIIB (0172), DNA polymerase B (0054), RNA polymerase
+# alpha (0023) and SNF2-like helicase (0013). The major capsid protein (0003) and RNAP beta
+# (0022) are available but NOT in the default set, as in the paper.
+cd "$OUT/work"
+ln -sfn "$NMS_DIR/hmm" hmm
+echo "[phylo] running ncldv_markersearch (aligner: $ALIGNER); this is the slow step"
+python -I "$NMS_DIR/ncldv_markersearch.py" \
+    -i "$OUT/proteins" \
+    -n "$PROJECT" \
+    -t "$THREADS" \
+    -g "$ALIGNER" \
+    -c
+
+CONCAT="$OUT/work/${PROJECT}.concat.aln"
+[[ -s "$CONCAT" ]] || { echo "No concatenated alignment was produced ($CONCAT)." >&2; exit 1; }
+echo "[phylo] concatenated alignment: $(grep -c '^>' "$CONCAT") taxa"
+
+# ---- 4. trimAl -automated1 ----------------------------------------------------
+# -automated1 chooses between gap-based and similarity-based trimming using a heuristic
+# tuned for maximum-likelihood phylogenetics; it is what the paper used. The HTML report
+# shows exactly which columns were dropped, which is worth checking before tree building.
+TRIMMED="$OUT/${PROJECT}.trimmed.aln"
+trimal -in "$CONCAT" -out "$TRIMMED" -automated1 -fasta \
+       -htmlout "$OUT/${PROJECT}.trimal_report.html"
+trimal -in "$TRIMMED" -sident > "$OUT/${PROJECT}.trimmed.identity.txt" 2>&1 || true
+
+# ---- summary ------------------------------------------------------------------
+cp "$OUT/work/${PROJECT}.table.tsv" "$OUT/" 2>/dev/null || true
+cp "$OUT/work/${PROJECT}.full_output.txt" "$OUT/" 2>/dev/null || true
+aln_len () {   # length of the first sequence in a FASTA alignment
+    python -I -c "
+import sys
+seq = []
+for line in open(sys.argv[1]):
+    if line.startswith('>'):
+        if seq: break
+    else:
+        seq.append(line.strip())
+print(len(''.join(seq)))" "$1"
+}
+{
+  echo "project:        $PROJECT"
+  echo "date:           $(date)"
+  echo "our vOTUs:      $n_q"
+  echo "total taxa:     $(grep -c '^>' "$TRIMMED")"
+  echo "reference tier: $([[ $USE_REFS == 1 ]] && echo "$TIER, orders=$ORDERS, max=$MAX_REFS" || echo none)"
+  echo "aligner:        $ALIGNER"
+  echo "columns before trimming: $(aln_len "$CONCAT")"
+  echo "columns after trimming:  $(aln_len "$TRIMMED")"
+} | tee "$OUT/${PROJECT}.phylogeny_summary.txt"
+
+echo
+echo "[phylo] done. Trimmed alignment for tree building:"
+echo "  $TRIMMED"
+echo "Per-marker occupancy per taxon: $OUT/${PROJECT}.table.tsv"
+echo "trimAl report (which columns were dropped): $OUT/${PROJECT}.trimal_report.html"
+echo "Next: infer a tree with IQ-TREE (see README step 10)."
+```
+
+#### 10c. What each tool does, and the parameters chosen
+
+**`pyrodigal-gv` (step 1 of the script).** Predicts proteins from each vOTU
+representative's nucleotide FASTA. This is needed because `ncldv_markersearch` works on
+proteins, not DNA. Critically, it must produce **Prodigal-style protein IDs**
+(`contigname_1`, `contigname_2`, ...): `ncldv_markersearch` parses those IDs to work out
+which proteins are neighbours on a contig, so that a marker gene **split across two
+predicted ORFs** can be joined back together. Giant virus genes in MAGs are frequently
+split that way, so this is essential rather than cosmetic. I verified pyrodigal-gv's output
+format on a test sequence: `>my_contig_name_1 # 1 # 882 # 1 # ID=1_1;...`, which is correct.
+`-p meta` is used because these are metagenomic sequences rather than a single organism.
+
+**`select_refs.py` (step 2).** Chooses which reference genomes to include. See 10d.
+
+**`ncldv_markersearch.py -c` (step 3).** In one pass it: runs `hmmsearch` with the nine
+giant virus marker HMMs against every taxon's proteins; keeps hits above its built-in
+bit-score thresholds; joins hits to the same marker that are non-overlapping and within
+`-p` genes of each other on one contig (default 3); aligns each marker separately
+(Clustal Omega by default, `-g muscle` for MUSCLE5); and concatenates the per-marker
+alignments into `<project>.concat.aln`, one entry per taxon, padding missing markers with
+runs of `X`. The `-c` flag is what produces the concatenated alignment, and the paper used
+exactly this option.
+
+Three quirks of this script that the job script works around, all found by reading its
+source:
+- It hardcodes a **relative** HMM path, `speci_db = "hmm/gvogs.common.hmm"`, so it only
+  works when the working directory contains `hmm/`. The job script symlinks the installed
+  `hmm/` into its own work directory.
+- It writes **all outputs into the current working directory**, prefixed with `-n`, so that
+  same work directory is also the output directory.
+- It **hardcodes `hmmsearch --cpu 16`**, ignoring `-t` for that step. So the job must
+  request at least 16 cores or it will oversubscribe the node, which is exactly the kind of
+  thing the front-end watchdog and your node-sharing neighbours notice. The script warns if
+  `--cpus-per-task` is below 16; it requests 32.
+
+It also writes `.domout` files into the **input** directory, which is why the script
+rebuilds `proteins/` from scratch on each run (`rm -f`): stale `.domout` files from a
+previous run with different taxa would otherwise be silently reused.
+
+**`trimal -automated1` (step 4).** Alignment columns that are mostly gaps, or too variable
+to be homologous, add noise rather than signal and can actively mislead tree inference.
+trimAl removes them. `-automated1` is a heuristic that inspects the alignment and chooses
+between gap-based and similarity-based trimming automatically, optimised for maximum
+likelihood phylogenetics - it is what the paper used. Version **1.5.1** here, the newest
+release; the paper used 1.4.22. The script also writes `-htmlout` report showing exactly
+which columns were dropped, worth looking at before you trust the tree, plus a `-sident`
+pairwise identity summary.
+
+#### 10d. Choosing reference genomes: the most extensive database available
+
+The request was to use the most extensive giant virus database including Vasquez et al.
+2025, which is **GVMAGs V2**: 18,725 genomes reduced to 8,508 ANI-cluster representatives,
+whose protein FASTAs ship in `GVMAGS_V2_database.gz` (1.18 GB). For comparison, the
+Booker et al. paper used the Aylward GVDB from September 2024, roughly 1,382
+representatives - so this is about a six-fold larger reference set.
+
+`select_refs.py` reads the release's `GVDB_stats.tsv` and offers two nested tiers, whose
+sizes I measured directly from that file:
+
+| tier | column | representatives | Imitervirales among them |
+|---|---|---|---|
+| `mcl` (default) | `mcl_rep` | 2,606 | 1,049 |
+| `skani` | `skani_rep` | 8,507 | 5,461 |
+
+`mcl` is the default because 2,606 is closest to the scale of the published tree (2,037
+genomes after filtering) and because 8,507 taxa make the Clustal Omega step punishingly
+slow.
+
+On top of the tier, references are filtered **by viral order**, which matters more than the
+tier does. `--orders auto` (the default) reads your own GVMAGs' orders from the step 08
+GVClass summaries and keeps references from those orders. All 11 GVMAGs in the paper were
+*Imitervirales*, so if yours are too, that is 1,049 references at the `mcl` tier. A tree of
+Imitervirales is far more informative about Imitervirales vOTUs than one diluted with
+distant orders.
+
+Because an unrooted tree has no direction, the script also keeps a few genomes from **every
+other order** (`--outgroup-per-order`, default 3) so the tree can be rooted - the paper
+midpoint-rooted theirs. And `--max-refs N` caps the in-order references, sampling **evenly
+across families** rather than at random so the subset stays taxonomically spread rather than
+dominated by whichever family happens to be largest.
+
+#### 10e. SCRIPT: `scripts/select_refs.py`
+
+```python
+#!/usr/bin/env python3
+"""Choose giant virus reference genomes from GVMAGs V2 for the phylogenomic tree.
+
+GVMAGs V2 (Vasquez et al. 2025, doi:10.1101/2025.09.26.678796) is the largest curated
+giant virus genome collection: 18,725 genomes reduced to 8,508 ANI-cluster
+representatives, whose protein FASTAs ship in GVMAGS_V2_database.gz. Putting all 8,508
+into one concatenated alignment is possible but slow, and far beyond what a Bayesian
+phylogenetic program can comfortably handle, so this script picks a defensible subset.
+
+Two nested tiers are available, both read from the release's GVDB_stats.tsv:
+
+  --tier mcl    the coarser MCL clustering (column `mcl_rep`): 2,606 representatives.
+                Closest in scale to the published tree, which had 2,037 genomes after
+                filtering. This is the default.
+  --tier skani  every ANI-cluster representative (column `skani_rep`): 8,507. Finest
+                resolution, slowest.
+
+On top of the tier you can restrict by viral order, which is usually what you want: a
+tree of Imitervirales genomes is far more informative about Imitervirales vOTUs than one
+diluted with distant orders. `--orders auto` reads the orders of your own GVMAGs from the
+step 08 GVClass summaries and keeps references from those orders, plus (unless
+--no-outgroup) a small, even sample of other orders to root the tree.
+
+--max-refs caps the number of in-order references, sampled evenly across families so the
+subset stays diverse rather than dominated by one clade.
+
+Output: the chosen references' .faa files copied into --out-dir with sanitised names
+(no dots, because ncldv_markersearch derives the taxon name from the file name), and a
+manifest TSV recording what was chosen and why.
+"""
+import argparse
+import csv
+import random
+import re
+import shutil
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+
+def sanitise(name):
+    """ncldv_markersearch uses the .faa basename as the taxon name and does regex
+    substitutions on '.faa', so dots and whitespace in names must go."""
+    return re.sub(r"[^A-Za-z0-9_-]", "_", name)
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--metadata", required=True, help="GVDB_stats.tsv")
+    p.add_argument("--faa-dir", required=True, help="directory of reference .faa files")
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--tier", choices=["mcl", "skani"], default="mcl")
+    p.add_argument("--orders", default="auto",
+                   help="'auto' (from --gvclass-summaries), 'all', or a comma-separated list")
+    p.add_argument("--gvclass-summaries", nargs="*", default=[],
+                   help="step 08 *_gvmag_summary.tsv files, for --orders auto")
+    p.add_argument("--max-refs", type=int, default=0, help="0 = no cap")
+    p.add_argument("--outgroup-per-order", type=int, default=3,
+                   help="references kept from each OTHER order, to root the tree (0 = none)")
+    p.add_argument("--seed", type=int, default=1)
+    a = p.parse_args()
+
+    rows = list(csv.DictReader(open(a.metadata), delimiter="\t"))
+    by_genome = {r["genome"]: r for r in rows}
+    col = "mcl_rep" if a.tier == "mcl" else "skani_rep"
+    reps = sorted({r[col] for r in rows if r[col] not in ("NA", "")})
+    print(f"[refs] tier '{a.tier}' ({col}): {len(reps)} representatives in the metadata")
+
+    # ---- which orders do we care about? ----
+    if a.orders == "all":
+        wanted = None
+    elif a.orders == "auto":
+        wanted = set()
+        for f in a.gvclass_summaries:
+            if not Path(f).exists():
+                continue
+            with open(f) as fh:
+                for row in csv.DictReader(fh, delimiter="\t"):
+                    o = (row.get("gvclass_order") or "").strip()
+                    if o and o not in ("o_", "NA"):
+                        wanted.add(o.removeprefix("o_"))
+        if not wanted:
+            sys.exit("--orders auto found no orders in the GVClass summaries; pass --orders "
+                     "explicitly (e.g. --orders Imitervirales) or 'all'")
+        print(f"[refs] orders taken from our own GVMAGs: {', '.join(sorted(wanted))}")
+    else:
+        wanted = {o.strip() for o in a.orders.split(",") if o.strip()}
+        print(f"[refs] orders requested: {', '.join(sorted(wanted))}")
+
+    # ---- split representatives into in-order and other-order ----
+    in_order, others_by_order = [], defaultdict(list)
+    for g in reps:
+        r = by_genome.get(g)
+        order = (r or {}).get("Order", "NA")
+        if wanted is None or order in wanted:
+            in_order.append(g)
+        else:
+            others_by_order[order].append(g)
+    print(f"[refs] {len(in_order)} representatives in those orders, "
+          f"{sum(len(v) for v in others_by_order.values())} in others")
+
+    # ---- cap, sampling evenly across families to keep the subset diverse ----
+    rng = random.Random(a.seed)
+    if a.max_refs and len(in_order) > a.max_refs:
+        by_family = defaultdict(list)
+        for g in in_order:
+            by_family[(by_genome.get(g) or {}).get("gvclass_family", "NA")].append(g)
+        for v in by_family.values():
+            rng.shuffle(v)
+        picked, families = [], sorted(by_family)
+        while len(picked) < a.max_refs and any(by_family[f] for f in families):
+            for f in families:
+                if by_family[f] and len(picked) < a.max_refs:
+                    picked.append(by_family[f].pop())
+        print(f"[refs] capped to {len(picked)} references across {len(families)} families "
+              f"(--max-refs {a.max_refs})")
+        in_order = sorted(picked)
+
+    # ---- outgroups: a few genomes from each other order, to root the tree ----
+    outgroups = []
+    if wanted is not None and a.outgroup_per_order > 0:
+        for order, gs in sorted(others_by_order.items()):
+            if order in ("NA", ""):
+                continue
+            rng.shuffle(gs)
+            outgroups.extend(gs[:a.outgroup_per_order])
+        print(f"[refs] plus {len(outgroups)} outgroup references from "
+              f"{len(others_by_order)} other orders")
+
+    # ---- copy the .faa files ----
+    out = Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
+    faa_dir = Path(a.faa_dir)
+    index = {f.stem: f for f in faa_dir.rglob("*.faa")}
+    print(f"[refs] {len(index)} .faa files available in {faa_dir}")
+
+    copied, missing = 0, []
+    with open(out.parent / "reference_manifest.tsv", "w") as man:
+        man.write("taxon_file\tgenome\trole\torder\tfamily\tgenus\tlength_bp\tecosystem\n")
+        for g, role in [(x, "in_order") for x in in_order] + \
+                       [(x, "outgroup") for x in outgroups]:
+            src = index.get(g)
+            if src is None:
+                missing.append(g); continue
+            name = sanitise(g)
+            shutil.copy(src, out / f"{name}.faa")
+            r = by_genome.get(g, {})
+            man.write("\t".join([name, g, role, r.get("Order", "NA"),
+                                 r.get("gvclass_family", "NA"), r.get("new_genus", "NA"),
+                                 r.get("LENbp", "NA"), r.get("Ecosystem", "NA")]) + "\n")
+            copied += 1
+
+    print(f"[refs] copied {copied} reference .faa files into {out}")
+    if missing:
+        print(f"[refs] WARNING: {len(missing)} selected genomes had no .faa in the bundle "
+              f"(first few: {', '.join(missing[:5])})", file=sys.stderr)
+    if copied == 0:
+        sys.exit("No reference proteins were copied; check --faa-dir points at the "
+                 "unpacked GVMAGs V2 bundle.")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### 10f. How to run it
+
+First make sure the one-time setup has installed `phylo-env` and `ncldv_markersearch`, and
+downloaded the 1.18 GB reference bundle (the metadata table alone is not enough for this
+step):
+
+```
+# phylo-env + ncldv_markersearch (also idempotent; added in prompt 26)
+( module purge; module load slurm/gulf; sbatch -p batch -N 1 -c 4 -C highmem --mem=16G \
+    -t 2:00:00 scripts/07_gvmag_setup.slurm )                      # job 92396
+
+# the 1.18 GB GVMAGs V2 genome+protein bundle, needed for reference genomes
+( module purge; module load slurm/gulf; sbatch -p batch -N 1 -c 4 -C highmem --mem=16G \
+    -t 2:00:00 --export=ALL,GVMAGS_V2_FULL=1 scripts/07_gvmag_setup.slurm )
+```
+
+Then, after step 09:
+
+```
+# default: mcl tier, orders auto, all in-order references, Clustal Omega
+( module purge; module load slurm/kuro; sbatch -p serial scripts/10_gvmag_phylogeny.slurm )
+
+# a smaller alignment: ~120 in-order references plus outgroups
+( module purge; module load slurm/kuro; sbatch -p serial scripts/10_gvmag_phylogeny.slurm \
+    --max-refs 120 )
+
+# our vOTUs only, no references (quick sanity check of the marker search)
+( module purge; module load slurm/kuro; sbatch -p serial scripts/10_gvmag_phylogeny.slurm \
+    --no-refs )
+```
+
+Outputs in `~/scr10/data/kbrevis/phylogeny/`:
+
+| file | contents |
+|---|---|
+| `kbrevis_gvmags.trimmed.aln` | **the trimmed concatenated alignment - the input for tree building** |
+| `kbrevis_gvmags.trimal_report.html` | which alignment columns trimAl dropped |
+| `kbrevis_gvmags.table.tsv` | how many of the 7 markers were found per taxon |
+| `kbrevis_gvmags.full_output.txt` | every marker hit, with bit scores and whether genes were joined |
+| `kbrevis_gvmags.phylogeny_summary.txt` | taxa counts, alignment length before and after trimming |
+| `reference_manifest.tsv` | which references were chosen, their taxonomy and ecosystem |
+| `work/` | `ncldv_markersearch` intermediates, including the untrimmed `.concat.aln` |
+
+**Check before building a tree:** open `kbrevis_gvmags.table.tsv` and look at marker
+occupancy. A taxon with only one or two of the seven markers contributes mostly `X` padding
+and can distort the tree; such taxa are usually better dropped. The paper's GVMAGs had 7-9
+markers each.
+
+#### 10g. How this was tested
+
+`select_refs.py` was tested on dev against the **real** `GVDB_stats.tsv`, with a mock
+protein bundle built from every `mcl_rep` genome and a mock step 08 GVClass summary
+declaring `o_Imitervirales`:
+
+```
+[refs] tier 'mcl' (mcl_rep): 2606 representatives in the metadata
+[refs] orders taken from our own GVMAGs: Imitervirales
+[refs] 1049 representatives in those orders, 1557 in others
+[refs] capped to 60 references across 12 families (--max-refs 60)
+[refs] plus 30 outgroup references from 12 other orders
+[refs] copied 90 reference .faa files
+```
+
+Checked: order auto-detection worked, the `--max-refs` cap sampled evenly across all 12
+families (6 per family rather than 60 from one), outgroups were drawn from every other
+order, and no taxon name contained a dot.
+
+The `ncldv_markersearch` + trimAl chain was smoke-tested as a **Slurm job on astral**
+(job 73841, 16 cores, 14 s) using the three giant virus genomes bundled with the repo
+(medusavirus, megavirus, tupanvirus), because `hmmsearch --cpu 16` must not run on dev:
+
+```
+=== concat alignment:
+>tupanvirus concatenated alignment of GVOGm0890,GVOGm0760,GVOGm0461,GVOGm0172,GVOGm0054,GVOGm0023,GVOGm0013
+>megavirus  concatenated alignment of ...
+>medusavirus concatenated alignment of ...
+columns before trimming: 6671
+columns after trimming : 4106
+=== marker occupancy table:
+genome       GVOGm0013 GVOGm0023 GVOGm0054 GVOGm0172 GVOGm0461 GVOGm0760 GVOGm0890
+medusavirus        0.0       0.0       1.0       0.0       0.0       1.0       1.0
+megavirus          1.0       1.0       1.0       1.0       1.0       1.0       1.0
+tupanvirus         1.0       1.0       1.0       1.0       1.0       1.0       1.0
+```
+
+Four things this confirmed: the default marker set is **exactly the paper's seven** (the
+GVOG IDs are printed in the FASTA description); the relative-`hmm/` symlink and
+write-to-CWD handling work; trimAl `-automated1` removed 38% of columns (6,671 to 4,106);
+and the occupancy table does flag poorly covered taxa (medusavirus has only 3 of 7 markers,
+so in a real run it would be a candidate for removal).
+
+The test also revealed that the bundled test proteins use headers like
+`medusavirus.fna|AP018495.1_1` - i.e. `<genome>|<contig>_<n>`, the format the repo's own
+`prodigal_launcher.py` produces. Both that and our plain pyrodigal-gv `contig_1` format end
+in `_<number>`, which is what the script's contig-name regex (`re.sub("_\d*$", "", ...)`)
+needs, so both work. The taxon name in the alignment comes from the **.faa file name**, not
+the headers, which is why the job script names the files after the vOTU.
+
+`bash -n` passes on `10_gvmag_phylogeny.slurm`; the Python helpers parse. The full script
+has **not** been run, because there are no vOTU representatives yet.
+
+#### 10h. Caveats
+
+- `ncldv_markersearch` is an **unversioned GitHub script** with no releases or tags, so the
+  setup script records the installed commit in
+  `~/data10/programs/ncldv_markersearch/INSTALLED_COMMIT` for reproducibility.
+- Reference `.faa` files come from the GVMAGs V2 bundle and were not necessarily produced by
+  Prodigal. If their headers are not `contigname_N`, split marker genes in those genomes
+  cannot be joined - single-copy hits still work, so the run succeeds, but some reference
+  genes may be missed. The script counts and reports how many taxa look non-Prodigal.
+- The concatenated alignment pads missing markers with `X`. That is standard practice, but
+  taxa with few markers are poorly placed.
+- Clustal Omega on thousands of sequences is the slow step: with the full `mcl` tier expect
+  many hours, which is why the job asks for 2 days.
+- This step builds an **alignment**, not a tree. Tree inference is deliberately separate, so
+  you can try several methods on the same alignment. The paper used IQ-TREE v2.2.2.6 with
+  `-m MFP -bb 1000 -nt AUTO -wbt`, then RAxML v8.2.12 (`-f i -m GTRCAT`) for tree certainty
+  scores; neither is installed yet.
+
+----------------------------------------------------------------------------------------
+
+#### 10i. A silent order-parsing bug in `select_refs.py`, found before the first run (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 39 in `PROMPT_LOG.md`).
+
+Step 10 had never been run. Before submitting it, the reference-selection step was checked
+against the real data, and it was broken in a way that would **not** have produced an error.
+
+**What was wrong.** `select_refs.py --orders auto` is supposed to read the viral orders of
+our own GVMAGs out of the step 08 GVClass summaries and keep reference genomes from those
+same orders. It did this:
+
+```python
+o = (row.get("gvclass_order") or "").strip()
+if o and o not in ("o_", "NA"):
+    wanted.add(o.removeprefix("o_"))
+```
+
+But `gvclass_order` in a GVClass summary is **not an order name - it is a vote string.**
+The real values in our summaries look like this:
+
+```
+NCLDV__Imitervirales:10(100.00%)
+NCLDV__Imitervirales:20(55.56%),BAC__UM-FILTER-46-8:8(22.22%),BAC__JAJFKO01:3(8.33%),...
+NCLDV__Pandoravirales:1(100.00%)
+```
+
+GVClass reports how many marker genes voted for each order and with what support, rather
+than a single label. So `wanted` was filled with 24 distinct strings of that form. The next
+stage compares them against GVDB_stats.tsv's `Order` column, whose values are bare names
+(`Imitervirales`, `Algavirales`, `Pimascovirales`, ...). **Nothing ever matched.**
+
+**Why that was dangerous rather than merely broken.** With `in_order` empty, the script did
+not fail. It fell through to the outgroup logic, which keeps 3 genomes from each *other*
+order, and happily copied ~24 outgroup proteomes. The job would then have run to completion
+and produced a perfectly well-formed 43-taxon alignment and tree from our 19 vOTUs plus two
+dozen distant outgroups - with **zero** *Imitervirales* references, the very genomes the
+tree exists to place our viruses among. Nothing in the logs would have looked wrong. This
+is the same class of error as the `domain` column in step 08 (section 08c): a GVClass
+column that reads like a label but is a vote tally.
+
+**The fix.** The resolved lineage lives in `gvclass_taxonomy_majority`, which is clean:
+
+```
+d_NCLDV;p_Nucleocytoviricota;c_Megaviricetes;o_Imitervirales;f_IM_01;g_;s_singleton
+```
+
+A new `order_of()` helper reads the `o_` field from that column, falls back to parsing the
+vote string only if the lineage column is absent, and returns `None` for an unresolved
+order (an empty `o_`), which correctly contributes nothing:
+
+```python
+def order_of(row):
+    tax = (row.get("gvclass_taxonomy_majority")
+           or row.get("taxonomy_majority") or "").strip()
+    for field in tax.split(";"):
+        field = field.strip()
+        if field.startswith("o_"):
+            name = field[2:].strip()
+            return name or None
+    vote = (row.get("gvclass_order") or "").strip()
+    m = re.search(r"NCLDV__([A-Za-z_]+?):", vote)
+    return m.group(1) if m else None
+```
+
+A second change makes this class of mistake impossible to repeat quietly. The script now
+**refuses to continue** if an order filter matches no reference at all:
+
+```python
+if wanted is not None and not in_order:
+    sys.exit("No reference genome matched the requested orders "
+             f"({', '.join(sorted(wanted))}). Those names must match GVDB_stats.tsv's "
+             "`Order` column exactly (e.g. 'Imitervirales', no 'o_' prefix). Refusing "
+             "to continue: the alignment would contain only outgroups, which looks "
+             "like a valid tree but is not the one you asked for.")
+```
+
+That guard matters more than the fix itself: the original bug was invisible precisely
+because an outgroup-only alignment is structurally valid. The previous version of the file
+was kept as `scripts/select_refs.py.bak`.
+
+**How it was tested.** First a dry run that exercised the real selection logic against the
+real metadata and the real summaries, but counted instead of copying 1,547 protein files
+(copying is job work, not front-end work):
+
+```bash
+# imports scripts/select_refs.py and calls order_of() on every step 08 summary row,
+# then replays the tier/order/outgroup split
+nice -n 19 python3 -I <dry-run script>
+```
+
+```
+orders detected from our GVMAGs: ['Imitervirales', 'Pandoravirales', 'Pimascovirales']
+tier mcl  :  2606 reps ->  1523 in-order + 24 outgroups = 1566 taxa with our 19 vOTUs
+   in-order breakdown: {'Imitervirales': 1049, 'Pimascovirales': 361, 'Pandoravirales': 113}
+tier skani:  8507 reps ->  6223 in-order + 24 outgroups = 6266 taxa with our 19 vOTUs
+```
+
+Then the production job confirmed the same numbers, which is the real test:
+
+```
+[refs] tier 'mcl' (mcl_rep): 2606 representatives in the metadata
+[refs] orders taken from our own GVMAGs: Imitervirales, Pandoravirales, Pimascovirales
+[refs] 1523 representatives in those orders, 1083 in others
+[refs] plus 24 outgroup references from 10 other orders
+[refs] copied 1547 reference .faa files
+[phylo] 1566 taxa in the alignment (19 ours + 1547 references)
+[phylo] all taxa have Prodigal-style protein IDs
+```
+
+Compare the pre-fix behaviour: 0 in-order, ~24 outgroups, 43 taxa.
+
+**Other pre-flight checks.** `phylo-env` has no `activate.d` hook, so the bare
+`conda activate phylo-env` under `set -euo pipefail` is safe (the step 08 `JAVA_HOME`
+problem does not apply). The `faa_files` half of the GVMAGs V2 bundle is present
+(8,508 files), which `--tier mcl` needs.
+
+**Submitted:**
+
+```bash
+( module purge; module load slurm/kuro; \
+  sbatch -p serial -N 1 -c 32 --mem=128G -t 24:00:00 \
+         scripts/10_gvmag_phylogeny.slurm )
+# Submitted batch job 111459
+```
+
+Defaults were used (`--tier mcl --orders auto`), giving 1,566 taxa. That is deliberately
+close to the published tree's scale (2,037 genomes after filtering), and section 10d
+explains why the `mcl` tier rather than `skani` (6,266 taxa) is the right default. kuro
+`serial` was chosen over gulf `gz` despite `gz` ranking first on estimated finish: a job of
+this length must not sit on a preemptible partition where a `gz_preempt` job would cancel
+it outright with no requeue. Walltime was cut from the script's `2-00:00:00` to 24 h, which
+is still ample - `ncldv_markersearch` is the slow step, dominated by Clustal Omega on seven
+marker alignments of up to ~1,500 sequences each.
+
+Note that `ncldv_markersearch.py` emits several `SyntaxWarning: invalid escape sequence`
+messages on Python 3.12 (`'\s+'`, `"_\d*$"`, `"\*"` written without raw-string prefixes).
+These are harmless warnings from the third-party script, not errors, and appear in the
+`.err` log of every step 10 run.
+
+----------------------------------------------------------------------------------------
+
+# Step 11. Maximum-likelihood tree from the alignment (written 2026-11-12, tested)
+
+Written by Claude Code on 2026-11-12 (prompt 28 in `PROMPT_LOG.md`). Files:
+`scripts/11_gvmag_tree.slurm`, `envs/tree-env.yml`. Tested end to end on small alignments;
+not yet run on real data, which needs step 10.
+
+#### 11a. What this step does and why
+
+Step 10 produces an *alignment*; this step turns it into a *tree*. It follows the paper
+(Supplemental Methods, "GVMAG comparisons"), which used IQ-TREE for the tree and RAxML only
+for certainty scores.
+
+**IQ-TREE** infers a maximum-likelihood phylogeny: it searches tree topologies for the one
+that makes the observed alignment most probable under a model of amino acid substitution.
+Three things happen in one invocation:
+
+1. **ModelFinder (`-m MFP`)** tests substitution models and picks the best by BIC. For
+   protein data that means empirical matrices (LG, WAG, JTT, rtREV, cpREV, FLU and others)
+   combined with `+F` (empirical amino acid frequencies), `+I` (invariant sites) and
+   `+G`/`+R` (rate heterogeneity across sites). This matters: in the smoke tests
+   ModelFinder chose `LG+F` for one alignment and `rtREV+F+I+R5` for another, so hard-coding
+   a model would have been wrong both times.
+2. **Tree search** under the chosen model.
+3. **Ultrafast bootstrap (`-B 1000`)**, which resamples alignment columns 1,000 times and
+   reports how often each branch recurs.
+
+**RAxML `-f i`** then computes **internode certainty (IC)** and **tree certainty (TC)**
+scores (Salichos & Rokas 2013) from the bootstrap trees. These expose *conflicting* signal
+that a single bootstrap percentage hides: a branch can have high bootstrap support while a
+competing arrangement is almost as well supported, and IC reveals that.
+
+#### 11b. SCRIPT: `scripts/11_gvmag_tree.slurm`
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=11_gvmag_tree
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=3-00:00:00
+#SBATCH --mail-type=FAIL,END
+#SBATCH --mail-user=iadanforth@wm.edu
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/11_gvmag_tree_%j.out
+#SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/11_gvmag_tree_%j.err
+
+# Infer a maximum-likelihood phylogenomic tree from the step 10 trimmed, concatenated
+# marker-gene alignment, following Booker et al. 2026 (Supplemental Methods):
+#   1. IQ-TREE: model selection + ML tree + ultrafast bootstrap   (paper: -m MFP -bb 1000 -nt AUTO -wbt)
+#   2. RAxML -f i: internode certainty (IC) and tree certainty (TC) scores
+#
+# Flag names below are IQ-TREE 2.x, verified against the installed 2.3.6 help text. The
+# paper's `-bb`/`-nt`/`-wbt` are IQ-TREE 1.x spellings; the 2.x equivalents are
+# `-B`/`-T`/`--boot-trees` (we use `--wbtl`, which also writes branch lengths because
+# RAxML's IC/TC step wants them).
+#
+# Submit (needs a 72 h partition; kuro caps at 48 h, so add -t 2-00:00:00 there):
+#   ( module purge; module load slurm/femto;  sbatch -p batch scripts/11_gvmag_tree.slurm )
+#   ( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/11_gvmag_tree.slurm )
+#   ( module purge; module load slurm/kuro;   sbatch -p serial -t 2-00:00:00 scripts/11_gvmag_tree.slurm )
+#
+# Options:
+#   --alignment PATH   alignment to use (default: step 10's kbrevis_gvmags.trimmed.aln)
+#   --model STRING     IQ-TREE model (default MFP = ModelFinder Plus, as in the paper).
+#                      Use e.g. LG+F+G4 to skip model selection on a large alignment.
+#   --bootstraps N     ultrafast bootstrap replicates (default 1000, as in the paper)
+#   --threads N|AUTO   default: the Slurm allocation (the paper used AUTO)
+#   --alrt N           also run SH-aLRT with N replicates (default 0 = off)
+#   --skip-ic          skip the RAxML IC/TC step
+
+set -euo pipefail
+
+THREADS_ALLOC="${SLURM_CPUS_PER_TASK:?Submit with sbatch}"
+REPO="/sciclone/home/iadanforth/K_brevis_viromes"
+DATA="$HOME/scr10/data/kbrevis"
+PHYLO_DIR="$DATA/phylogeny"
+OUT="$DATA/tree"
+PROJECT="kbrevis_gvmags"
+
+ALN="$PHYLO_DIR/${PROJECT}.trimmed.aln"
+MODEL=MFP; BOOTSTRAPS=1000; THREADS="$THREADS_ALLOC"; ALRT=0; DO_IC=1
+while (($#)); do
+    case "$1" in
+        --alignment) ALN="$2"; shift 2 ;;
+        --model) MODEL="$2"; shift 2 ;;
+        --bootstraps) BOOTSTRAPS="$2"; shift 2 ;;
+        --threads) THREADS="$2"; shift 2 ;;
+        --alrt) ALRT="$2"; shift 2 ;;
+        --skip-ic) DO_IC=0; shift ;;
+        *) echo "Unknown option: $1" >&2; exit 2 ;;
+    esac
+done
+
+[[ -s "$ALN" ]] || { echo "No trimmed alignment ($ALN); run step 10 first." >&2; exit 1; }
+mkdir -p "$OUT"
+
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate tree-env
+
+# ---- Pre-flight: look at the alignment before spending days on it -------------
+# IQ-TREE refuses to bootstrap fewer than 4 sequences ("It makes no sense to perform
+# bootstrap with less than 4 sequences"), and it only says so AFTER model selection has
+# run. Catch it up front. Found while smoke-testing on a 3-taxon alignment.
+N_TAXA=$(grep -c '^>' "$ALN")
+if ((N_TAXA < 4)) && ((BOOTSTRAPS > 0)); then
+    echo "Only $N_TAXA taxa in $ALN. IQ-TREE cannot bootstrap fewer than 4 sequences." >&2
+    echo "Either add reference genomes (step 10 without --no-refs) or pass --bootstraps 0." >&2
+    exit 1
+fi
+
+# Taxa made up mostly of X padding (markers that were not found) are placed unreliably and
+# slow everything down. This reports them so they can be removed and the step re-run; it
+# does not drop them automatically, since that is a scientific decision.
+python - "$ALN" <<'PY'
+import sys
+aln, name, seqs = sys.argv[1], None, {}
+for line in open(aln):
+    line = line.rstrip("\n")
+    if line.startswith(">"):
+        name = line[1:].split()[0]; seqs[name] = []
+    elif name:
+        seqs[name].append(line.strip())
+seqs = {k: "".join(v) for k, v in seqs.items()}
+if not seqs:
+    sys.exit("alignment contains no sequences")
+L = len(next(iter(seqs.values())))
+bad = {k: v for k, v in seqs.items() if len(v) != L}
+print(f"[tree] {len(seqs)} taxa, {L} alignment columns")
+if bad:
+    sys.exit(f"alignment is not rectangular: {len(bad)} sequences differ in length "
+             f"(first: {next(iter(bad))})")
+def pad(s):
+    return 100.0 * (s.count("X") + s.count("x") + s.count("-")) / len(s)
+poor = sorted(((pad(v), k) for k, v in seqs.items()), reverse=True)
+over = [(p, k) for p, k in poor if p >= 70]
+print(f"[tree] worst padding/gap fraction: {poor[0][0]:.1f}% ({poor[0][1]})")
+if over:
+    print(f"[tree] WARNING: {len(over)} taxa are >=70% X/gap and are placed unreliably:")
+    for p, k in over[:10]:
+        print(f"[tree]   {p:5.1f}%  {k}")
+    print("[tree] Consider removing them (see phylogeny/*.table.tsv) and re-running step 10.")
+PY
+
+# ---- 1. IQ-TREE: ModelFinder + ML tree + ultrafast bootstrap ------------------
+# -m MFP  : ModelFinder Plus - tests substitution models (for protein data: LG, WAG, JTT,
+#           ... with +F/+G/+R variants), picks the best by BIC, then infers the tree.
+# -B 1000 : ultrafast bootstrap (UFBoot), 1000 replicates. UFBoot support values are NOT
+#           comparable to classical bootstrap: >=95 is roughly as strong as >=70 classical.
+# --bnni  : optimise each UFBoot tree by NNI. Recommended by the IQ-TREE authors because it
+#           reduces UFBoot's tendency to overestimate support when the model is misspecified
+#           - a real risk with concatenated markers. (Not in the paper; a deliberate addition.)
+# --wbtl  : write the bootstrap trees, with branch lengths, to <prefix>.ufboot. The paper's
+#           -wbt did the same without branch lengths; RAxML's IC/TC step reads this file.
+# -T      : explicit thread count rather than the paper's AUTO, because AUTO probes the
+#           machine and can exceed the Slurm allocation.
+PREFIX="$OUT/$PROJECT"
+# --mem caps IQ-TREE's own memory use at 85% of the Slurm allocation, so it reports a
+# shortfall rather than being OOM-killed. (On small alignments IQ-TREE prints harmless
+# "Too low -mem, automatically increased to N MB" notes per model; ignore them.)
+IQ_ARGS=(-s "$ALN" -m "$MODEL" --bnni
+         -T "$THREADS" --prefix "$PREFIX" --seed 12345
+         --mem "$(( ${SLURM_MEM_PER_NODE:-131072} * 85 / 100 / 1024 ))G")
+((BOOTSTRAPS > 0)) && IQ_ARGS+=(-B "$BOOTSTRAPS" --wbtl)
+((ALRT > 0)) && IQ_ARGS+=(--alrt "$ALRT")
+
+echo "[tree] iqtree2 ${IQ_ARGS[*]}"
+iqtree2 "${IQ_ARGS[@]}"
+
+TREE="$PREFIX.treefile"
+[[ -s "$TREE" ]] || { echo "IQ-TREE produced no tree ($TREE)" >&2; exit 1; }
+
+# ---- 2. RAxML -f i: internode certainty / tree certainty ---------------------
+# -f i computes IC and TC scores (Salichos & Rokas 2013): how consistently each internal
+# branch is supported across the bootstrap trees, which exposes conflicting signal that a
+# single bootstrap number can hide.
+#
+# DELIBERATE DEVIATION FROM THE PAPER: it reports `-f i -m GTRCAT`, but GTRCAT is RAxML's
+# GTR *nucleotide* model and this alignment is amino acids. RAxML's protein models are
+# PROTCAT<matrix>/PROTGAMMA<matrix>, so PROTCATLG is used here (LG is the modern general
+# protein matrix). The IC/TC calculation compares tree topologies rather than optimising a
+# likelihood, so the matrix choice has little effect - but the model must at least match the
+# data type or RAxML will reject the alignment.
+if ((DO_IC)); then
+    UFBOOT="$PREFIX.ufboot"
+    if [[ -s "$UFBOOT" ]]; then
+        IC_DIR="$OUT/ic"; rm -rf "$IC_DIR"; mkdir -p "$IC_DIR"
+        # RAxML writes RAxML_* files into -w, which must be an absolute path.
+        raxmlHPC-PTHREADS-SSE3 -T "$THREADS" -f i \
+            -t "$TREE" -z "$UFBOOT" -s "$ALN" \
+            -m PROTCATLG -n ic -w "$IC_DIR" -C \
+            || echo "[tree] WARNING: RAxML IC/TC step failed; the ML tree above is unaffected" >&2
+        cp "$IC_DIR"/RAxML_info.ic "$OUT/${PROJECT}.IC_TC_info.txt" 2>/dev/null || true
+    else
+        echo "[tree] no .ufboot file, so the IC/TC step was skipped" >&2
+    fi
+fi
+
+# ---- Summary -----------------------------------------------------------------
+{
+  echo "project:            $PROJECT"
+  echo "date:               $(date)"
+  echo "alignment:          $ALN"
+  echo "model requested:    $MODEL"
+  echo "model chosen:       $(grep -m1 'Best-fit model' "$PREFIX.log" 2>/dev/null | sed 's/.*: //' || echo 'see log')"
+  echo "log-likelihood:     $(grep -m1 'BEST SCORE FOUND' "$PREFIX.log" 2>/dev/null | sed 's/.*: //' || echo 'see log')"
+  echo "bootstrap reps:     $( ((BOOTSTRAPS>0)) && echo "$BOOTSTRAPS (ultrafast UFBoot, --bnni)" || echo "none (--bootstraps 0)" )"
+  echo "threads:            $THREADS"
+  echo "taxa in tree:       $(tr ',' '\n' < "$TREE" | grep -c ':' || true)"
+  echo
+  if ((BOOTSTRAPS > 0)); then
+  echo "UFBoot support distribution (branch support values):"
+  python - "$TREE" <<'PY'
+import re, sys
+vals = [float(x) for x in re.findall(r"\)(\d+(?:\.\d+)?):", open(sys.argv[1]).read())]
+if not vals:
+    print("  (no support values found in the tree file)")
+else:
+    vals.sort()
+    n = len(vals)
+    strong = sum(1 for v in vals if v >= 95)
+    print(f"  {n} internal branches; median {vals[n//2]:.0f}")
+    print(f"  >=95 (well supported): {strong} ({100*strong/n:.0f}%)")
+    print(f"  <70  (poorly supported): {sum(1 for v in vals if v < 70)}")
+PY
+  fi
+} | tee "$OUT/${PROJECT}.tree_summary.txt"
+
+echo
+echo "[tree] done. Key outputs in $OUT:"
+echo "  ${PROJECT}.treefile          the ML tree with UFBoot support (Newick)"
+echo "  ${PROJECT}.iqtree            human-readable report: model, likelihood, parameters"
+echo "  ${PROJECT}.log               full IQ-TREE log"
+[[ -s "$PREFIX.ufboot" ]] && echo "  ${PROJECT}.ufboot            the bootstrap trees"
+[[ -s "$OUT/${PROJECT}.IC_TC_info.txt" ]] && echo "  ${PROJECT}.IC_TC_info.txt    RAxML internode/tree certainty scores"
+echo "  ${PROJECT}.tree_summary.txt  this summary"
+echo
+echo "The tree is UNROOTED. Booker et al. midpoint-rooted theirs; do that in iTOL,"
+echo "FigTree or PearTree, or with ape::midpoint in R, before interpreting it."
+```
+
+#### 11c. Parameters, and where they differ from the paper
+
+The paper's command was `-m MFP -bb 1000 -nt AUTO -wbt`. Those are IQ-TREE **1.x** flag
+spellings; the installed version is 2.3.6, whose equivalents I verified against its own
+help text:
+
+| paper (IQ-TREE 1.x) | used here (2.3.6) | meaning |
+|---|---|---|
+| `-m MFP` | `-m MFP` | unchanged: ModelFinder Plus |
+| `-bb 1000` | `-B 1000` | ultrafast bootstrap, 1,000 replicates |
+| `-nt AUTO` | `-T $SLURM_CPUS_PER_TASK` | **deliberate change**: `AUTO` probes the machine and can exceed the Slurm allocation, so the thread count is set explicitly |
+| `-wbt` | `--wbtl` | write bootstrap trees; `--wbtl` also writes branch lengths, which the RAxML step wants |
+| – | `--bnni` | **addition**: optimises each bootstrap tree by NNI. The IQ-TREE authors recommend it because UFBoot overestimates support when the model is misspecified, a real risk with concatenated markers |
+| – | `--seed 12345` | reproducible runs |
+| – | `--mem` | caps IQ-TREE at 85% of the Slurm allocation so it reports a shortfall rather than being OOM-killed |
+
+**The RAxML model is a genuine correction to the paper.** The paper reports
+`-f i -m GTRCAT`, but **GTRCAT is RAxML's GTR nucleotide model** and this alignment is amino
+acids - RAxML's protein models are `PROTCAT<matrix>` / `PROTGAMMA<matrix>`. This script uses
+**`PROTCATLG`** (LG being the modern general protein matrix). The IC/TC calculation compares
+tree topologies rather than optimising a likelihood, so the matrix barely affects the
+numbers, but the model must match the data type or RAxML rejects the alignment. The paper's
+published combination cannot have been run as written on a protein alignment.
+
+**Reading the support values.** UFBoot values are **not** on the same scale as classical
+bootstrap: **>=95 is roughly as trustworthy as >=70 classical**. The script's summary
+reports how many branches clear 95 and how many fall below 70.
+
+#### 11d. Environment
+
+`envs/tree-env.yml`:
+
+```yaml
+# Tree inference from the step 10 trimmed alignment (step 11).
+#
+# iqtree 2.3.6: the paper used IQ-TREE v2.2.2.6, which is not on bioconda (available 2.x
+# releases are 2.2.3, 2.2.5, 2.2.6, 2.3.0-2.3.6). 2.3.6 is the newest 2.x, so it keeps the
+# paper's command-line interface. IQ-TREE 3.x exists but is a major release, so it is
+# avoided here for comparability with the published tree.
+#
+# raxml 8.2.12: exactly the version the paper used, needed only for the internode/tree
+# certainty scores (-f i), which IQ-TREE does not compute.
+name: tree-env
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.12   # the job script's inline alignment and support-value checks
+  - iqtree=2.3.6
+  - raxml=8.2.12
+```
+
+IQ-TREE **2.3.6**: the paper used 2.2.2.6, which is not on bioconda (available 2.x releases
+are 2.2.3, 2.2.5, 2.2.6 and 2.3.0-2.3.6), so this is the newest 2.x and keeps the same
+command-line interface. IQ-TREE 3.x exists but is a major release, avoided here for
+comparability. RAxML **8.2.12** is exactly the paper's version. `python` is included because
+the job script uses it for the pre-flight alignment check and the support-value summary -
+the environment did not have Python at first, and the script failed until it was added.
+
+#### 11e. How to run it
+
+```
+# default: the step 10 alignment, ModelFinder, 1000 UFBoot replicates
+( module purge; module load slurm/femto;  sbatch -p batch scripts/11_gvmag_tree.slurm )
+
+# kuro caps walltime at 48 h, so shorten it there
+( module purge; module load slurm/kuro;   sbatch -p serial -t 2-00:00:00 scripts/11_gvmag_tree.slurm )
+
+# skip model selection on a very large alignment (much faster)
+( module purge; module load slurm/femto;  sbatch -p batch scripts/11_gvmag_tree.slurm --model LG+F+G4 )
+
+# add SH-aLRT as a second support measure, and skip the RAxML step
+( module purge; module load slurm/femto;  sbatch -p batch scripts/11_gvmag_tree.slurm --alrt 1000 --skip-ic )
+```
+
+Resources: 32 cores, 128 GB, 3 days. A ~1,000-taxon protein alignment with ModelFinder and
+1,000 UFBoot replicates is genuinely expensive; if it times out, rerun with an explicit
+`--model` to skip model selection, or cut taxa with `--max-refs` in step 10.
+
+Outputs in `~/scr10/data/kbrevis/tree/`:
+
+| file | contents |
+|---|---|
+| `kbrevis_gvmags.treefile` | **the ML tree with UFBoot support values (Newick)** |
+| `kbrevis_gvmags.iqtree` | readable report: chosen model, likelihood, parameters |
+| `kbrevis_gvmags.log` | full IQ-TREE log, including the whole ModelFinder table |
+| `kbrevis_gvmags.contree` | consensus tree of the bootstrap replicates |
+| `kbrevis_gvmags.ufboot` | the 1,000 bootstrap trees |
+| `kbrevis_gvmags.IC_TC_info.txt` | RAxML IC/TC summary |
+| `ic/RAxML_IC_Score_BranchLabels.ic` | the tree with IC scores as branch labels |
+| `kbrevis_gvmags.tree_summary.txt` | model, likelihood, support distribution |
+
+#### 11f. How this was tested
+
+All tests ran as Slurm jobs on astral, never on dev.
+
+**Test 1 (job 73846, 3 taxa, FAILED - a useful failure).** Run on the step 10 smoke-test
+alignment. ModelFinder completed and chose `LG+F`, then IQ-TREE stopped with
+`ERROR: It makes no sense to perform bootstrap with less than 4 sequences.` The pre-flight
+check correctly flagged `medusavirus` as 84.8% X/gap - the taxon that had only 3 of the 7
+markers. Fix: the script now counts taxa up front and refuses early with a clear message,
+rather than discovering this after model selection.
+
+**Test 2 (job 73847, 3 taxa, `--bootstraps 0`, COMPLETED in 2 s).** Confirmed the no-
+bootstrap path: model `LG+F`, log-likelihood -17659.226, tree written, and the IC/TC step
+correctly skipped with a message because no `.ufboot` file exists. This run also exposed
+three misleading summary lines (reporting "1000 (ultrafast)" when bootstrapping was off,
+"could not parse support values", and listing files that were never created), all fixed.
+
+**Test 3 (job 73848, FAILED - environment lesson).** The test alignment was passed from the
+agent scratchpad under `/tmp`, which is **node-local**, so the compute node could not see it:
+`No trimmed alignment (...); run step 10 first.` Re-staged to `~/scr10` and resubmitted.
+
+**Test 4 (job 73849, 6 taxa, COMPLETED in 17 s)** - the full path. A 6-taxon alignment was
+built from the 3 real genomes plus mutated copies, so bootstrapping and RAxML could actually
+run:
+
+```
+model chosen:       rtREV+F+I+R5 chosen according to BIC
+log-likelihood:     -20020.086
+bootstrap reps:     1000 (ultrafast UFBoot, --bnni)
+taxa in tree:       6
+UFBoot support distribution (branch support values):
+  3 internal branches; median 100
+  >=95 (well supported): 3 (100%)
+  <70  (poorly supported): 0
+```
+
+and RAxML produced real certainty scores on protein data with `PROTCATLG`:
+
+```
+Tree certainty for this tree: 2.947085
+Relative tree certainty for this tree: 0.982362
+```
+
+So the verified-working pieces are: ModelFinder on protein data, the `-B`/`--wbtl`/`--bnni`
+flags, the thread and memory handling, the UFBoot support parser, the RAxML `-f i` call with
+a protein model, and the summary. The 100% support is an artefact of the test (each mutated
+copy pairs with its original), not a meaningful result.
+
+#### 11g. Caveats
+
+- **The tree is unrooted.** The paper midpoint-rooted theirs. Root it in iTOL, FigTree or
+  PearTree, or with `ape::midpoint()` in R, before interpreting it. The script prints a
+  reminder.
+- **UFBoot is not classical bootstrap.** Treat >=95 as the threshold, not >=70.
+- Taxa that are mostly `X` padding get placed unreliably. The pre-flight lists any taxon
+  that is >=70% X/gap; consider removing them and rerunning step 10.
+- IQ-TREE silently merges identical sequences and warns about it - check the log if the taxon
+  count in the tree is lower than in the alignment.
+- ModelFinder on a large alignment can take a large share of the total runtime. `--model
+  LG+F+G4` skips it.
+- A tree of concatenated markers is a tree of *those genes*, not necessarily of the genomes:
+  giant viruses recombine and acquire genes horizontally, so individual marker trees can
+  disagree. That is exactly what the IC/TC scores are for.
+
+
 # Earlier attempts (not part of the current pipeline)
 
 Kept so the history makes sense. Their outputs either no longer exist or aren't used.
@@ -3497,6 +6084,8 @@ cp metadata/SraRunTable.csv ~/scr10/data/kbrevis/
 ( module purge; module load slurm/astral; sbatch -p batch -c 4 --exclude=as01 --mem=16G -t 6:00:00 scripts/07_gvmag_setup.slurm )  # step 07, once (job 73832); also downloads the CheckV db v1.5
 ( module purge; module load slurm/kuro; bash scripts/08_gvmags.sh -p serial )      # step 08 (array, ≤10 at once)
 ( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/09_gvmag_votus.slurm )  # step 09 (once)
+( module purge; module load slurm/kuro; sbatch -p serial scripts/10_gvmag_phylogeny.slurm )  # step 10 (once; needs GVMAGS_V2_FULL=1 setup)
+( module purge; module load slurm/femto; sbatch -p batch scripts/11_gvmag_tree.slurm )       # step 11 (once; 72 h partition)
 # the two removed steps have no scripts any more (a binning test and the CheckV database download,
 # which step 07 now does); step 08 bins the merged contigs itself
 ```
@@ -3506,9 +6095,234 @@ Before each submission, check which cluster will finish soonest with
 `sbatch` line. Bora `batch` gives a 20-core, 125 GB node, so it can't run the 360 GB
 assembly jobs; those need kuro `serial` or gulf `gz`.
 
+----------------------------------------------------------------------------------------
+
+# Step 12. Copying results out of scratch into the repository (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 40 in `PROMPT_LOG.md`). File:
+`scripts/copy_results.slurm`, plus a new `.gitignore`.
+
+#### 12a. Why this step exists
+
+Everything steps 08 and 09 produced lives in `~/scr10/data/kbrevis`. Scratch is **never
+backed up and is purged after 90 days without access** (AGENTS.md section 6), so results
+left there will eventually vanish. This step copies them into the repository at
+`~/K_brevis_viromes/output`, where they sit beside the scripts that made them and are
+covered by the weeknightly home backup.
+
+The scratch originals are **copied, not moved** - `~/scr10/data/kbrevis` is untouched, so
+steps 10 and 11 keep reading their inputs from scratch as they were written to do.
+
+#### 12b. What could not be copied, and why
+
+The request was to copy `gvmags` and `votus` whole. That is not possible, and the reason is
+worth recording rather than quietly working around:
+
+| directory | size |
+|---|---|
+| `votus` | 16 MB |
+| `gvmags` | **115 GB** |
+
+The home filesystem gives this account a **50 GB quota**, of which 21.2 GB was free, and the
+underlying filesystem was 92% full. Copying 115 GB into home is physically impossible, not
+merely inadvisable; attempting it would have filled the quota and died partway through,
+while putting avoidable pressure on a nearly-full shared filesystem.
+
+Measuring where the 115 GB actually sits shows the problem is confined to one directory:
+
+```bash
+for d in binning bins gvclass_in gvclass checkv genomad gvmags; do
+  printf "%-12s %s\n" "$d" "$(du -shc gvmags/*/$d | tail -1 | cut -f1)"
+done
+```
+
+```
+binning      108G      <- excluded
+bins         1.9G
+gvclass_in   1.9G      <- excluded
+gvclass      2.5G
+checkv       27M
+genomad      11M
+gvmags       14M
+```
+
+**Two directories are excluded, both for good reasons:**
+
+- **`binning/` (108 GB)** holds, per sample, the bbmap BAM of reads against the merged
+  contigs, its index, and the `jgi_summarize_bam_contig_depths` table. These are the
+  mapping intermediates MetaBAT2 consumed to decide which contigs co-vary in depth.
+  Nothing downstream reads them again - step 09 works from the GVMAG FASTAs, and steps 10
+  and 11 from the vOTU representatives. They are also fully regenerable from the step 06
+  merged contigs plus the step 02 cleaned reads by re-running `08_gvmags.slurm`. This is
+  the only directory that makes the copy impossible, and it contains the least irreplaceable
+  data in the tree.
+- **`gvclass_in/` (1.9 GB)** is a byte-for-byte duplicate of `bins/`, differing only in file
+  naming because GVClass requires a `.fna` extension where MetaBAT2 writes `bin.10.fa`.
+  Verified on 2026-11-16: both hold 41 files for SRR28004137, and
+  `bins/SRR28004137_bin.10.fa` and `gvclass_in/SRR28004137_bin_10.fna` are both exactly
+  244,266 bytes with distinct inodes (separate copies, not hardlinks). Excluding it loses
+  no information whatsoever.
+
+**`bins/` (1.9 GB) is deliberately kept**, even though it is an intermediate. It holds all
+848 MetaBAT2 bins, which means the *classification* half of step 08 (GVClass, CheckV,
+geNomad, GVMAG selection) can be re-run without redoing the 108 GB of read mapping. That is
+a cheap insurance policy for 1.9 GB.
+
+If the BAMs are ever worth keeping, the right destination is `~/data10` (251 TB free, weekly
+backup), not home. That was **not** done here, because nothing has asked for it and 108 GB
+of regenerable intermediates is poor use of archival space.
+
+#### 12c. SCRIPT: `scripts/copy_results.slurm`
+
+The copy runs as a batch job rather than on dev, because AGENTS.md section 6 requires
+GB-scale copies between filesystems to go through Slurm. One core is correct: this is pure
+I/O and nothing in it is parallel.
+
+Two safeguards are built in. The script **checks the free quota and aborts before copying
+anything** if the transfer plus a 2 GB margin would not fit, so a too-large copy fails
+immediately and harmlessly instead of filling the filesystem and dying halfway. And it uses
+`rsync -a` rather than `cp`, so an interrupted run is resumed by simply resubmitting the
+same job - rsync skips what is already identical.
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=copy_results
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time=4:00:00
+#SBATCH --mail-type=FAIL,END
+#SBATCH --mail-user=iadanforth@wm.edu
+#SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/copy_results_%j.out
+#SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/copy_results_%j.err
+
+set -euo pipefail
+
+SRC="$HOME/scr10/data/kbrevis"
+DEST="/sciclone/home/iadanforth/K_brevis_viromes/output"
+
+mkdir -p "$DEST"
+
+# Refuse to start if the copy cannot fit, rather than filling a 92%-full shared
+# filesystem and dying halfway through.
+NEED_MB=$(du -sm --exclude=binning --exclude=gvclass_in "$SRC/gvmags" "$SRC/votus" \
+          | awk '{t+=$1} END{print t}')
+FREE_MB=$(quota -s 2>/dev/null \
+          | awk '/sciclone\/home/{getline} /^ *[0-9]/{gsub("M","",$1); gsub("M","",$2); print $2-$1}')
+echo "[copy] need ${NEED_MB} MB, home quota has ${FREE_MB:-unknown} MB free"
+if [[ -n "${FREE_MB:-}" ]] && (( NEED_MB + 2048 > FREE_MB )); then
+    echo "[copy] ABORT: not enough room in the home quota (need ${NEED_MB} MB + 2 GB margin)." >&2
+    exit 1
+fi
+
+# -a preserves times/permissions; --exclude drops the two directories named above.
+# rsync (not cp) so an interrupted copy can be resumed by simply resubmitting.
+for d in gvmags votus; do
+    echo "[copy] $SRC/$d -> $DEST/$d"
+    rsync -a --info=stats2 \
+        --exclude='binning/' --exclude='gvclass_in/' \
+        "$SRC/$d/" "$DEST/$d/"
+done
+
+echo
+echo "[copy] verifying: every file present in the source (minus exclusions) is in the copy"
+MISSING=$(rsync -rn --itemize-changes \
+            --exclude='binning/' --exclude='gvclass_in/' \
+            "$SRC/gvmags/" "$DEST/gvmags/" | grep -c '^>f' || true)
+echo "[copy] files still differing after the copy: $MISSING (0 = complete)"
+
+echo
+echo "[copy] result sizes:"
+du -sh "$DEST"/gvmags "$DEST"/votus
+# Count with shell globs, NOT `find -path`: in find, '*' matches '/' as well, so
+# -path '*/gvmags/*.fna' also matches .fna files nested deeper (e.g. under gvclass/),
+# which inflated this line to 53 on the first run when the real GVMAG count is 26.
+shopt -s nullglob
+gv=( "$DEST"/gvmags/*/gvmags/*.fna )
+bn=( "$DEST"/gvmags/*/bins/*.fa )
+echo "[copy] GVMAG .fna files copied: ${#gv[@]}"
+echo "[copy] MetaBAT2 bins copied:    ${#bn[@]}"
+echo "[copy] done. Scratch originals in $SRC are untouched."
+```
+
+#### 12d. How it was run, and the result
+
+```bash
+( module purge; module load slurm/kuro; sbatch -p serial scripts/copy_results.slurm )
+# Submitted batch job 111460
+```
+
+Completed in **3 minutes 30 seconds**, exit 0, empty `.err`:
+
+```
+[copy] need 4512 MB, home quota has 21685 MB free
+[copy] files still differing after the copy: 0 (0 = complete)
+4.4G    /sciclone/home/iadanforth/K_brevis_viromes/output/gvmags
+16M     /sciclone/home/iadanforth/K_brevis_viromes/output/votus
+[copy] done. Scratch originals are untouched.
+```
+
+The verification step is the part that matters: a second `rsync -rn --itemize-changes` pass
+re-walks the source and reports any file that would still need transferring. It found **0**,
+so the copy is complete rather than merely "finished without an error".
+
+Final contents of `output/`:
+
+| path | what it is |
+|---|---|
+| `output/votus/` | all of step 09: `gvmags_votus.tsv`, `gvmags_representatives.txt`, `votu_summary.txt`, `votu_nearest_reference.tsv`, `all_gvmag_summaries.tsv`, `ani/`, `heatmap/`, and the 26 pooled GVMAG FASTAs |
+| `output/gvmags/<sample>/gvmags/` | the **26 GVMAGs**, the headline output of step 08 |
+| `output/gvmags/<sample>/bins/` | all **848 MetaBAT2 bins** |
+| `output/gvmags/<sample>/gvclass/` | GVClass taxonomy output per sample |
+| `output/gvmags/<sample>/checkv/` | CheckV completeness/contamination per sample |
+| `output/gvmags/<sample>/genomad/` | geNomad output per sample |
+| `output/gvmags/<sample>/*_gvmag_summary.tsv` | the per-sample summary tables (9 samples have one) |
+
+Home quota went from 28.8 GB to **33.2 GB used of 50 GB** (16.8 GB free).
+
+#### 12e. `.gitignore`
+
+`output/` is deliberately **not tracked by git**. Several GB of FASTA and tabular data
+committed into history would be stored forever and would make the repository effectively
+unclonable. The files live in the working tree so they are backed up and sit next to the
+code, but git ignores them:
+
+```
+# Analysis outputs copied out of scratch by scripts/copy_results.slurm (~5 GB).
+# These are data, not code: git would store every byte forever and the repo would
+# become unclonable. They live in the working tree so they survive the 90-day scratch
+# purge and sit beside the scripts that made them, but they are deliberately untracked.
+# To track one specific small file anyway: git add -f output/votus/gvmags_votus.tsv
+output/
+
+# Slurm logs are kept (AGENTS.md requires them in logs/), so logs/ is NOT ignored here.
+```
+
+Individual small result files can still be committed deliberately with `git add -f`, which
+is the right way to put something like `gvmags_votus.tsv` under version control.
+
+#### 12f. Caveats
+
+- This is a **copy**, so `output/` and scratch will drift apart as soon as anything re-runs.
+  `scripts/copy_results.slurm` is idempotent and safe to resubmit, which is the intended way
+  to refresh it; note that `rsync` without `--delete` will not remove files from `output/`
+  that have disappeared from scratch.
+- The 108 GB of `binning/` BAMs are **not** preserved anywhere. If step 08's binning ever
+  needs to be audited rather than re-run, that data is gone once scratch is purged.
+- Home is backed up weeknightly with roughly one month of retention, and there is no
+  archival storage on this system. For anything that must outlive the project, copy it off
+  the cluster.
+- `output/` counts against the 50 GB home quota. With 16.8 GB free, a second round of
+  results this size would need either `~/data10` or a cleanup first.
+
+----------------------------------------------------------------------------------------
+
 # Next steps
 
-1. Wait for the metaSPAdes jobs (step 05b), then run the merge (step 06).
+1. ~~Wait for the metaSPAdes jobs (step 05b), then run the merge (step 06).~~ **Done
+   2026-11-13**: step 05b was cancelled for time for the last two samples (section 05b-fix-c)
+   and step 06 merged all 20 samples (jobs 110082, 110084-110102).
 2. ~~Run a virus identifier (geNomad `end-to-end` or VirSorter2) on the merged contigs.~~
    **Decided against on 2026-11-12 (prompt 24): not interested in phages.** Note the
    consequence: the only viral selection in this pipeline is GVClass's `d_NCLDV` call on
@@ -3516,13 +6330,28 @@ assembly jobs; those need kuro `serial` or gulf `gz`.
    virus identification happens at all. If that changes, `genomad end-to-end` on the merged
    contigs is the cheapest route, since geNomad and its database are already installed.
 3. CheckV runs inside step 08 on the GVMAGs. There is no separate CheckV step on contigs.
-4. Step 08 (GVMAGs): setup is done (jobs 73832, 73834, 73835); run
-   `bash scripts/08_gvmags.sh` after step 06. Check the first sample's
-   `SAMPLE_gvmag_summary.tsv` by eye, and `seff` its job to adjust memory/time.
-5. Step 09 (vOTUs): after step 08, `sbatch scripts/09_gvmag_votus.slurm`. Add `--with-refs`
-   to compare against GVMAGs V2, first fetching the bundle with
-   `sbatch --export=ALL,GVMAGS_V2_FULL=1 ... scripts/07_gvmag_setup.slurm`.
-6. Still unwritten: the marker-gene phylogeny (`ncldv_markersearch` + trimAl + IQ-TREE +
-   RAxML), CoverM prevalence across the field samples, and a check for endogenous viral
-   elements in the *K. brevis* genome (prompt 19).
-7. Copy final results (not raw reads) to `~/data10` before scratch purges them.
+4. ~~Step 08 (GVMAGs)~~ **Done 2026-11-16** (sections 08f-08h): 848 bins, 26 GVMAGs in 9
+   of 20 samples, mostly Imitervirales; 5 high-quality. Keep `--mem=96G` - several jobs
+   peaked at the full 96 GB. Eleven samples have no `_gvmag_summary.tsv` at all, which
+   step 09 must tolerate.
+5. ~~Step 09 (vOTUs)~~ **Done 2026-11-16** (section 09f, job 111457, 1 m 07 s): 26 GVMAGs
+   -> **19 vOTUs**, 6 of them recovered from more than one sample. Against all 8,508 GVMAGs
+   V2 references, **none reaches the MIUViG species threshold**, so all 19 are new species;
+   12 have a relative above ~80% ANI, 7 have none. A re-run needs only `-c 8 --mem=24G
+   -t 30:00`.
+6. Step 10 (phylogeny): **RUNNING** as job 111459 (kuro `serial`, 32 cores, 128 GB, 24 h,
+   submitted 2026-11-16). 1,566 taxa: our 19 vOTUs + 1,523 in-order GVMAGs V2 references +
+   24 outgroups. Note the `select_refs.py` order-parsing bug fixed first (section 10i) - it
+   would have built the tree with **zero** in-order references and no error. When it
+   finishes, check `kbrevis_gvmags.phylogeny_summary.txt` for columns before/after trimming
+   and `kbrevis_gvmags.table.tsv` for per-marker occupancy before building the tree.
+7. Step 11 (tree): after step 10, `sbatch scripts/11_gvmag_tree.slurm` on a 72 h partition.
+   Then midpoint-root the tree before interpreting it.
+8. Still unwritten: CoverM prevalence across the field samples, and a check for endogenous
+   viral elements in the *K. brevis* genome (prompt 19).
+9. ~~Copy final results out of scratch~~ **Partly done 2026-11-16** (Step 12, job 111460):
+   steps 08 and 09 results are now in `output/` (4.4 GB), excluding the 108 GB of `binning/`
+   BAMs, which cannot fit in the 50 GB home quota and are regenerable. Still to do: copy
+   the step 10/11 phylogeny results once they exist, and decide whether anything needs to go
+   to `~/data10` or off-cluster. `output/` is git-ignored; use `git add -f` for individual
+   small result files.
