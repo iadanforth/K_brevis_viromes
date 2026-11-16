@@ -1017,3 +1017,21 @@ version kept as `scripts/11_gvmag_tree.slurm.orig`), `README.md` (new sections 1
 11i; step 10/11 headers and next-steps items 6-7 updated), `PROMPT_LOG.md`. Outside the
 repo: `~/scr10/data/kbrevis/phylogeny/` (step 10 outputs), `~/scr10/data/kbrevis/tree/`
 (step 11, in progress), `~/scr10/data/kbrevis/tree_probe/` (diagnostic scratch).
+
+---
+
+### 43. 2026-11-16 14:05 (US Eastern) — Claude Code (Opus 5)
+
+> Ok please commit and push
+
+**Done:** Added `*.orig` to `.gitignore` alongside `*.bak`, for the same reason - a backup
+committed next to the fixed file is noise when git history already holds the previous
+version, so `scripts/11_gvmag_tree.slurm.orig` stays on disk untracked. Staged and committed
+this session's remaining work: `README.md` (sections 10j, 11h, 11i), `PROMPT_LOG.md`
+(entry 42), the two new diagnostic scripts, the `--mset`/`--cmax`/`--safe` changes to
+`11_gvmag_tree.slurm`, and 9 Slurm log files - 169 files staged in total, 0.5 MB. Committed
+as **fcba449** and pushed to `origin/main` (`4f670c3..fcba449`). Left the two pre-existing
+deletions (`datasets-env.yml`, `sra-toolkit-env.yml`) unstaged again, since they are from an
+earlier session and nothing has asked about them; they are the only thing left in the
+working tree. Step 11 (job 111564) was still running at the time of the commit.
+**Files:** `.gitignore`, `PROMPT_LOG.md`. Committed and pushed: commit fcba449 on `main`.
