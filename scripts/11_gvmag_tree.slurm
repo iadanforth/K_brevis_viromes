@@ -33,6 +33,10 @@
 #   --threads N|AUTO   default: the Slurm allocation (the paper used AUTO)
 #   --alrt N           also run SH-aLRT with N replicates (default 0 = off)
 #   --skip-ic          skip the RAxML IC/TC step
+#   --mset LIST        restrict ModelFinder to these matrices (e.g. LG,WAG,JTT). Only
+#                      meaningful with --model MFP/MF. Default: empty = all matrices.
+#   --cmax N           max rate categories ModelFinder tries (IQ-TREE default 10)
+#   --safe             IQ-TREE's -safe: slower but numerically stable likelihood scaling
 
 set -euo pipefail
 
@@ -45,6 +49,7 @@ PROJECT="kbrevis_gvmags"
 
 ALN="$PHYLO_DIR/${PROJECT}.trimmed.aln"
 MODEL=MFP; BOOTSTRAPS=1000; THREADS="$THREADS_ALLOC"; ALRT=0; DO_IC=1
+MSET=""; CMAX=""; SAFE=0
 while (($#)); do
     case "$1" in
         --alignment) ALN="$2"; shift 2 ;;
@@ -53,6 +58,9 @@ while (($#)); do
         --threads) THREADS="$2"; shift 2 ;;
         --alrt) ALRT="$2"; shift 2 ;;
         --skip-ic) DO_IC=0; shift ;;
+        --mset) MSET="$2"; shift 2 ;;
+        --cmax) CMAX="$2"; shift 2 ;;
+        --safe) SAFE=1; shift ;;
         *) echo "Unknown option: $1" >&2; exit 2 ;;
     esac
 done
@@ -129,7 +137,27 @@ IQ_ARGS=(-s "$ALN" -m "$MODEL" --bnni
          --mem "$(( ${SLURM_MEM_PER_NODE:-131072} * 85 / 100 / 1024 ))G")
 ((BOOTSTRAPS > 0)) && IQ_ARGS+=(-B "$BOOTSTRAPS" --wbtl)
 ((ALRT > 0)) && IQ_ARGS+=(--alrt "$ALRT")
+# -mset / -cmax bound how many models ModelFinder tries. Measured on this alignment
+# (job 111549): optimising the parameters of ONE model took 1,492 s, so an unrestricted
+# ModelFinder over every protein matrix x rate-heterogeneity variant would spend days
+# before the tree search even starts. Restricting to the standard matrices keeps the
+# paper's "pick the best-fit model by BIC" approach affordable.
+[[ -n "$MSET" ]] && IQ_ARGS+=(-mset "$MSET")
+[[ -n "$CMAX" ]] && IQ_ARGS+=(-cmax "$CMAX")
+# -safe switches IQ-TREE to scaled likelihood computation. IQ-TREE itself asked for it on
+# this alignment ("WARNING: Numerical underflow for lh-branch, use `-safe` option"), which
+# is expected at 14.5% average pairwise identity across 1,564 taxa. It is slower, but an
+# underflowing likelihood can mislead both the tree search and the support values.
+((SAFE)) && IQ_ARGS+=(-safe)
 
+# No --redo: if a previous run of this job hit the walltime, IQ-TREE finds
+# <prefix>.ckp.gz and resumes from it rather than starting over. That is what makes this
+# job safe to run on a partition whose time limit is shorter than the whole analysis -
+# just resubmit the identical command and it continues. Pass --redo by hand only to
+# deliberately discard a previous run.
+if [[ -s "$PREFIX.ckp.gz" ]]; then
+    echo "[tree] found $PREFIX.ckp.gz - IQ-TREE will resume from the checkpoint"
+fi
 echo "[tree] iqtree2 ${IQ_ARGS[*]}"
 iqtree2 "${IQ_ARGS[@]}"
 

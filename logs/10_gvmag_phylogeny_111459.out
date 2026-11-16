@@ -8,3 +8,21 @@
 [phylo] 1566 taxa in the alignment (19 ours + 1547 references)
 [phylo] all taxa have Prodigal-style protein IDs
 [phylo] running ncldv_markersearch (aligner: clustalo); this is the slow step
+Performing HMM search...
+Compiling results...
+Generating multi-sequence alignments...
+[phylo] concatenated alignment: 1564 taxa
+project:        kbrevis_gvmags
+date:           Mon Nov 16 01:07:47 PM EST 2026
+our vOTUs:      19
+total taxa:     1564
+reference tier: mcl, orders=auto, max=0
+aligner:        clustalo
+columns before trimming: 46737
+columns after trimming:  37739
+
+[phylo] done. Trimmed alignment for tree building:
+  /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.trimmed.aln
+Per-marker occupancy per taxon: /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.table.tsv
+trimAl report (which columns were dropped): /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.trimal_report.html
+Next: infer a tree with IQ-TREE (see README step 10).

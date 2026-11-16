@@ -975,3 +975,45 @@ pre-existing working-tree changes alone (the deletions of `datasets-env.yml` and
 **Files:** `.gitignore` (bytecode/backup rules), `README.md` (section 12e records which
 files were committed and which were deliberately excluded), `PROMPT_LOG.md`. Committed and
 pushed: commit 9356303 on `main`.
+
+---
+
+### 42. 2026-11-16 13:20 (US Eastern) — Claude Code (Opus 5)
+
+> Once step 10 completes, please move forward with step 11
+
+**Done:** Step 10 (job 111459) completed in **1 h 09 m 44 s** using only 3.6 GB of the
+128 GB requested, producing a **1,564-taxon x 37,739-column** alignment (46,737 columns
+before trimAl). 1,566 taxa went in and 1,564 came out: `ncldv_markersearch` silently drops
+taxa with no markers, and the two dropped were **vOTU05 and vOTU19**, the only 2 of 1,566
+with zero markers - so no removal decision was needed. Flagged that **vOTU05 should not be
+reported as a giant virus** without more evidence: CheckV called it 100% complete at 203 kb,
+yet it carries none of the seven core *Nucleocytoviricota* markers and its GVClass lineage
+resolves no order. Also recorded that average pairwise identity is **14.5%**, so deep
+branches will be weakly supported. Rather than guess step 11's resources, ran two cheap
+diagnostics first (new scripts `11_pre_tree_check.slurm`, `11_pre_tree_check2.slurm`; jobs
+111549 and 111550, 26 min total), which changed every number: IQ-TREE needs **30 GB, not
+128 GB**; 21,156 of 37,739 columns are parsimony-informative; **optimising one model's
+parameters takes 1,492 s**, so the paper's unrestricted `-m MFP` (~80 models) would have
+consumed the entire walltime before building a tree; and IQ-TREE explicitly asked for
+`-safe` because of numerical underflow. The second diagnostic corrected a misleading
+reading of the first: "all 1,564 taxa are >=70% padded" conflated `X` (missing markers) with
+`-` (alignment gaps); separating them shows **762 taxa have no missing markers**, 44 are
+>=70% missing, none >=90%, and 11 of our 17 vOTUs in the tree have zero missing markers -
+only vOTU13 is genuinely data-poor (74.8% X, ~1,022 real amino acids) and its placement
+should be distrusted. Added `--mset`, `--cmax` and `--safe` options to
+`11_gvmag_tree.slurm` (previous version kept as `.orig`) plus a note that the script passes
+no `--redo`, so IQ-TREE resumes from its checkpoint if the walltime expires. Submitted step
+11 as job **111564** to kuro `serial` (64 cores, 96 GB, 48 h) with `--mset LG,WAG,JTT
+--cmax 4 --safe`, choosing kuro for its immediate start and 64 cores over astral (~24 h
+queue wait) and preemptible gulf `gz`. Running cleanly on ku59 with the Safe AVX+FMA kernel.
+Three deviations from the paper are documented with their measured justification (`-mset`,
+`-cmax`, `-safe`). Also noted that step 11's own built-in padding warning is over-broad for
+the same X-vs-gap reason and should be split, but did not edit it, since Slurm had already
+snapshotted the running script.
+**Files:** `scripts/11_pre_tree_check.slurm` (new), `scripts/11_pre_tree_check2.slurm`
+(new), `scripts/11_gvmag_tree.slurm` (`--mset`/`--cmax`/`--safe`, checkpoint note; previous
+version kept as `scripts/11_gvmag_tree.slurm.orig`), `README.md` (new sections 10j, 11h,
+11i; step 10/11 headers and next-steps items 6-7 updated), `PROMPT_LOG.md`. Outside the
+repo: `~/scr10/data/kbrevis/phylogeny/` (step 10 outputs), `~/scr10/data/kbrevis/tree/`
+(step 11, in progress), `~/scr10/data/kbrevis/tree_probe/` (diagnostic scratch).

@@ -4880,7 +4880,7 @@ the UPGMA dendrogram (`ANIclustermap_dendrogram.nwk`) and the underlying ANI mat
 
 ----------------------------------------------------------------------------------------
 
-# Step 10. Concatenated marker-gene phylogeny of the vOTUs (RUNNING, submitted 2026-11-16)
+# Step 10. Concatenated marker-gene phylogeny of the vOTUs (COMPLETE 2026-11-16)
 
 Written by Claude Code on 2026-11-12 (prompt 26 in `PROMPT_LOG.md`). Files:
 `scripts/10_gvmag_phylogeny.slurm`, `scripts/select_refs.py`, `envs/phylo-env.yml`.
@@ -5630,11 +5630,124 @@ These are harmless warnings from the third-party script, not errors, and appear 
 
 ----------------------------------------------------------------------------------------
 
-# Step 11. Maximum-likelihood tree from the alignment (written 2026-11-12, tested)
+#### 10j. Running step 10: the production run and its results (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 42 in `PROMPT_LOG.md`).
+
+Job **111459** (kuro `serial`, 32 cores, 128 GB, 24 h) **completed in 1 h 09 m 44 s**, exit 0.
+
+```
+JobID        State      Elapsed   MaxRSS
+111459       COMPLETED  01:09:44
+111459.batch COMPLETED  01:09:44  3634196K
+```
+
+Peak memory was **3.6 GB of the 128 GB requested** - a 35x over-request. `ncldv_markersearch`
+runs hmmsearch one proteome at a time and Clustal Omega one marker at a time, so nothing ever
+holds the whole dataset in memory. **A re-run needs `-c 32 --mem=16G -t 4:00:00`**, and the
+`#SBATCH --mem=128G` in the script is far too generous; it was left as written because the
+job had already been submitted, but it should be reduced.
+
+**Results:**
+
+```
+[phylo] predicted proteins for 19 vOTU representatives
+[refs] 1523 representatives in those orders, 1083 in others
+[refs] plus 24 outgroup references from 10 other orders
+[phylo] 1566 taxa in the alignment (19 ours + 1547 references)
+[phylo] all taxa have Prodigal-style protein IDs
+[phylo] concatenated alignment: 1564 taxa
+columns before trimming: 46737
+columns after trimming:  37739
+```
+
+Note **1566 taxa went in and 1564 came out.** `ncldv_markersearch` silently drops a taxon in
+which it found none of the seven markers, and exactly two were dropped: **vOTU05**
+(`SRR28004151_bin_29`) and **vOTU19** (`SRR28004139_bin_7`). They were the only 2 of all
+1,566 taxa with zero markers. So 17 of our 19 vOTUs are in the tree, and no decision about
+removing them was needed - the tool made it.
+
+**vOTU05 deserves a second look on its own merits.** CheckV called it 100% complete at
+203,021 bp (section 09f), it has no relative in GVMAGs V2, and it carries **none** of the
+seven core *Nucleocytoviricota* markers - no VLTF3, no A32 packaging ATPase, no DNA
+topoisomerase II, no TFIIB, no DNA polymerase B, no RNA polymerase alpha, no SNF2 helicase.
+A genuinely complete giant virus genome should carry most of these. The likelier
+explanations are that it is a mis-binned contig set, or something real but so divergent that
+the GVOG HMMs do not detect it. Its GVClass lineage stopped at
+`d_NCLDV;p_Nucleocytoviricota;c_Megaviricetes;o_;f_;g_;s_` - no order - which is consistent
+with very few marker hits. **It should not be reported as a giant virus genome without
+further evidence.** vOTU19 is the CheckV "Not-determined" genome, so its weakness is less
+surprising.
+
+**Marker occupancy** (`kbrevis_gvmags.table.tsv`), across all 1,566 taxa before the drop:
+
+| markers found | taxa |
+|---|---|
+| 7 | 583 |
+| 6 | 326 |
+| 5 | 258 |
+| 4 | 204 |
+| 3 | 137 |
+| 2 | 56 |
+| 0 | 2 |
+
+Our own vOTUs do well: **11 have all 7 markers**, 5 have 6, and only vOTU13 is poor with 2.
+That is a better occupancy profile than the reference set as a whole, which is reassuring -
+our GVMAGs are not systematically more fragmentary than the published genomes they are being
+placed among.
+
+**Alignment quality, and why it needs stating plainly.** `trimal -sident` reports:
+
+```
+## MaxIdentity      0.9306
+## AverageIdentity  0.1450
+```
+
+**Average pairwise identity is 14.5%.** That is expected when concatenating markers across
+three viral orders spanning hundreds of millions of years of divergence, and it is the
+regime these marker genes were chosen for - but it is near the floor of what maximum
+likelihood can resolve, and it predicts a tree with poorly supported deep branches. Treat
+deep relationships in the step 11 tree with caution and lean on the UFBoot and IC/TC scores
+rather than the topology alone.
+
+trimAl `-automated1` removed only 19% of columns (46,737 -> 37,739), which is a lenient
+trim. Section 11h measures what stricter trimming would retain and explains why the
+alignment was nonetheless used as the paper specifies.
+
+**Outputs** in `~/scr10/data/kbrevis/phylogeny`:
+
+| file | what it is |
+|---|---|
+| `kbrevis_gvmags.trimmed.aln` | 58 MB, the alignment step 11 consumes |
+| `kbrevis_gvmags.table.tsv` | per-marker occupancy for every taxon |
+| `kbrevis_gvmags.trimal_report.html` | 164 MB; which columns trimAl dropped. Large enough that it should be opened with care, not in a light editor |
+| `kbrevis_gvmags.trimmed.identity.txt` | 27 MB pairwise identity matrix; one very long line per taxon, so do not `head` it casually |
+| `reference_manifest.tsv` | which references were chosen, their role (in_order/outgroup), taxonomy and ecosystem |
+| `kbrevis_gvmags.phylogeny_summary.txt` | the summary block quoted above |
+
+**Caveats.**
+
+- The 1,523 in-order references are the `mcl` tier, not every known giant virus. A vOTU's
+  position is relative to the genomes included; adding the finer `skani` tier (6,266 taxa)
+  could change local topology.
+- Only 24 outgroup genomes root a 1,564-taxon tree. That is enough to orient it but thin,
+  and the tree is produced **unrooted** regardless - it must be midpoint-rooted before
+  interpretation.
+- `ncldv_markersearch` pads absent markers with `X`. 44 taxa are >=70% X (section 11h), and
+  those are placed on very little data.
+- The dropped vOTU05 and vOTU19 are absent from the tree entirely. They are not "unplaced";
+  they simply were not analysed, and nothing in the tree output will mention them.
+
+----------------------------------------------------------------------------------------
+
+# Step 11. Maximum-likelihood tree from the alignment (RUNNING, submitted 2026-11-16)
 
 Written by Claude Code on 2026-11-12 (prompt 28 in `PROMPT_LOG.md`). Files:
-`scripts/11_gvmag_tree.slurm`, `envs/tree-env.yml`. Tested end to end on small alignments;
-not yet run on real data, which needs step 10.
+`scripts/11_gvmag_tree.slurm`, `envs/tree-env.yml`, plus the two diagnostics
+`scripts/11_pre_tree_check.slurm` and `scripts/11_pre_tree_check2.slurm` added on
+2026-11-16. **Submitted 2026-11-16 as job 111564** (kuro `serial`, 64 cores, 96 GB, 48 h) on
+step 10's 1,564-taxon alignment. Sections 11h and 11i cover the diagnostics that sized the
+job, the three deliberate deviations from the paper's IQ-TREE settings, and the run itself.
 
 #### 11a. What this step does and why
 
@@ -6097,6 +6210,183 @@ assembly jobs; those need kuro `serial` or gulf `gz`.
 
 ----------------------------------------------------------------------------------------
 
+#### 11h. Pre-flight diagnostics before committing to a multi-day tree (2026-11-16)
+
+Written by Claude Code on 2026-11-16 (prompt 42 in `PROMPT_LOG.md`). Files:
+`scripts/11_pre_tree_check.slurm`, `scripts/11_pre_tree_check2.slurm`.
+
+Step 11 is the most expensive job in the pipeline, and the script as written asks for
+32 cores, 128 GB and **3 days**. Guessing those numbers for a 1,564-taxon x 37,739-column
+amino-acid alignment is a bad bet in both directions: too little memory and the job dies
+after days of work, too much and it sits in the queue blocking other users for nothing.
+IQ-TREE reports the RAM it needs within seconds of reading an alignment, so two short
+diagnostic jobs were run first. Together they cost 26 minutes and changed every resource
+number in the submission.
+
+**Why a separate script rather than running it on dev:** reading a 58 MB alignment and
+starting IQ-TREE is exactly the kind of work AGENTS.md section 1 forbids on the front end.
+A first attempt put the probe script in the session scratchpad under `/tmp` and failed
+instantly with `No such file or directory` - `/tmp` is **node-local**, so a compute node
+cannot see a file dev wrote there. Diagnostic scripts belong in the repository (or scratch),
+like any other script a job runs.
+
+**Diagnostic 1 (`11_pre_tree_check.slurm`, job 111549, 26 m 12 s, 33.7 GB peak).** Runs
+`iqtree2 -m LG+F+G4 -n 0`, which initialises and optimises parameters but does not search
+for a tree. The decisive lines:
+
+```
+Alignment has 1564 sequences with 37739 columns, 32764 distinct patterns
+21156 parsimony-informative, 8598 singleton sites, 7985 constant sites
+WARNING: 566 sites contain only gaps or ambiguous characters.
+WARNING: 1564 sequences contain more than 50% gaps/ambiguity
+NOTE: 31686 MB RAM (30 GB) is required!
+WARNING: Numerical underflow for lh-branch, use `-safe` option to avoid this warning
+Parameters optimization took 13 rounds (1491.654 sec)
+```
+
+Four findings, each of which changed the submission:
+
+1. **30 GB of RAM is required, not 128 GB.** The script's request was more than 4x too
+   large. 96 GB was requested in the end (headroom for 64 threads, whose per-thread buffers
+   the 4-thread probe did not exercise), which still leaves most of a kuro node free.
+2. **21,156 of 37,739 columns are parsimony-informative.** Despite the 14.5% average
+   identity, there is real signal here - this is not a hopeless alignment.
+3. **Optimising ONE model's parameters took 1,492 seconds (25 minutes).** This is the
+   finding that mattered most. The paper used `-m MFP`, which asks ModelFinder to test every
+   protein matrix against every rate-heterogeneity variant - on the order of 80 models. At
+   this cost per model, unrestricted ModelFinder would spend **days** before the tree search
+   began, and the walltime would expire during model selection.
+4. **IQ-TREE explicitly asked for `-safe`.** Numerical underflow at 14.5% identity across
+   1,564 taxa is expected, and an underflowing likelihood can mislead both the tree search
+   and the support values.
+
+**Diagnostic 2 (`11_pre_tree_check2.slurm`, job 111550, 6 seconds).** The first diagnostic
+reported that **all 1,564 taxa are >=70% "padded"**, which is true and useless - it is also
+what step 11's own built-in pre-flight warning says, and it fires for every taxon including
+perfectly good ones. The reason is that the metric added together two completely different
+things:
+
+- **`X`** - a marker gene **not found** in that genome. This is missing data, and a taxon
+  made mostly of `X` cannot be placed.
+- **`-`** - an alignment gap, which says nothing about the genome. It means Clustal Omega
+  inserted a gap because some *other* sequence has residues there. At 14.5% identity across
+  1,564 divergent genomes the alignment is mostly gaps **for everyone**, complete genomes
+  included.
+
+Separating them gives the picture that actually matters:
+
+```
+=== MISSING DATA (X only) ===
+X% histogram (bucket: taxa): {0: 762, 10: 190, 20: 167, 30: 160, 40: 104,
+                              50: 91, 60: 46, 70: 33, 80: 11}
+  >=50% X: 181 taxa      >=70% X: 44 taxa      >=90% X: 0 taxa
+
+=== ALIGNMENT GAPS (- only) ===
+  median 76.4%   min 11.0%   max 90.8%
+
+=== REAL RESIDUES per taxon ===
+  median 11.7%  -> ~4413 amino acids of actual data
+```
+
+So the honest reading is: **762 taxa have no missing markers at all**, 44 are >=70% missing
+data, and none is >=90%. The median taxon contributes ~4,400 real amino acids, which is a
+reasonable amount of data for a phylogeny. The alarming "1,564 taxa >=70% padded" was an
+artifact of a gappy alignment, not 1,564 bad genomes.
+
+Our own vOTUs, by missing data rather than by gaps:
+
+| vOTU | X% (missing) | residue % | real amino acids |
+|---|---|---|---|
+| vOTU01, 02, 03, 06, 07, 08, 11, 12, 16, 17, 18 | **0.0** | 12.2-17.2 | 4,590-6,482 |
+| vOTU04, vOTU09, vOTU14 | 6.7 | 10.9-14.1 | 4,098-5,332 |
+| vOTU10 | 8.5 | 9.8 | 3,713 |
+| vOTU15 | 33.2 | 9.6 | 3,641 |
+| **vOTU13** | **74.8** | **2.7** | **1,022** |
+
+Eleven of our 17 vOTUs in the tree have **zero** missing markers. Only **vOTU13**
+(`SRR28004137_bin_11`) is genuinely data-poor at 74.8% missing and ~1,022 real amino acids;
+**its position in the tree should not be trusted**, and it is flagged rather than removed
+because dropping a taxon is a scientific decision, not a technical one.
+
+**Column occupancy, and the decision to keep trimAl `-automated1`:**
+
+```
+columns with data in >=  5% of taxa:  10638 ( 28.2% of 37739)
+columns with data in >= 10% of taxa:   7867 ( 20.8% of 37739)
+columns with data in >= 20% of taxa:   6074 ( 16.1% of 37739)
+columns with data in >= 50% of taxa:   4165 ( 11.0% of 37739)
+```
+
+Stricter gap trimming would cut the alignment to a quarter or less of its length, which
+would run far faster. **It was not done**, for two reasons: the paper specifies
+`-automated1`, and this run exists to reproduce the paper; and 21,156 of the columns are
+parsimony-informative, so the length is carrying signal rather than only gaps. This is
+recorded as a deliberate choice with a measured basis, and a stricter trim
+(`trimal -gt 0.1`) is the obvious first thing to try if the tree turns out poorly resolved.
+
+**Changes made to `scripts/11_gvmag_tree.slurm`** as a result (the previous version was kept
+as `scripts/11_gvmag_tree.slurm.orig`):
+
+- `--mset LIST` - restrict ModelFinder to named matrices.
+- `--cmax N` - cap the rate categories ModelFinder tries.
+- `--safe` - pass IQ-TREE's `-safe`.
+- A note, and a log line, documenting that the script passes **no** `--redo`, so IQ-TREE
+  finds `<prefix>.ckp.gz` and **resumes from its checkpoint** if a previous run hit the
+  walltime. This is what makes the job safe to run on a partition whose time limit is
+  shorter than the whole analysis: resubmit the identical command and it continues.
+
+#### 11i. Running step 11 (submitted 2026-11-16)
+
+```bash
+( module purge; module load slurm/kuro; \
+  sbatch -p serial -N 1 -c 64 --mem=96G -t 48:00:00 \
+         scripts/11_gvmag_tree.slurm --mset LG,WAG,JTT --cmax 4 --safe )
+# Submitted batch job 111564
+```
+
+Which becomes:
+
+```
+iqtree2 -s .../kbrevis_gvmags.trimmed.aln -m MFP --bnni -T 64 \
+        --prefix .../tree/kbrevis_gvmags --seed 12345 --mem 81G \
+        -B 1000 --wbtl -mset LG,WAG,JTT -cmax 4 -safe
+```
+
+**Every parameter, and why:**
+
+| choice | value | why |
+|---|---|---|
+| cluster | kuro `serial` | 64 cores and an immediate start. astral `batch` (the only other fitting non-preemptible option) would not have started for ~24 h, and gulf `gz` is preemptible with `PreemptMode=CANCEL` - unacceptable for a job of this length even though it ranked first on estimated finish |
+| cores | 64 | ~512 distinct patterns per thread, above IQ-TREE's rule of thumb of a few hundred per core |
+| memory | 96 GB | measured requirement is 30 GB at 4 threads; the margin covers 64 threads' buffers. The script's original 128 GB was unjustified |
+| walltime | 48 h | kuro's maximum. The analysis may well need longer, which is fine: IQ-TREE checkpoints, so resubmitting the identical command resumes |
+| `-m MFP` | kept | the paper's ModelFinder-by-BIC approach is preserved |
+| `-mset LG,WAG,JTT` | **deviation** | bounds ModelFinder to the three standard protein matrices instead of ~80 model combinations. Justified by the measured 1,492 s per model (section 11h): unrestricted selection would consume the entire walltime before any tree was built. LG is the modern general protein matrix; WAG and JTT are the classic alternatives, so the best-fit model is still chosen by BIC from a defensible set |
+| `-cmax 4` | **deviation** | caps rate categories at 4 (IQ-TREE's default is 10), for the same cost reason. +G4/+R4 is the standard choice in protein phylogenetics |
+| `-safe` | **addition** | requested by IQ-TREE itself on this alignment |
+| `-B 1000 --wbtl` | kept | 1,000 ultrafast bootstrap replicates, as the paper did; `--wbtl` writes the bootstrap trees with branch lengths for the RAxML IC/TC step |
+| `--bnni` | kept | NNI-optimises each UFBoot replicate, which the IQ-TREE authors recommend because UFBoot otherwise overestimates support under model misspecification - a real risk with concatenated markers |
+| `--seed 12345` | kept | reproducibility |
+
+The job started immediately on ku59 and IQ-TREE confirmed the safe kernel and thread count:
+
+```
+Host:    ku59.sciclone.wm.edu (AVX512, FMA3, 376 GB RAM)
+Kernel:  Safe AVX+FMA - 64 threads (64 CPU cores detected)
+Alignment has 1564 sequences with 37739 columns, 32764 distinct patterns
+```
+
+**Note on step 11's own pre-flight warning.** The script prints
+`WARNING: 1564 taxa are >=70% X/gap and are placed unreliably` and lists ten of them. As
+section 11h establishes, that warning is **over-broad**: it combines `X` with alignment gaps,
+so it fires for every taxon in a gappy alignment. The genuinely data-poor taxa are the 44
+that are >=70% `X`, one of which is our vOTU13. The warning's underlying `pad()` function
+should be split into separate X and gap figures; this is noted rather than changed, because
+the script was already running when the problem was understood and editing a file does not
+affect a submitted job - Slurm snapshots the script at submit time.
+
+----------------------------------------------------------------------------------------
+
 # Step 12. Copying results out of scratch into the repository (2026-11-16)
 
 Written by Claude Code on 2026-11-16 (prompt 40 in `PROMPT_LOG.md`). File:
@@ -6366,14 +6656,22 @@ on disk, untracked).
    V2 references, **none reaches the MIUViG species threshold**, so all 19 are new species;
    12 have a relative above ~80% ANI, 7 have none. A re-run needs only `-c 8 --mem=24G
    -t 30:00`.
-6. Step 10 (phylogeny): **RUNNING** as job 111459 (kuro `serial`, 32 cores, 128 GB, 24 h,
-   submitted 2026-11-16). 1,566 taxa: our 19 vOTUs + 1,523 in-order GVMAGs V2 references +
-   24 outgroups. Note the `select_refs.py` order-parsing bug fixed first (section 10i) - it
-   would have built the tree with **zero** in-order references and no error. When it
-   finishes, check `kbrevis_gvmags.phylogeny_summary.txt` for columns before/after trimming
-   and `kbrevis_gvmags.table.tsv` for per-marker occupancy before building the tree.
-7. Step 11 (tree): after step 10, `sbatch scripts/11_gvmag_tree.slurm` on a 72 h partition.
-   Then midpoint-root the tree before interpreting it.
+6. ~~Step 10 (phylogeny)~~ **Done 2026-11-16** (section 10j, job 111459, 1 h 10 m):
+   **1,564-taxon x 37,739-column** alignment (17 of our vOTUs + 1,523 in-order references +
+   24 outgroups). vOTU05 and vOTU19 were dropped by `ncldv_markersearch` for having **zero**
+   markers - vOTU05 in particular should not be reported as a giant virus without more
+   evidence (100% CheckV complete, yet none of the 7 core markers). A re-run needs only
+   `--mem=16G -t 4:00:00`, not 128 GB. Average pairwise identity is **14.5%**, so deep
+   branches in the tree will be weakly supported.
+7. Step 11 (tree): **RUNNING** as job 111564 (kuro `serial`, 64 cores, 96 GB, 48 h,
+   submitted 2026-11-16) with `--mset LG,WAG,JTT --cmax 4 --safe`. Sized from measurement,
+   not guesswork: IQ-TREE needs **30 GB**, not 128 GB, and one model's parameter
+   optimisation takes 25 minutes, so unrestricted ModelFinder would have burned the whole
+   walltime before building a tree (sections 11h-11i). **If it hits the 48 h limit, simply
+   resubmit the identical command** - IQ-TREE resumes from `kbrevis_gvmags.ckp.gz`. When it
+   finishes: midpoint-root the tree before interpreting it, distrust vOTU13's position
+   (74.8% missing data), and read support from UFBoot plus the RAxML IC/TC scores rather
+   than the topology alone.
 8. Still unwritten: CoverM prevalence across the field samples, and a check for endogenous
    viral elements in the *K. brevis* genome (prompt 19).
 9. ~~Copy final results out of scratch~~ **Partly done 2026-11-16** (Step 12, job 111460):

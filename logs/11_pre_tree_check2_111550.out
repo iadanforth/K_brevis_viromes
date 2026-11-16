@@ -1,0 +1,40 @@
+taxa: 1564  columns: 37739
+
+=== MISSING DATA (X only) - this is what matters for dropping taxa ===
+X% histogram (bucket: taxa): {0: 762, 10: 190, 20: 167, 30: 160, 40: 104, 50: 91, 60: 46, 70: 33, 80: 11}
+  >=50% X: 181 taxa
+  >=70% X: 44 taxa
+  >=90% X: 0 taxa
+
+=== ALIGNMENT GAPS (- only) - affects everyone, not a quality signal ===
+  median 76.4%   min 11.0%   max 90.8%
+
+=== REAL RESIDUES per taxon ===
+  median 11.7%   min 1.4%   max 19.9%
+  that is a median of ~4413 amino acids of actual data
+
+=== our vOTUs: X% (missing markers) vs residues ===
+  vOTU            X%    gap%  residue%     aa
+  vOTU01         0.0    87.8      12.2   4590
+  vOTU02         0.0    82.9      17.1   6445
+  vOTU03         0.0    82.8      17.2   6482
+  vOTU04         6.7    79.2      14.1   5332
+  vOTU06         0.0    85.6      14.4   5426
+  vOTU07         0.0    86.1      13.9   5238
+  vOTU08         0.0    85.4      14.6   5518
+  vOTU09         6.7    79.3      14.0   5278
+  vOTU10         8.5    81.6       9.8   3713
+  vOTU11         0.0    86.7      13.3   5029
+  vOTU12         0.0    86.1      13.9   5238
+  vOTU13        74.8    22.5       2.7   1022
+  vOTU14         6.7    82.5      10.9   4098
+  vOTU15        33.2    57.2       9.6   3641
+  vOTU16         0.0    86.3      13.7   5153
+  vOTU17         0.0    86.1      13.9   5256
+  vOTU18         0.0    84.7      15.3   5771
+
+=== column occupancy: how many columns would survive stricter gap trimming ===
+  columns with data in >=  5% of taxa:  10638 ( 28.2% of 37739)
+  columns with data in >= 10% of taxa:   7867 ( 20.8% of 37739)
+  columns with data in >= 20% of taxa:   6074 ( 16.1% of 37739)
+  columns with data in >= 50% of taxa:   4165 ( 11.0% of 37739)

@@ -11,6 +11,8 @@ output/
 __pycache__/
 *.pyc
 
-# Backup copies of scripts. Git history is the real backup; a committed .bak alongside
-# the fixed file is noise. scripts/select_refs.py.bak is kept on disk, untracked.
+# Backup copies of scripts. Git history is the real backup; a committed .bak or .orig
+# alongside the fixed file is noise. scripts/select_refs.py.bak and
+# scripts/11_gvmag_tree.slurm.orig are kept on disk, untracked.
 *.bak
+*.orig

@@ -1,0 +1,52 @@
+===== alignment composition =====
+taxa: 1564  columns: 37739
+non-rectangular sequences: 0
+padding/gap % histogram (lower bound of 10%-bucket: taxa): {80: 1011, 90: 553}
+>=70% padded: 1564 taxa
+>=90% padded: 553 taxa
+
+our vOTUs present in the alignment: 17
+   97.3% padded  vOTU13..SRR28004137..SRR28004137.bin.11.
+   90.4% padded  vOTU15..SRR28004152..SRR28004152.bin.36.
+   90.2% padded  vOTU10..SRR28004148..SRR28004148.bin.93.
+   89.1% padded  vOTU14..SRR28004151..SRR28004151.bin.1.
+   87.8% padded  vOTU01..SRR28004148..SRR28004148.bin.1.
+   86.7% padded  vOTU11..SRR28004138..SRR28004138.bin.37.
+   86.3% padded  vOTU16..SRR28004148..SRR28004148.bin.29.
+   86.1% padded  vOTU12..SRR28004154..SRR28004154.bin.8.
+   86.1% padded  vOTU07..SRR28004154..SRR28004154.bin.7.
+   86.1% padded  vOTU17..SRR28004154..SRR28004154.bin.6.
+   86.0% padded  vOTU09..SRR28004154..SRR28004154.bin.24.
+   85.9% padded  vOTU04..SRR34748664..SRR34748664.bin.2.
+   85.6% padded  vOTU06..SRR28004144..SRR28004144.bin.70.
+   85.4% padded  vOTU08..SRR28004139..SRR28004139.bin.22.
+   84.7% padded  vOTU18..SRR28004138..SRR28004138.bin.51.
+   82.9% padded  vOTU02..SRR28004154..SRR28004154.bin.22.
+   82.8% padded  vOTU03..SRR28004137..SRR28004137.bin.6.
+
+zero-marker vOTUs absent from the alignment: ['vOTU05', 'vOTU19']
+
+===== IQ-TREE memory requirement =====
+Host:    ku57.sciclone.wm.edu (AVX512, FMA3, 376 GB RAM)
+WARNING: 566 sites contain only gaps or ambiguous characters.
+Alignment has 1564 sequences with 37739 columns, 32764 distinct patterns
+21156 parsimony-informative, 8598 singleton sites, 7985 constant sites
+ 726  Rama                                       92.33%    failed      0.00%
+WARNING: 1564 sequences contain more than 50% gaps/ambiguity
+NOTE: 31686 MB RAM (30 GB) is required!
+Estimate model parameters (epsilon = 0.010)
+WARNING: Numerical underflow for lh-branch, use `-safe` option to avoid this warning
+WARNING: Numerical underflow for lh-branch, use `-safe` option to avoid this warning
+Parameters optimization took 13 rounds (1491.654 sec)
+
+--- RAM / pattern lines from probe.log:
+Host:    ku57.sciclone.wm.edu (AVX512, FMA3, 376 GB RAM)
+Alignment has 1564 sequences with 37739 columns, 32764 distinct patterns
+ 726  Rama                                       92.33%    failed      0.00%
+NOTE: 31686 MB RAM (30 GB) is required!
+Estimate model parameters (epsilon = 0.010)
+Pattern 1220 likelihood is underflown
+Pattern 15306 likelihood is underflown
+Pattern 1220 likelihood is underflown
+Pattern 16735 likelihood is underflown
+Parameters optimization took 13 rounds (1491.654 sec)
