@@ -1035,3 +1035,33 @@ deletions (`datasets-env.yml`, `sra-toolkit-env.yml`) unstaged again, since they
 earlier session and nothing has asked about them; they are the only thing left in the
 working tree. Step 11 (job 111564) was still running at the time of the commit.
 **Files:** `.gitignore`, `PROMPT_LOG.md`. Committed and pushed: commit fcba449 on `main`.
+
+---
+
+### 44. 2026-11-17 09:45 (US Eastern) — Claude Code (Opus 5)
+
+> It looks like step 11 ran well. I'd now like to visualize this tree in ITOL. Could you please push the .treefile to git so that I can upload it to ITOL?
+
+**Done:** Checked before pushing, and **step 11 has not finished** - job 111564 was still
+RUNNING at 20 h 01 m, at iteration 340 of the ML search with ~3-5 h left plus the bootstrap
+consensus step still to come. The `.treefile` that exists is real but intermediate: 1,564
+tips, a genuine ML topology, but **zero UFBoot support values**, and `.iqtree`, `.contree`,
+`.ufboot` and `.splits.nex` are all absent. IQ-TREE was still improving the tree when it was
+written (`BETTER TREE FOUND at iteration 308`). Pushed it anyway so the user is not blocked,
+but under the unambiguous name
+`output/tree/kbrevis_gvmags.PRELIMINARY_no_support.treefile` with an `output/tree/README.md`
+saying plainly that it must not be used for conclusions or figures. Also corrected an
+earlier statement of mine: I reported that LG variants were winning ModelFinder, but the
+selected model is **WAG+F+I+R4**, so including WAG and JTT in `-mset` mattered - restricting
+to LG alone, which I had considered, would have forced the wrong model. Beyond the bare
+request, wrote `scripts/make_itol_annotations.py`, because a 1,564-tip tree is an
+unreadable hairball in iTOL: it generates readable labels for our 17 vOTUs, red/bold
+branch highlighting so they can be found, colour-blind-safe colour strips for viral order
+and family with legends, and hover pop-ups carrying completeness, nearest GVMAGs V2
+relative with ANI/AF, and ecosystem. A naming trap had to be handled - Clustal Omega
+rewrote `_` as `.` in the FASTA headers, so `IMGM3300034190_BIN56` in the manifest is
+`IMGM3300034190.BIN56` in the tree; after normalising, all 1,547 reference manifest rows
+matched tips. The README also records the rooting step (iTOL midpoint root) and carries
+forward the vOTU13, vOTU05/vOTU19 and 14.5%-identity caveats.
+**Files:** `scripts/make_itol_annotations.py` (new), `output/tree/` (new: preliminary
+treefile, 5 iTOL annotation files, README.md), `PROMPT_LOG.md`. Committed and pushed.
