@@ -1,0 +1,34 @@
+[ani] ours: 26   published: 10
+[ani] fastANI, ours as query
+[ani] fastANI, published as query (for alignment fraction of the shorter genome)
+[ani] pairs found: 41 forward, 46 reverse
+26 of our GVMAGs vs 10 published GVMAGs
+  with any fastANI hit (>=~80% ANI): 19
+  same species by MIUViG (>=95.0% ANI over >=85.0% of the shorter): 12
+
+  matches:
+    SRR28004137__SRR28004137_bin_10            (vOTU17)  ==  vOTU3_CE2_022B_bin19       (vOTU3)  ANI 99.999%  AF 98.718%
+    SRR28004137__SRR28004137_bin_2             (vOTU08)  ==  vOTU2_CE2_022B_bin31       (vOTU2)  ANI 99.989%  AF 100.000%
+    SRR28004137__SRR28004137_bin_21            (vOTU02)  ==  vOTU1_GVMAG_022C_bin.20    (vOTU1)  ANI 99.374%  AF 91.603%
+    SRR28004137__SRR28004137_bin_32            (vOTU12)  ==  GVMAG_022B_bin.8           (NA)  ANI 99.999%  AF 100.000%
+    SRR28004137__SRR28004137_bin_6             (vOTU03)  ==  vOTU6_CE2_022B_bin14r      (vOTU6)  ANI 99.552%  AF 86.709%
+    SRR28004139__SRR28004139_bin_22            (vOTU08)  ==  vOTU2_CE2_022C_bin.14      (vOTU2)  ANI 99.712%  AF 87.440%
+    SRR28004154__SRR28004154_bin_22            (vOTU02)  ==  vOTU1_GVMAG_022C_bin.20    (vOTU1)  ANI 99.994%  AF 99.491%
+    SRR28004154__SRR28004154_bin_23            (vOTU08)  ==  vOTU2_CE2_022B_bin31       (vOTU2)  ANI 99.986%  AF 99.476%
+    SRR28004154__SRR28004154_bin_25            (vOTU03)  ==  vOTU6_CE2_022C_bin16       (vOTU6)  ANI 99.994%  AF 97.037%
+    SRR28004154__SRR28004154_bin_6             (vOTU17)  ==  vOTU3_CE2_022B_bin19       (vOTU3)  ANI 99.996%  AF 99.237%
+    SRR28004154__SRR28004154_bin_7             (vOTU07)  ==  vOTU4_GVMAG_022C_bin.27    (vOTU4)  ANI 99.803%  AF 87.755%
+    SRR28004154__SRR28004154_bin_8             (vOTU12)  ==  vOTU5_CE2_022C_bin.2       (vOTU5)  ANI 99.989%  AF 100.000%
+
+  related but below the species threshold:
+    SRR28004137__SRR28004137_bin_11            -> vOTU6_CE2_022B_bin14r      ANI 97.261%  AF 71.591%
+    SRR28004138__SRR28004138_bin_51            -> vOTU2_CE2_022C_bin.14      ANI 74.825%  AF 17.391%
+    SRR28004139__SRR28004139_bin_36            -> vOTU2_CE2_022C_bin.14      ANI 74.792%  AF 16.425%
+    SRR28004148__SRR28004148_bin_1             -> vOTU2_CE2_022B_bin31       ANI 74.782%  AF 30.435%
+    SRR28004148__SRR28004148_bin_29            -> vOTU1_GVMAG_022C_bin.20    ANI 74.751%  AF 8.654%
+    SRR28004152__SRR28004152_bin_36            -> vOTU2_CE2_022C_bin.14      ANI 74.778%  AF 28.409%
+    SRR28004154__SRR28004154_bin_24            -> vOTU6_CE2_022B_bin14r      ANI 93.890%  AF 64.000%
+
+wrote /sciclone/home/iadanforth/K_brevis_viromes/output/booker_gvmag_ani_summary.csv
+wrote /sciclone/home/iadanforth/K_brevis_viromes/output/booker_gvmag_ani_all_pairs.csv
+[ani] done

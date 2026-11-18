@@ -1210,3 +1210,41 @@ month Y" but is weak evidence of absence elsewhere.
 `scripts/plot_votu_abundance.R` (all new), `output/abundance/` (long table, matrix, two
 figures as PDF and PNG), `README.md` (new Step 14 with sections 14a-14g; next-steps item 8),
 `PROMPT_LOG.md`.
+
+---
+
+### 49. 2026-11-18 07:10 (US Eastern) — Claude Code (Opus 5)
+
+> Ok I now want to know if any of my GVMAGs match the GVMAGs identified in the original study. Could you please align my GVMAGs with these ones: "GVMAGs can be found under GenBank accession numbers PV483752-PV483756, PV637767-PV637835" and calculate the average nucleotide identity between my GVMAGs and each of these GVMAGs? Please output the summarized results of this in ~/K_brevis_viromes/output as a .csv
+
+**Done:** Found first that **the 74 listed accessions are contigs, not genomes** - each
+GenBank record carries an `isolate` field naming its parent GVMAG, and the 74 contigs
+resolve to just **10 published GVMAGs** spanning the paper's vOTU1-vOTU6. Comparing our
+multi-contig GVMAGs against individual contigs (one is 2.7 kb) would have produced
+meaningless ANI and alignment fractions, so `group_booker_contigs.py` regroups them into
+one multi-FASTA per isolate; all 74 were assigned, none unparsed. Downloaded from NCBI
+E-utilities sending **no email or API key**, since the user's contact details are not mine
+to give an external service. Ran fastANI in **both directions** (job 73934, astral, 10 s),
+because fastANI reports aligned fraction relative to the query and a small genome inside a
+large one otherwise looks like a full or partial match depending which way you read it;
+the summariser reports the fraction belonging to the **shorter** genome, and applies the
+same MIUViG rule (>=95% ANI over >=85%) used to build our own vOTUs in step 09.
+**Result: 12 of our 26 GVMAGs are the same species as a published GVMAG at 99.4-100% ANI,
+and all six of the paper's vOTUs were recovered** - a clean one-to-one correspondence
+(our vOTU02=their vOTU1, 08=2, 17=3, 07=4, 12=5, 03=6), which is strong independent
+validation of steps 01-09. Noted that the two numbering schemes are NOT interchangeable,
+and that our vOTU12 matches two published genomes at ~100%, implying the unlabelled
+`GVMAG_022B_bin.8` is the second member of their vOTU5. Thirteen of our nineteen vOTUs have
+no published counterpart; flagged that this is **not yet evidence of novelty**, because
+only 10 genomes for 6 vOTUs were deposited and the paper may simply not have deposited the
+rest - the supplementary tables should be checked. Also noted vOTU05 now has three
+independent strikes (no markers, no GVMAGs V2 relative, no published match) while CheckV
+calls it 100% complete, and added that to next steps. Wrote three CSVs to `output/` as
+requested: a per-GVMAG summary (the main deliverable), a vOTU-level rollup, and the full
+pairwise table in both directions.
+**Files:** `scripts/15_fetch_booker_gvmags.sh`, `scripts/group_booker_contigs.py`,
+`scripts/15_booker_ani.slurm`, `scripts/summarize_booker_ani.py` (all new),
+`output/booker_gvmag_ani_summary.csv`, `output/booker_gvmag_ani_by_votu.csv`,
+`output/booker_gvmag_ani_all_pairs.csv` (new), `README.md` (new Step 15, sections 15a-15f;
+next-steps items 10-11), `PROMPT_LOG.md`. Outside the repo:
+`~/scr10/data/kbrevis/booker_gvmags/` (downloaded contigs, 10 grouped genomes, fastANI output).

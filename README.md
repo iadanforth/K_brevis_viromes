@@ -7147,6 +7147,176 @@ explicit `plot.background`.
 
 ----------------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------------------
+
+# Step 15. Do our GVMAGs match the ones the original study published? (2026-11-18)
+
+Written by Claude Code on 2026-11-18 (prompt 49 in `PROMPT_LOG.md`). Files:
+`scripts/15_fetch_booker_gvmags.sh`, `scripts/group_booker_contigs.py`,
+`scripts/15_booker_ani.slurm`, `scripts/summarize_booker_ani.py`.
+
+This is the direct test of the whole reanalysis: Booker et al. 2026 deposited their GVMAGs
+in GenBank, so we can ask whether our independent assembly and binning recovered the same
+viruses.
+
+#### 15a. The accessions are contigs, not genomes
+
+The paper lists its GVMAGs as **GenBank PV483752-PV483756 and PV637767-PV637835** - 74
+accessions. It is tempting to treat those as 74 genomes. They are not. Each record is a
+**contig**, and the GenBank title carries an `isolate` field naming the GVMAG it belongs
+to:
+
+```
+PV483752.1  128444 bp  Nucleocytoviricota sp. isolate GVMAG_022B_bin.8 sequence
+PV483756.1   54326 bp  Nucleocytoviricota sp. isolate GVMAG_022B_bin.8 sequence
+PV637767.1  351190 bp  MAG: ... isolate vOTU6_CE2_022B_bin14r genomic sequence
+PV637800.1    2709 bp  MAG: ... isolate vOTU6_CE2_022B_bin14r genomic sequence
+```
+
+Grouping by isolate turns the 74 contigs into **10 published GVMAGs**:
+
+| published GVMAG | their vOTU | contigs | total bp |
+|---|---|---|---|
+| GVMAG_022B_bin.8 | (none given) | 5 | 436,894 |
+| vOTU1_GVMAG_022C_bin.20 | vOTU1 | 3 | 1,249,865 |
+| vOTU2_CE2_022B_bin31 | vOTU2 | 2 | 623,527 |
+| vOTU2_CE2_022C_bin.14 | vOTU2 | 2 | 623,463 |
+| vOTU3_CE2_022B_bin19 | vOTU3 | 4 | 418,504 |
+| vOTU3_GVMAG_022C_bin.21 | vOTU3 | 5 | 419,385 |
+| vOTU4_GVMAG_022C_bin.27 | vOTU4 | 5 | 451,954 |
+| vOTU5_CE2_022C_bin.2 | vOTU5 | 4 | 438,504 |
+| vOTU6_CE2_022B_bin14r | vOTU6 | 38 | 687,815 |
+| vOTU6_CE2_022C_bin16 | vOTU6 | 6 | 457,346 |
+
+**Why this matters:** comparing our whole multi-contig GVMAGs against individual 2.7 kb
+contigs would produce meaningless ANI and alignment fractions, and would have looked like
+74 mostly-failed comparisons rather than 10 genome-to-genome ones.
+`group_booker_contigs.py` writes one multi-FASTA per isolate so both sides have the same
+shape. All 74 contigs were assigned; none was left unparsed.
+
+The download sends **no email or API key** to NCBI. E-utilities does not require one, and
+the user's contact details are not ours to hand to an external service.
+
+#### 15b. Method
+
+`fastANI` is run **in both directions**, because it reports the aligned fraction relative
+to the *query*. A 200 kb genome wholly contained in a 2 Mb genome aligns over 100% of the
+small one but only 10% of the large one, so quoting one direction can make a partial match
+look complete or a complete match look partial. `summarize_booker_ani.py` reads both runs
+and reports the fraction belonging to the **shorter** genome.
+
+"Same species" uses the **MIUViG rule: >=95% ANI over >=85% of the shorter genome** - the
+same rule used to build our own vOTUs in step 09, so the answer is consistent with the rest
+of the project.
+
+Job **73934** (astral, 4 cores, 8 GB) finished in **10 seconds**.
+
+#### 15c. Result: all six published vOTUs were recovered
+
+**12 of our 26 GVMAGs are the same species as a published GVMAG**, nearly all at
+**99.4-100% ANI**:
+
+| our GVMAG | our vOTU | published GVMAG | their vOTU | ANI | AF (shorter) |
+|---|---|---|---|---|---|
+| SRR28004154_bin_6 | vOTU17 | vOTU3_CE2_022B_bin19 | vOTU3 | 99.996 | 99.2 |
+| SRR28004137_bin_10 | vOTU17 | vOTU3_CE2_022B_bin19 | vOTU3 | 99.999 | 98.7 |
+| SRR28004137_bin_32 | vOTU12 | GVMAG_022B_bin.8 | - | 99.999 | 100.0 |
+| SRR28004154_bin_8 | vOTU12 | vOTU5_CE2_022C_bin.2 | vOTU5 | 99.989 | 100.0 |
+| SRR28004154_bin_25 | vOTU03 | vOTU6_CE2_022C_bin16 | vOTU6 | 99.994 | 97.0 |
+| SRR28004137_bin_6 | vOTU03 | vOTU6_CE2_022B_bin14r | vOTU6 | 99.552 | 86.7 |
+| SRR28004154_bin_22 | vOTU02 | vOTU1_GVMAG_022C_bin.20 | vOTU1 | 99.994 | 99.5 |
+| SRR28004137_bin_21 | vOTU02 | vOTU1_GVMAG_022C_bin.20 | vOTU1 | 99.374 | 91.6 |
+| SRR28004137_bin_2 | vOTU08 | vOTU2_CE2_022B_bin31 | vOTU2 | 99.989 | 100.0 |
+| SRR28004154_bin_23 | vOTU08 | vOTU2_CE2_022B_bin31 | vOTU2 | 99.986 | 99.5 |
+| SRR28004139_bin_22 | vOTU08 | vOTU2_CE2_022C_bin.14 | vOTU2 | 99.712 | 87.4 |
+| SRR28004154_bin_7 | vOTU07 | vOTU4_GVMAG_022C_bin.27 | vOTU4 | 99.803 | 87.8 |
+
+At vOTU level this is a clean one-to-one correspondence, and **every one of the paper's six
+vOTUs is recovered**:
+
+| our vOTU | their vOTU | ANI range |
+|---|---|---|
+| vOTU02 | vOTU1 | 99.37-99.99 |
+| vOTU08 | vOTU2 | 99.71-99.99 |
+| vOTU17 | vOTU3 | 100.00 |
+| vOTU07 | vOTU4 | 99.80 |
+| vOTU12 | vOTU5 + the unlabelled GVMAG_022B_bin.8 | 99.99-100.00 |
+| vOTU03 | vOTU6 | 99.55-99.99 |
+
+**ANI of 99.4-100% means these are the same viruses, reassembled independently.** That is
+about as strong a validation of steps 01-09 as this project can get: a different assembler
+invocation, a different binning run and a different vOTU clustering all converged on the
+same genomes. Note also that our vOTU numbering is **not** theirs - our vOTU17 is their
+vOTU3 - so the two numbering schemes must never be used interchangeably.
+
+**Our vOTU12 matches two published genomes**, `GVMAG_022B_bin.8` and
+`vOTU5_CE2_022C_bin.2`, both at ~100% ANI. The simplest reading is that those two published
+genomes are themselves the same virus, and that the unlabelled `GVMAG_022B_bin.8` is the
+other member of their vOTU5 - consistent with it being the only deposited genome without a
+vOTU prefix.
+
+#### 15d. What is new in our reanalysis
+
+**13 of our 19 vOTUs have no counterpart in the published set**, and 7 of our 26 GVMAGs
+return no fastANI hit at all:
+
+| our GVMAG | our vOTU | length |
+|---|---|---|
+| SRR28004138_bin_37 | vOTU11 | 671,956 |
+| SRR28004144_bin_70 | vOTU06 | 421,742 |
+| SRR28004148_bin_93 | vOTU10 | 351,669 |
+| SRR34748664_bin_2 | vOTU04 | 348,214 |
+| SRR28004151_bin_1 | vOTU14 | 261,816 |
+| SRR28004139_bin_7 | vOTU19 | 216,065 |
+| SRR28004151_bin_29 | vOTU05 | 203,021 |
+
+Two readings, and this comparison cannot separate them: these are genuinely additional
+giant viruses our pipeline recovered, **or** the paper recovered them too and deposited
+only a subset. The deposited set is 10 genomes for 6 vOTUs, which is small for a study of
+this size, so **the second possibility should be checked against the paper's supplementary
+tables before claiming novelty.** Note that `SRR34748664_bin_2` (vOTU04) comes from a
+sample outside the original study's accession series altogether, so that one is expected to
+be new.
+
+Also worth noting: **vOTU05 and vOTU19 are in this no-match list**, and they are the same
+two genomes that carried none of the seven marker genes and were dropped from the step 11
+tree (section 10j). vOTU05 now has three strikes against it - no markers, no GVMAGs V2
+relative, and no match to the published set - while still being called 100% complete by
+CheckV at 203 kb. It should not be reported as a novel giant virus without further work.
+
+Seven more of our GVMAGs hit a published genome **below** the species threshold. Most sit
+at ~74.8% ANI over 8-30% alignment, which is background-level similarity between different
+viruses. Two are more interesting: `SRR28004137_bin_11` (our vOTU13) at 97.3% ANI over
+71.6%, and `SRR28004154_bin_24` (our vOTU09) at 93.9% over 64.0% - both just under the
+cut-off against their vOTU6. These are close relatives rather than the same virus, and
+vOTU13 is in any case the fragmentary genome flagged in sections 11k and 14d.
+
+#### 15e. Output files
+
+In `output/`, as requested:
+
+| file | what it is |
+|---|---|
+| `booker_gvmag_ani_summary.csv` | **the main result** - one row per our 26 GVMAGs, with its best-matching published GVMAG, ANI, aligned fraction of the shorter genome, our vOTU and CheckV completeness, and a `same_species_miuvig` verdict. GVMAGs with no match appear with `none_above_fastani_threshold`, because that is a result |
+| `booker_gvmag_ani_by_votu.csv` | the same rolled up to vOTU level - the clearest view of the correspondence |
+| `booker_gvmag_ani_all_pairs.csv` | every fastANI pair in both directions, with both aligned fractions, for checking the summary or applying a different threshold |
+
+#### 15f. Caveats
+
+- **fastANI reports nothing below roughly 80% ANI.** An absent pair means "no relative
+  within ~80% ANI", not "0% identity", and it is not evidence that two genomes are
+  unrelated at a deeper taxonomic level. That question belongs to the step 11 tree.
+- ANI is computed between **assemblies**, so a fragmentary genome can fail the 85%
+  alignment-fraction test while being the same virus. `SRR28004137_bin_11` at 97.3% ANI
+  over 71.6% is exactly that situation, and is better described as "probably the same
+  virus, incompletely assembled" than as a different one.
+- The comparison is only against what was **deposited**. Absence from GenBank is not
+  absence from the paper.
+- Our vOTU numbers and the paper's vOTU numbers are independent. The mapping in 15c is the
+  only valid translation between them.
+
+----------------------------------------------------------------------------------------
+
 # Next steps
 
 1. ~~Wait for the metaSPAdes jobs (step 05b), then run the merge (step 06).~~ **Done
@@ -7201,3 +7371,13 @@ explicit `plot.background`.
    the step 10/11 phylogeny results once they exist, and decide whether anything needs to go
    to `~/data10` or off-cluster. `output/` is git-ignored; use `git add -f` for individual
    small result files.
+
+10. **Validation achieved (Step 15, 2026-11-18):** all six of the paper's published vOTUs
+    were independently recovered at **99.4-100% ANI**, confirming steps 01-09. Thirteen of
+    our nineteen vOTUs have no deposited counterpart; **check the paper's supplementary
+    tables before claiming these are novel**, since only 10 genomes for 6 vOTUs were
+    deposited and the rest may simply be undeposited.
+11. **vOTU05 needs resolving before any write-up.** CheckV calls it 100% complete at
+    203 kb, yet it has no giant-virus marker genes (10j), no GVMAGs V2 relative (09f), and
+    no match to the published set (15d). Three independent signals say it is not what
+    CheckV's completeness implies. vOTU13 and vOTU19 need similar scrutiny.

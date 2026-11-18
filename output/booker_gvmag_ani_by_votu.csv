@@ -1,0 +1,20 @@
+our_votu,n_our_gvmags,matches_published,published_gvmags,published_votu,min_ani_percent,max_ani_percent
+vOTU01,1,no,none,NA,NA,NA
+vOTU02,2,yes,vOTU1_GVMAG_022C_bin.20,vOTU1,99.374,99.994
+vOTU03,2,yes,vOTU6_CE2_022B_bin14r; vOTU6_CE2_022C_bin16,vOTU6,99.552,99.994
+vOTU04,1,no,none,NA,NA,NA
+vOTU05,1,no,none,NA,NA,NA
+vOTU06,1,no,none,NA,NA,NA
+vOTU07,1,yes,vOTU4_GVMAG_022C_bin.27,vOTU4,99.803,99.803
+vOTU08,3,yes,vOTU2_CE2_022B_bin31; vOTU2_CE2_022C_bin.14,vOTU2,99.712,99.989
+vOTU09,1,no,none,NA,NA,NA
+vOTU10,1,no,none,NA,NA,NA
+vOTU11,1,no,none,NA,NA,NA
+vOTU12,2,yes,GVMAG_022B_bin.8; vOTU5_CE2_022C_bin.2,vOTU5,99.989,99.999
+vOTU13,1,no,none,NA,NA,NA
+vOTU14,1,no,none,NA,NA,NA
+vOTU15,1,no,none,NA,NA,NA
+vOTU16,1,no,none,NA,NA,NA
+vOTU17,2,yes,vOTU3_CE2_022B_bin19,vOTU3,99.996,99.999
+vOTU18,2,no,none,NA,NA,NA
+vOTU19,1,no,none,NA,NA,NA
