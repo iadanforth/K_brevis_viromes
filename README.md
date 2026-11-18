@@ -159,10 +159,14 @@ touched for 90 days are deleted**, so copy anything important to `~/data10`.
 ├── clean/                          SRRxxx_{1,2}_CLEAN.fastq + SRRxxx_CLEAN.log (60 files, 1.1 TB)
 ├── contigs/                        metaviralSPAdes: SRRxxx_contigs.fasta + SRRxxx/ run folder (90 GB)
 ├── contigs_no_v/                   metaSPAdes: same layout (being filled by step 05b)
-├── contigs_merged/                 step 06 output (created when step 06 runs)
-├── binning_test/                   the removed binning-test step test on SRR28004137 (contigs/, reads/, bins/); no longer used, can be deleted
-├── gvmags/                         step 08 output (not run yet)
-└── host_filtered/                  leftover from an earlier attempt (see "Earlier attempts")
+├── contigs_merged/                 step 06 output: merged contigs per sample (6.6 GB)
+├── gvmags/                         step 08 output: bins, GVMAGs, CheckV/geNomad/GVClass (115 GB)
+├── votus/                          step 09 output: vOTUs, ANI, heatmap (16 MB)
+├── phylogeny/                      step 10 output: the trimmed alignment + manifest (629 MB)
+└── tree/                           step 11 output: IQ-TREE run (in progress)
+
+(`binning_test/`, `host_filtered/` and four smoke-test directories were deleted on
+2026-11-17; see "Step 13. Cleaning up scratch".)
 
 ~/data10/databases/checkv_db/checkv-db-v1.5     CheckV database v1.5 (the only copy; used by every script)
 ~/data10/databases/genomad_db                   geNomad database (step 07)
@@ -5740,14 +5744,16 @@ alignment was nonetheless used as the paper specifies.
 
 ----------------------------------------------------------------------------------------
 
-# Step 11. Maximum-likelihood tree from the alignment (RUNNING, submitted 2026-11-16)
+# Step 11. Maximum-likelihood tree from the alignment (COMPLETE 2026-11-18)
 
 Written by Claude Code on 2026-11-12 (prompt 28 in `PROMPT_LOG.md`). Files:
 `scripts/11_gvmag_tree.slurm`, `envs/tree-env.yml`, plus the two diagnostics
 `scripts/11_pre_tree_check.slurm` and `scripts/11_pre_tree_check2.slurm` added on
-2026-11-16. **Submitted 2026-11-16 as job 111564** (kuro `serial`, 64 cores, 96 GB, 48 h) on
-step 10's 1,564-taxon alignment. Sections 11h and 11i cover the diagnostics that sized the
-job, the three deliberate deviations from the paper's IQ-TREE settings, and the run itself.
+2026-11-16, and `scripts/votu_tree_context.py` added on 2026-11-18. **Job 111564 completed
+2026-11-18** in 1 d 11 h 46 m (kuro `serial`, 64 cores, 96 GB; 42.5 GB peak). Sections 11h
+and 11i cover the diagnostics that sized the job and the three deliberate deviations from
+the paper's IQ-TREE settings; **11j-11l cover the finished tree, where the vOTUs landed, and
+the two findings that need following up.**
 
 #### 11a. What this step does and why
 
@@ -6387,6 +6393,170 @@ affect a submitted job - Slurm snapshots the script at submit time.
 
 ----------------------------------------------------------------------------------------
 
+#### 11j. Step 11 results: the tree (2026-11-18)
+
+Written by Claude Code on 2026-11-18 (prompt 47 in `PROMPT_LOG.md`).
+
+Job **111564** **COMPLETED** in **1 d 11 h 46 m** (35.8 h), exit 0, peak memory **42.5 GB**
+of the 96 GB requested. The 96 GB request was right: the section 11h probe measured 30 GB
+at 4 threads, and 64 threads pushed it to 42.5 GB, so the measured figure plus headroom was
+the correct call and the script's original 128 GB would have been wasteful. It finished
+inside kuro's 48 h limit, so the checkpoint-resume path was never needed.
+
+```
+model chosen:       WAG+F+I+R4 chosen according to BIC
+log-likelihood:     -9852356.848 (s.e. 99100.142)
+AIC:                19711015.696
+taxa in tree:       1564
+bootstrap reps:     1000 (ultrafast UFBoot, --bnni)
+constant sites:     7985 (21.2%)
+parsimony-informative sites: 21156
+distinct site patterns:      32764
+```
+
+**The model was `WAG+F+I+R4`, not an LG variant.** This is worth recording because
+restricting ModelFinder to LG alone - which was considered in section 11h to save time -
+would have forced the wrong matrix. Including WAG and JTT in `-mset` is what let BIC find
+it. An interim reading of the log part-way through model selection suggested LG was winning;
+that was wrong, and the final BIC table decided otherwise.
+
+**Support across the tree:**
+
+```
+1561 internal branches; median 100
+>=95 (well supported): 998 (64%)
+<70  (poorly supported): 225 (14%)
+```
+
+RAxML internode/tree certainty (`kbrevis_gvmags.IC_TC_info.txt`):
+
+```
+Tree certainty for this tree:          1143.280485
+Relative tree certainty:               0.732403
+Relative TC including all conflicting bipartitions (TCA): 0.733119
+```
+
+A relative tree certainty of **0.73** across 1,564 taxa at 14.5% average pairwise identity
+is a reasonable result: most bipartitions are consistent across the bootstrap trees, but a
+real minority conflict. Remember UFBoot values are **not** comparable to classical
+bootstrap - `>=95` UFBoot is roughly as strong as `>=70` classical - so the 64% figure is
+the one to quote, not a classical-bootstrap equivalent. The 225 branches below 70 are
+concentrated in deep relationships, exactly as the 14.5% identity predicted (section 10j).
+
+#### 11k. Where the *K. brevis* vOTUs sit, and two findings worth following up
+
+`scripts/votu_tree_context.py` (new) answers the question a 1,564-tip Newick file cannot
+answer by eye: for each of our vOTU tips it walks up to the parent node, reports the UFBoot
+support on the branch that places it, and identifies the sister group's order and family
+from `reference_manifest.tsv`. Output: `output/tree/votu_tree_context.tsv`.
+
+| vOTU | UFBoot | sister tips | sister order | sister family |
+|---|---|---|---|---|
+| vOTU01 | 97 | 5 | Imitervirales ×5 | f_Mesomimiviridae ×5 |
+| vOTU02 | 100 | 1 | Imitervirales | f_Mimiviridae |
+| vOTU03 | 100 | 2 | *our own vOTUs* | — |
+| **vOTU04** | **100** | 1 | **Asfuvirales** | **f_AF_01** |
+| vOTU06 | 100 | 1 | Imitervirales | f_Mesomimiviridae |
+| vOTU07 | 100 | 1 | *our own vOTU* | — |
+| vOTU08 | 100 | 1 | Imitervirales | f_Mimiviridae |
+| vOTU09 | 100 | 1 | *our own vOTU* | — |
+| vOTU10 | 100 | 1 | Imitervirales | f_Mesomimiviridae |
+| vOTU11 | 100 | 1 | Imitervirales | f_IM_14 |
+| vOTU12 | 100 | 1 | *our own vOTU* | — |
+| vOTU13 | 100 | 1 | *our own vOTU* | — |
+| vOTU14 | 100 | 1 | Pimascovirales | f_PM_01 |
+| vOTU15 | 100 | 1 | Algavirales | f_AG_04 |
+| vOTU16 | 100 | 1 | Imitervirales | f_Mimiviridae |
+| vOTU17 | 100 | 16 | Imitervirales ×16 | f_IM_07 ×16 |
+| vOTU18 | 100 | 1 | Imitervirales | f_Mimiviridae |
+
+**Every placement is supported at 97 or above**, and all but vOTU01 at 100. The overall
+picture matches steps 08 and 09: the *K. brevis* bloom virome is dominated by
+*Imitervirales*, with nearest relatives in *Mimiviridae* and *Mesomimiviridae*, plus single
+representatives in *Pimascovirales* (vOTU14) and *Algavirales* (vOTU15).
+
+**Finding 1: the tree contradicts GVClass about vOTU04, and GVClass was already unsure.**
+vOTU04 (`SRR34748664_bin_2`) is placed sister to an **Asfuvirales** reference (`f_AF_01`)
+with **100 UFBoot support**. But step 08's GVClass assigned it
+`o_Imitervirales;f_IM_07`. Looking at the underlying vote explains the conflict - the call
+was never confident:
+
+```
+NCLDV__Imitervirales:4(66.67%),NCLDV__Asfuvirales:2(33.33%)
+```
+
+Four marker genes voted *Imitervirales*, two voted *Asfuvirales*, and GVClass reported the
+majority. The concatenated seven-marker phylogeny - which uses all the markers jointly
+rather than voting - puts it firmly with *Asfuvirales*. It also has **no GVMAGs V2 relative
+above the fastANI threshold** (section 09f), so ANI cannot break the tie. **This is exactly
+what a marker-gene tree is for, and the tree should be preferred over the vote here.** It is
+also the one vOTU whose order assignment changes between steps 08 and 11, so any table
+carrying per-vOTU taxonomy needs a footnote. Worth confirming by looking at which markers
+voted which way before publishing either label.
+
+**Finding 2: two small clades contain only *K. brevis* viruses, with no reference
+interleaved.**
+
+- **{vOTU03, vOTU09, vOTU13}** - vOTU03's sister group is vOTU13 + vOTU09
+- **{vOTU07, vOTU12}**
+
+Groups of our own genomes that are each other's closest relatives, with no GVMAGs V2
+genome falling between them, mean lineages **not represented in the reference database** -
+consistent with these vOTUs having no close sequenced relative (section 09f). If these hold
+up they are the most interesting result in the analysis: candidate *K. brevis*-associated
+giant virus lineages rather than novel members of known families.
+
+**But treat the vOTU13 membership with suspicion.** vOTU13 has **74.8% missing data** and
+only ~1,022 real amino acids (section 11h). Taxa with very little data can attach to each
+other with spuriously high support, because there is too little signal to place them
+anywhere else - so the 100 UFBoot on vOTU13's branch does not mean what 100 means for a
+complete genome. The **{vOTU03, vOTU09}** pairing is credible (0.0% and 6.7% missing data
+respectively); vOTU13 joining them is not established by this tree. The {vOTU07, vOTU12}
+pair is credible, both having 0.0% missing data.
+
+**Caveats on the whole tree.**
+
+- **It is UNROOTED.** Booker et al. midpoint-rooted theirs. Nothing about the branching
+  *order* means anything until it is rooted (iTOL: Advanced -> Midpoint root).
+- vOTU05 and vOTU19 are **not in the tree at all** - they carried none of the seven markers
+  and `ncldv_markersearch` dropped them (section 10j). vOTU05 remains the open question from
+  step 10: 100% CheckV complete, 203 kb, no reference relative, yet no core marker genes.
+- The sister group is only as informative as the references included. These placements are
+  relative to the 1,523 `mcl`-tier in-order references; the finer `skani` tier (6,266 taxa)
+  could insert a reference inside one of the two *K. brevis* clades and dissolve it. **That
+  is the single most valuable follow-up**, and it is one flag: re-run step 10 with
+  `--tier skani`.
+- 225 of 1,561 branches are below 70 UFBoot. None of them is a vOTU placement, but they do
+  affect the deep backbone the vOTUs hang from.
+
+#### 11l. Files copied to `output/tree/`
+
+Copied from `~/scr10/data/kbrevis/tree` (the scratch run directory is left intact):
+
+| file | size | what it is |
+|---|---|---|
+| `kbrevis_gvmags.treefile` | 80 KB | **the ML tree with UFBoot support** - this is the file to upload to iTOL |
+| `kbrevis_gvmags.contree` | 80 KB | the extended majority-rule consensus of the bootstrap trees |
+| `kbrevis_gvmags.iqtree` | 732 KB | human-readable report: the full BIC model table, likelihood, parameters |
+| `kbrevis_gvmags.IC_TC_info.txt` | 228 KB | RAxML internode and tree certainty scores |
+| `kbrevis_gvmags.IC_branch_labels.nwk` | — | the tree with IC scores as branch labels, for viewing certainty instead of UFBoot |
+| `kbrevis_gvmags.log` | 132 KB | the full IQ-TREE log |
+| `kbrevis_gvmags.tree_summary.txt` | 558 B | the summary block quoted above |
+| `votu_tree_context.tsv` | — | the placement table above |
+| `itol_*.txt` | — | five iTOL annotation files, regenerated against the final tree |
+
+**Deliberately not copied:** `kbrevis_gvmags.ufboot` (74 MB of bootstrap trees),
+`kbrevis_gvmags.ckp.gz` (18 MB checkpoint) and `kbrevis_gvmags.mldist` (24 MB distance
+matrix). None is needed to visualise or interpret the tree, and committing 116 MB to git
+would be the mistake Step 12 exists to avoid. They remain in scratch, which is purged after
+90 days without access - so if the bootstrap trees are ever needed again (for example to
+recompute IC/TC differently), copy them to `~/data10` before then.
+
+The earlier `kbrevis_gvmags.PRELIMINARY_no_support.treefile` (prompt 44) has been
+**deleted**, since a support-free tree sitting beside the real one is a trap.
+
+----------------------------------------------------------------------------------------
+
 # Step 12. Copying results out of scratch into the repository (2026-11-16)
 
 Written by Claude Code on 2026-11-16 (prompt 40 in `PROMPT_LOG.md`). File:
@@ -6635,6 +6805,147 @@ on disk, untracked).
 
 ----------------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------------------
+
+# Step 13. Cleaning up scratch (2026-11-17)
+
+Written by Claude Code on 2026-11-17 (prompt 45 in `PROMPT_LOG.md`).
+
+`~/scr10/data/kbrevis` had accumulated eleven working directories plus four smoke-test
+leftovers. **Scratch has no backup and no undo**, and step 11 (job 111564) was running at
+the time against `phylogeny/` and `tree/`, so nothing was deleted until each candidate had
+been checked against the scripts that use it.
+
+**How the candidates were identified.** Rather than judging by name, every directory was
+grepped for across all scripts:
+
+```bash
+cd scripts
+for d in raw trim clean host_filtered reference contigs contigs_no_v \
+         contigs_merged gvmags votus phylogeny tree; do
+  printf "%-16s %s\n" "$d" "$(grep -lE "kbrevis/$d\b|/$d/" *.slurm *.sh *.py 2>/dev/null | tr '\n' ' ')"
+done
+```
+
+Exactly one directory came back with **no script referencing it**: `host_filtered/`. Its
+contents confirmed why - a single merged read pair
+(`kbrevis_reads_{1,2}_hostfree.fastq`, 7.2 GB each) rather than the per-sample files the
+pipeline uses, dated 25 October, from before the 20-sample workflow existed. The README's
+own directory listing already described it as "leftover from an earlier attempt".
+
+**Deleted (5 directories, 14 GB):**
+
+| directory | size | what it was |
+|---|---|---|
+| `host_filtered/` | 14 GB | superseded by `clean/`; no script reads it; an early single-pair host-filtering attempt |
+| `nms_smoketest/` | 1.9 MB | smoke test of `ncldv_markersearch` while writing step 10 |
+| `_tailtest_smoketest/` | 860 KB | the step 08 CheckV/geNomad smoke test (the bacterial bin that had to be moved out of the GVMAG root, section 09a-bis) |
+| `tree_probe/` | 612 KB | the IQ-TREE memory probe from section 11h |
+| `tree_smoketest/` | 28 KB | 6-taxon alignment used to test step 11 |
+
+```bash
+cd ~/scr10/data/kbrevis
+rm -rf tree_smoketest tree_probe _tailtest_smoketest nms_smoketest host_filtered
+```
+
+The four smoke-test directories were all created by this agent while developing steps 08,
+10 and 11; none is an input to anything. Step 11 continued running throughout, unaffected.
+
+**Kept, and why.** Everything else is referenced by at least one script:
+
+| directory | size | why it stays |
+|---|---|---|
+| `raw/` | 2.0 TB | step 01's downloads; input to step 02. Re-downloadable from SRA, but slowly |
+| `trim/` | 1.6 TB | step 02 output; input to step 04 |
+| `clean/` | 1.1 TB | step 04 output. **Still actively needed** - step 08 maps these reads to contigs, so re-running binning requires them |
+| `contigs_no_v/` | 322 GB | metaSPAdes assemblies; input to step 06 |
+| `gvmags/` | 115 GB | step 08 output (results already copied to `output/`, Step 12) |
+| `contigs/` | 90 GB | metaviralSPAdes assemblies; input to step 06 |
+| `reference/` | 79 GB | contaminant genomes and the bowtie2 host index; needed to re-run step 04 |
+| `contigs_merged/` | 6.6 GB | step 06 output; step 08's input |
+| `phylogeny/` | 629 MB | step 10 output; **step 11 is reading it** |
+| `tree/` | 42 MB | **step 11 is writing it** |
+| `votus/` | 16 MB | step 09 results |
+
+**There is no space pressure, so nothing further was deleted.** `/sciclone/scr10` is 219 TB,
+72% used, with **62 TB free**. The obvious further candidates, if space ever matters, are:
+
+- `gvmags/*/binning/` - **108 GB** of bbmap BAMs, indexes and depth tables that nothing
+  downstream reads and that `08_gvmags.slurm` regenerates (already excluded from the
+  `output/` copy for exactly this reason, Step 12b).
+- `raw/` + `trim/` - **3.6 TB** of upstream reads, regenerable from SRA and fastp, needed
+  only if the cleaning step is re-run from scratch.
+
+Deleting either is a judgement call about re-computation cost versus disk, not a tidiness
+question, so neither was done unprompted.
+
+#### 13a. Log files: almost none of them are irrelevant
+
+`logs/` held 234 files (18 MB), every one of them tracked in git. The question "which are
+irrelevant?" was answered by checking, not by guessing from filenames, because these logs
+are the evidence behind the README's "How this was tested" sections - deleting a log that a
+section cites would leave a claim with nothing behind it.
+
+Every job ID appearing in a log filename was grepped for in `README.md` and
+`PROMPT_LOG.md`:
+
+```bash
+for id in 73841 73842 73843 73846 73847 73848 73849 110122 611846 621411 111548; do
+  grep -c "\b$id\b" README.md PROMPT_LOG.md
+done
+```
+
+The result was the opposite of what the directory listing suggests. Logs that *look*
+disposable are mostly cited:
+
+| log | cited? | what cites it |
+|---|---|---|
+| `nms_smoketest_73841` | yes | step 10's testing section |
+| `beast_introspect_73842` | yes | the BEAST X introspection note |
+| `tree_smoketest_73846` | yes | "73846 (3 taxa) failed usefully, revealing..." |
+| `tree_smoketest2_73847` | yes | the `--bootstraps 0` test |
+| `tree_smoketest3_73848` | yes | the alignment-too-short failure |
+| `tree_smoketest4_73849` | yes | the 6-taxon test built from real data |
+| `08_gvmags_tailtest_110122` | yes | 7 mentions; the step 08 tail smoke test |
+| `07_binnning_test_611846` | yes | 4 mentions (the misspelt name is deliberate - it records a real job) |
+| `test_checkV_db__621411` | yes | the CheckV database failure, quoted verbatim |
+| `08_gvmags_pilot_110103` | yes | the `JAVA_HOME` crash |
+
+**Only two jobs were referenced nowhere at all**, and only those were deleted (4 files):
+
+| deleted | why |
+|---|---|
+| `tree_introspect_73843.{out,err}` | exploratory introspection of the tree tooling; superseded by the `tree_smoketest*` jobs, which are the ones the README actually cites |
+| `11_pre_tree_check_111548.{out,err}` | my own failed first attempt at the step 11 probe. It died in 1 s with `No such file or directory` because the script had been written to the session scratchpad under `/tmp`, which is node-local and invisible to compute nodes. Resubmitted as job 111549 within minutes, and the lesson is recorded in prose in section 11h, so the log adds nothing |
+
+```bash
+cd logs
+rm -f tree_introspect_73843.out tree_introspect_73843.err \
+      11_pre_tree_check_111548.out 11_pre_tree_check_111548.err
+```
+
+**Nothing else was deleted, on purpose.** Checks that might have justified a larger cull all
+came back negative:
+
+- **No log is empty on both sides.** Not one job produced an empty `.out` *and* an empty
+  `.err`. (50 individual files are empty, but an empty `.err` beside a full `.out` is
+  itself information - it says the job ran without errors.)
+- **The large logs are real output**, not noise: `05_metaspades_109630.out` (1.4 MB) is an
+  assembly log, and `09_gvmag_votus_111457.err` (868 KB) is fastANI's verbose INFO stream
+  from a successful run.
+- **Size is not a reason.** The whole directory is 18 MB.
+
+Since all 230 remaining files are tracked in git, any future deletion is recoverable from
+history - which is the main reason deleting logs is far less risky than deleting scratch.
+
+**A side effect worth knowing.** Scratch is purged after **90 days without access**, and the
+`du` and `stat` commands used to inventory these directories updated their access times. The
+purge clock for everything under `~/scr10/data/kbrevis` therefore now runs from 2026-11-17.
+That is harmless - it delays purging rather than hastening it - but it means access times
+in this tree currently reflect inspection, not pipeline use.
+
+----------------------------------------------------------------------------------------
+
 # Next steps
 
 1. ~~Wait for the metaSPAdes jobs (step 05b), then run the merge (step 06).~~ **Done
@@ -6663,15 +6974,17 @@ on disk, untracked).
    evidence (100% CheckV complete, yet none of the 7 core markers). A re-run needs only
    `--mem=16G -t 4:00:00`, not 128 GB. Average pairwise identity is **14.5%**, so deep
    branches in the tree will be weakly supported.
-7. Step 11 (tree): **RUNNING** as job 111564 (kuro `serial`, 64 cores, 96 GB, 48 h,
-   submitted 2026-11-16) with `--mset LG,WAG,JTT --cmax 4 --safe`. Sized from measurement,
-   not guesswork: IQ-TREE needs **30 GB**, not 128 GB, and one model's parameter
-   optimisation takes 25 minutes, so unrestricted ModelFinder would have burned the whole
-   walltime before building a tree (sections 11h-11i). **If it hits the 48 h limit, simply
-   resubmit the identical command** - IQ-TREE resumes from `kbrevis_gvmags.ckp.gz`. When it
-   finishes: midpoint-root the tree before interpreting it, distrust vOTU13's position
-   (74.8% missing data), and read support from UFBoot plus the RAxML IC/TC scores rather
-   than the topology alone.
+7. ~~Step 11 (tree)~~ **Done 2026-11-18** (sections 11j-11l, job 111564, 1 d 11 h 46 m):
+   `WAG+F+I+R4`, logL -9,852,356.85, **64% of 1,561 branches at >=95 UFBoot**, relative tree
+   certainty **0.73**. All 17 vOTU placements supported at >=97. Two things to follow up:
+   **(a)** the tree places **vOTU04 with *Asfuvirales*** at 100 support, contradicting
+   GVClass's *Imitervirales* call - which was only a 4-vs-2 marker vote, so prefer the tree;
+   **(b)** two clades contain **only our vOTUs** with no reference interleaved
+   ({vOTU03, vOTU09, vOTU13} and {vOTU07, vOTU12}), i.e. candidate *K. brevis* lineages
+   absent from GVMAGs V2 - but vOTU13's membership is suspect at 74.8% missing data.
+   **Highest-value next run: step 10 with `--tier skani`** (6,266 taxa), to test whether a
+   reference falls inside those clades and dissolves them. The tree is **unrooted** -
+   midpoint-root it before interpreting.
 8. Still unwritten: CoverM prevalence across the field samples, and a check for endogenous
    viral elements in the *K. brevis* genome (prompt 19).
 9. ~~Copy final results out of scratch~~ **Partly done 2026-11-16** (Step 12, job 111460):

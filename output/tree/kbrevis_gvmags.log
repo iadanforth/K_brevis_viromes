@@ -1,0 +1,1827 @@
+IQ-TREE multicore version 2.3.6 for Linux x86 64-bit built Dec 11 2024
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor, Heiko Schmidt,
+Dominik Schrempf, Michael Woodhams, Ly Trong Nhan, Thomas Wong
+
+Host:    ku59.sciclone.wm.edu (AVX512, FMA3, 376 GB RAM)
+Command: iqtree2 -s /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.trimmed.aln -m MFP --bnni -T 64 --prefix /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags --seed 12345 --mem 81G -B 1000 --wbtl -mset LG,WAG,JTT -cmax 4 -safe
+Seed:    12345 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Mon Nov 16 13:42:01 2026
+Kernel:  Safe AVX+FMA - 64 threads (64 CPU cores detected)
+
+Reading alignment file /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.trimmed.aln ... Fasta format detected
+Reading fasta file: done in 0.674264 secs using 88.69% CPU
+Alignment most likely contains protein sequences
+WARNING: 566 sites contain only gaps or ambiguous characters.
+Alignment has 1564 sequences with 37739 columns, 32764 distinct patterns
+21156 parsimony-informative, 8598 singleton sites, 7985 constant sites
+                                          Gap/Ambiguity  Composition  p-value
+Analyzing sequences: done in 0.0087642 secs using 6131% CPU
+   1  IMGM3300034190.BIN56                       90.50%    failed      0.00%
+   2  IMGM3300042109.BIN286                      85.90%    failed      0.00%
+   3  bin.2435                                   89.88%    failed      0.00%
+   4  TARA.PSW.NCLDV.00071                       89.42%    failed      0.00%
+   5  IMGM3300012952.BIN200                      87.46%    failed      0.00%
+   6  GCA.002966235-1.ASM296623v1                82.77%    failed      0.00%
+   7  IMGM3300050206.BIN817                      93.14%    failed      0.00%
+   8  IMGM3300036768.BIN778                      92.05%    failed      0.00%
+   9  IMGM3300042922.BIN501                      91.01%    failed      0.00%
+  10  IMGM3300010300.BIN236                      87.78%    failed      0.00%
+  11  bin.5385                                   91.33%    failed      0.00%
+  12  ERX552270-87                               91.19%    failed      0.00%
+  13  IMGM3300050249.BIN1201                     88.70%    failed      0.00%
+  14  TARA.PON.NCLDV.00002                       92.11%    failed      0.00%
+  15  LCPAC101                                   86.08%    failed      0.00%
+  16  GCA.002818865-1.ASM281886v1                94.34%    failed      0.00%
+  17  IMGM3300017950.BIN196                      91.66%    failed      0.00%
+  18  IMGM3300012919.BIN194                      86.13%    failed      0.00%
+  19  TARA.MED.NCLDV.00036                       85.97%    failed      0.00%
+  20  IMGM3300009182.BIN376                      86.29%    failed      0.00%
+  21  GVMAG-M-3300001351-8                       85.74%    failed      0.00%
+  22  IMGM3300032299.BIN125                      84.83%    failed      0.00%
+  23  IMGM3300017956.BIN137                      90.13%    failed      0.00%
+  24  TARA.PSW.NCLDV.00064                       95.41%    failed      0.00%
+  25  TARA.PSW.NCLDV.00041                       94.96%    failed      0.00%
+  26  bin.3929                                   83.61%    failed      0.00%
+  27  IMGM3300022206.BIN57                       89.06%    failed      0.00%
+  28  IMGM3300031659.BIN453                      88.91%    failed      0.00%
+  29  GCA.003814225-1.ASM381422v1                91.92%    failed      0.00%
+  30  ERX552253-37                               91.78%    failed      0.00%
+  31  bin.5824                                   84.59%    failed      0.00%
+  32  GVMAG-M-3300005613-41                      85.17%    failed      0.00%
+  33  IMGM3300021093.BIN1350                     89.14%    failed      0.00%
+  34  TARA.MED.NCLDV.00074                       89.49%    failed      0.00%
+  35  IMGM3300029449.BIN179                      91.71%    failed      0.00%
+  36  TARA.MED.NCLDV.00023                       87.40%    failed      0.00%
+  37  IMGM3300024520.BIN633                      91.16%    failed      0.00%
+  38  IMGM3300045131.BIN589                      91.65%    failed      0.00%
+  39  IMGM3300001352.BIN687                      91.22%    failed      0.00%
+  40  GCA.000846905-1.ViralProj14544             92.18%    failed      0.00%
+  41  IMGS3300050451.BIN62                       89.77%    failed      0.00%
+  42  TARA.PON.NCLDV.00001                       88.46%    failed      0.00%
+  43  ERX288965-16                               85.07%    failed      0.00%
+  44  IMGM3300050670.BIN456                      85.32%    failed      0.00%
+  45  IMGM3300025874.BIN681                      89.38%    failed      0.00%
+  46  bin.6849                                   83.81%    failed      0.00%
+  47  TARA.PSE.NCLDV.00011                       89.86%    failed      0.00%
+  48  IMGM3300027970.BIN354                      82.32%    failed      0.00%
+  49  IMGM3300020190.BIN301                      88.11%    failed      0.00%
+  50  ERX552287-77                               90.78%    failed      0.00%
+  51  GVMAG-M-3300014204-73                      82.97%    failed      0.00%
+  52  IMGM3300009164.BIN216                      83.76%    failed      0.00%
+  53  TARA.MED.NCLDV.00057                       88.47%    failed      0.00%
+  54  bin.2871                                   83.35%    failed      0.00%
+  55  IMGM3300028287.BIN211                      85.71%    failed      0.00%
+  56  GVMAG-M-3300023179-82                      85.31%    failed      0.00%
+  57  IMGM3300009496.BIN243                      87.23%    failed      0.00%
+  58  IMGM3300023174.BIN960                      87.28%    failed      0.00%
+  59  IMGM3300050206.BIN2246                     93.18%    failed      0.00%
+  60  IMGM3300042922.BIN531                      94.04%    failed      0.00%
+  61  IMGM3300045919.BIN466                      85.02%    failed      0.00%
+  62  IMGM3300040810.BIN15                       91.71%    failed      0.00%
+  63  IMGM3300013128.BIN511                      88.11%    failed      0.00%
+  64  bin.3696                                   85.90%    failed      0.00%
+  65  TARA.ARC.NCLDV.00004                       87.38%    failed      0.00%
+  66  IMGM3300005584.BIN91                       86.39%    failed      0.00%
+  67  IMGM3300010883.BIN3515                     92.97%    failed      0.00%
+  68  GVMAG-S-1035100-100                        85.93%    failed      0.00%
+  69  IMGM3300007987.BIN84                       98.55%    passed      6.80%
+  70  GVMAG-M-3300017963-13                      89.05%    failed      0.00%
+  71  IMGM3300013014.BIN409                      86.81%    failed      0.00%
+  72  IMGM3300002231.BIN841                      90.07%    failed      0.00%
+  73  TARA.MED.NCLDV.00014                       87.44%    failed      0.00%
+  74  IMGM3300013137.BIN836                      91.19%    failed      0.00%
+  75  GVMAG-M-3300020192-26                      83.29%    failed      0.00%
+  76  GVMAG-S-1101162-72                         82.37%    failed      0.00%
+  77  IMGM3300025874.BIN511                      88.54%    failed      0.00%
+  78  IMGM3300045970.BIN581                      93.60%    failed      0.00%
+  79  Pabr                                       85.86%    failed      0.00%
+  80  IMGM3300009172.BIN443                      83.54%    failed      0.00%
+  81  GVMAG-S-3300013131-116                     84.82%    failed      0.00%
+  82  TARA.ARC.NCLDV.00036                       88.77%    failed      0.00%
+  83  IMGM3300009182.BIN327                      86.97%    failed      0.00%
+  84  IMGM3300009443.BIN311                      86.67%    failed      0.00%
+  85  IMGM3300032736.BIN230                      85.39%    failed      0.00%
+  86  bin.4834                                   85.90%    failed      0.00%
+  87  LKH495.P10.Am-13                           88.52%    failed      0.00%
+  88  GCA.000838105-1.ViralProj14124             88.59%    failed      0.00%
+  89  bin.2876                                   86.40%    failed      0.00%
+  90  IMGM3300023179.BIN1943                     96.80%    failed      0.04%
+  91  IMGM3300032435.BIN1013                     90.30%    failed      0.00%
+  92  TARA.ARC.NCLDV.00062                       93.63%    failed      0.00%
+  93  GVMAG-M-3300021079-18                      91.97%    failed      0.00%
+  94  IMGM3300021425.BIN101                      85.86%    failed      0.00%
+  95  IMGM3300050249.BIN1751                     94.86%    failed      0.00%
+  96  IMGM3300047352.BIN595                      85.81%    failed      0.00%
+  97  IMGM3300014059.BIN282                      89.76%    failed      0.00%
+  98  bin.6626                                   86.89%    failed      0.00%
+  99  IMGM3300017963.BIN554                      92.16%    failed      0.00%
+ 100  IMGM3300047356.BIN167                      94.27%    failed      0.00%
+ 101  IMGM3300001351.BIN518                      86.41%    failed      0.00%
+ 102  IMGM3300031224.BIN328                      87.83%    failed      0.00%
+ 103  bin.2711                                   83.90%    failed      0.00%
+ 104  IMGM3300031403.BIN235                      85.33%    failed      0.00%
+ 105  IMGM3300032516.BIN756                      95.54%    failed      0.00%
+ 106  IMGM3300017989.BIN1126                     94.10%    failed      0.00%
+ 107  bin.4693                                   86.58%    failed      0.00%
+ 108  IMGM3300024302.BIN252                      87.17%    failed      0.00%
+ 109  IMGM3300017969.BIN211                      87.25%    failed      0.00%
+ 110  bin.6750                                   88.11%    failed      0.00%
+ 111  bin.7006                                   92.90%    failed      0.00%
+ 112  SRX802202-55                               89.34%    failed      0.00%
+ 113  IMGM3300032360.BIN727                      91.84%    failed      0.00%
+ 114  IMGM3300023179.BIN1560                     88.92%    failed      0.00%
+ 115  GVMAG-S-ERX555915-91                       89.07%    failed      0.00%
+ 116  IMGM3300023174.BIN839                      84.24%    failed      0.00%
+ 117  IMGM3300020182.BIN618                      85.75%    failed      0.00%
+ 118  bin.3329                                   85.47%    failed      0.00%
+ 119  bin.5990                                   87.40%    failed      0.00%
+ 120  IMGM3300023179.BIN969                      84.12%    failed      0.00%
+ 121  GVMAG-S-1016704-142                        88.87%    failed      0.00%
+ 122  GCA.011559005-1.ASM1155900v1               94.05%    failed      0.00%
+ 123  IMGM3300031785.BIN371                      96.30%    failed      0.00%
+ 124  IMGM3300012936.BIN805                      86.08%    failed      0.00%
+ 125  IMGM3300037467.BIN814                      87.11%    failed      0.00%
+ 126  IMGM3300045918.BIN196                      92.78%    failed      0.00%
+ 127  IMGM3300040815.BIN418                      88.47%    failed      0.00%
+ 128  TARA.PSW.NCLDV.00072                       92.61%    failed      0.00%
+ 129  IMGM3300027779.BIN1083                     90.89%    failed      0.00%
+ 130  LCPAC401                                   90.95%    failed      0.00%
+ 131  IMGM3300024336.BIN278                      93.45%    failed      0.00%
+ 132  IMGM3300007775.BIN41                       93.52%    failed      0.00%
+ 133  GCA.002892525-1.ASM289252v1                89.66%    failed      0.00%
+ 134  GVMAG-S-3300001748-13                      89.63%    failed      0.00%
+ 135  GVMAG-M-3300010368-24                      86.20%    failed      0.00%
+ 136  IMGM3300022907.BIN404                      85.94%    failed      0.00%
+ 137  IMGM3300034166.BIN605                      84.68%    failed      0.00%
+ 138  IMGM3300045970.BIN430                      84.71%    failed      0.00%
+ 139  IMGM3300017967.BIN561                      93.31%    failed      0.00%
+ 140  GVMAG-S-1101162-73                         83.09%    failed      0.00%
+ 141  TARA.ARC.NCLDV.00063                       89.05%    failed      0.00%
+ 142  TARA.PSE.NCLDV.00022                       91.43%    failed      0.00%
+ 143  bin.2165                                   96.00%    failed      0.00%
+ 144  bin.3649                                   86.94%    failed      0.00%
+ 145  IMGM3300028571.BIN506                      87.32%    failed      0.00%
+ 146  IMGM3300009510.BIN446                      91.31%    failed      0.00%
+ 147  bin.3168                                   82.22%    failed      0.00%
+ 148  IMGM3300042353.BIN211                      90.17%    failed      0.00%
+ 149  Pithovirus.LCPAC304                        92.02%    failed      0.00%
+ 150  IMGM3300034062.BIN838                      91.27%    failed      0.00%
+ 151  GVMAG-S-1035085-51                         86.54%    failed      0.00%
+ 152  IMGM3300012956.BIN561                      89.62%    failed      0.00%
+ 153  bin.3884                                   85.83%    failed      0.00%
+ 154  IMGS3300042691.BIN1295                     86.36%    failed      0.00%
+ 155  bin.6024                                   87.61%    failed      0.00%
+ 156  IMGM3300028196.BIN458                      85.72%    failed      0.00%
+ 157  bin.2973                                   86.40%    failed      0.00%
+ 158  IMGM3300028196.BIN139                      88.33%    failed      0.00%
+ 159  GVMAG-M-2140918012-1                       89.16%    failed      0.00%
+ 160  TARA.AON.NCLDV.00011                       90.07%    failed      0.00%
+ 161  IMGM3300032132.BIN413                      93.26%    failed      0.00%
+ 162  IMGM3300046154.BIN113                      84.83%    failed      0.00%
+ 163  IMGM3300046010.BIN832                      85.24%    failed      0.00%
+ 164  IMGM3300007520.BIN1027                     95.69%    failed      0.00%
+ 165  SRX803008-78                               86.00%    failed      0.00%
+ 166  vOTU18..SRR28004138..SRR28004138.bin.51.   84.71%    failed      0.00%
+ 167  bin.5003                                   90.66%    failed      0.00%
+ 168  IMGM3300008963.BIN38                       91.80%    failed      0.00%
+ 169  IMGM3300007345.BIN690                      89.80%    failed      0.00%
+ 170  IMGM3300031773.BIN219                      88.33%    failed      0.00%
+ 171  IMGM3300043447.BIN351                      89.97%    failed      0.00%
+ 172  IMGM3300020196.BIN616                      85.50%    failed      0.00%
+ 173  IMGM3300024302.BIN426                      85.99%    failed      0.00%
+ 174  GVMAG-M-3300010354-11                      85.34%    failed      0.00%
+ 175  IMGM3300020417.BIN475                      95.98%    failed      0.00%
+ 176  IMGM3300032327.BIN203                      89.13%    failed      0.00%
+ 177  IMGM3300009706.BIN312                      93.47%    failed      0.00%
+ 178  IMGM3300005335.BIN98                       92.86%    failed      0.00%
+ 179  bin.3293                                   88.74%    failed      0.00%
+ 180  IMGM3300020165.BIN452                      86.98%    failed      0.00%
+ 181  IMGM3300012952.BIN197                      90.19%    failed      0.00%
+ 182  IMGM3300027712.BIN229                      90.75%    failed      0.00%
+ 183  IMGM3300021964.BIN850                      85.81%    failed      0.00%
+ 184  IMGM3300032294.BIN302                      89.04%    failed      0.00%
+ 185  IMGM3300043419.BIN415                      94.39%    failed      0.00%
+ 186  bin.1777                                   85.85%    failed      0.00%
+ 187  bin.5304                                   87.52%    failed      0.00%
+ 188  TARA.ARC.NCLDV.00182                       92.84%    failed      0.00%
+ 189  LKH577.P12.Am-135                          87.95%    failed      0.00%
+ 190  IMGM3300002447.BIN164                      92.13%    failed      0.00%
+ 191  IMGM3300025892.BIN1187                     86.89%    failed      0.00%
+ 192  bin.3119                                   84.33%    failed      0.00%
+ 193  IMGM3300031519.BIN225                      93.71%    failed      0.00%
+ 194  TARA.AON.NCLDV.00017                       92.11%    failed      0.00%
+ 195  TARA.PSW.NCLDV.00014                       94.19%    failed      0.00%
+ 196  IMGM3300007520.BIN745                      85.37%    failed      0.00%
+ 197  Sylv                                       89.23%    failed      0.00%
+ 198  IMGM3300027861.BIN40                       96.13%    failed      0.00%
+ 199  IMGM3300014720.BIN746                      90.47%    failed      0.00%
+ 200  TARA.SOC.NCLDV.00017                       91.09%    failed      0.00%
+ 201  IMGM3300017967.BIN364                      88.52%    failed      0.00%
+ 202  IMGM3300047358.BIN160                      91.08%    failed      0.00%
+ 203  TARA.ION.NCLDV.00010                       87.63%    failed      0.00%
+ 204  GVMAG-M-3300023184-161                     85.95%    failed      0.00%
+ 205  IMGM3300034166.BIN148                      91.87%    failed      0.00%
+ 206  IMGM3300010368.BIN9                        90.43%    failed      0.00%
+ 207  IMGM3300010334.BIN565                      90.18%    failed      0.00%
+ 208  GVMAG-S-1085360-44                         92.09%    failed      0.00%
+ 209  bin.2773                                   88.17%    failed      0.00%
+ 210  SRX247688-42                               93.19%    failed      0.00%
+ 211  bin.1821                                   91.24%    failed      0.00%
+ 212  bin.5613                                   85.15%    failed      0.00%
+ 213  GCA.000913615-1.ViralProj223065            94.56%    failed      0.00%
+ 214  bin.3030                                   91.73%    failed      0.00%
+ 215  IMGM3300035235.BIN261                      86.20%    failed      0.00%
+ 216  GCA.001806195-1.ViralProj349153            91.81%    failed      0.00%
+ 217  IMGM3300010883.BIN2805                     97.97%    passed      9.28%
+ 218  bin.4741                                   88.34%    failed      0.00%
+ 219  IMGM3300035438.BIN2                        84.38%    failed      0.00%
+ 220  IMGM3300004105.BIN192                      93.36%    failed      0.00%
+ 221  IMGM3300022926.BIN280                      86.42%    failed      0.00%
+ 222  IMGM3300042197.BIN646                      87.15%    failed      0.00%
+ 223  IMGM3300031963.BIN1921                     85.94%    failed      0.00%
+ 224  bin.1582                                   93.14%    failed      0.00%
+ 225  IMGM3300027126.BIN97                       86.53%    failed      0.00%
+ 226  IMGM3300015360.BIN735                      90.71%    failed      0.00%
+ 227  TARA.ARC.NCLDV.00057                       90.87%    failed      0.00%
+ 228  IMGM3300025323.BIN1643                     87.31%    failed      0.00%
+ 229  ERX555926-27                               85.90%    failed      0.00%
+ 230  IMGM3300020414.BIN295                      85.48%    failed      0.00%
+ 231  IMGM3300045743.BIN19                       95.85%    failed      0.00%
+ 232  bin.3548                                   84.22%    failed      0.00%
+ 233  IMGM3300017651.BIN264                      89.51%    failed      0.00%
+ 234  IMGM3300023179.BIN995                      89.76%    failed      0.00%
+ 235  GVMAG-M-3300023184-134                     90.80%    failed      0.00%
+ 236  GVMAG-M-3300027790-3                       91.25%    failed      0.00%
+ 237  IMGM3300042471.BIN242                      90.79%    failed      0.00%
+ 238  IMGM3300015202.BIN140                      88.89%    failed      0.00%
+ 239  IMGM3300028377.BIN66                       88.69%    failed      0.00%
+ 240  bin.1875                                   85.25%    failed      0.00%
+ 241  bin.1088                                   88.65%    failed      0.00%
+ 242  IMGM3300051198.BIN588                      94.54%    failed      0.00%
+ 243  bin.5861                                   88.11%    failed      0.00%
+ 244  IMGM3300031519.BIN113                      89.85%    failed      0.00%
+ 245  IMGM3300032266.BIN235                      90.11%    failed      0.00%
+ 246  IMGM3300042885.BIN17                       89.46%    failed      0.00%
+ 247  IMGM3300023174.BIN571                      86.23%    failed      0.00%
+ 248  IMGM3300013094.BIN445                      85.75%    failed      0.00%
+ 249  IMGM3300049215.BIN444                      90.03%    failed      0.00%
+ 250  bin.3049                                   81.65%    failed      0.00%
+ 251  IMGM3300010334.BIN385                      85.57%    failed      0.00%
+ 252  bin.3834                                   85.55%    failed      0.00%
+ 253  IMGM3300021093.BIN1261                     88.53%    failed      0.00%
+ 254  bin.5781                                   89.41%    failed      0.00%
+ 255  IMGM3300006056.BIN822                      88.46%    failed      0.00%
+ 256  GVMAG-M-3300023179-11                      82.57%    failed      0.00%
+ 257  IMGM3300037862.BIN219                      94.08%    failed      0.00%
+ 258  GCA.000889395-1.ViralProj59783             84.64%    failed      0.00%
+ 259  IMGM3300002105.BIN878                      85.87%    failed      0.00%
+ 260  IMGM3300020681.BIN21                       86.74%    failed      0.00%
+ 261  IMGM3300035695.BIN243                      87.90%    failed      0.00%
+ 262  IMGM3300031703.BIN155                      95.19%    failed      0.00%
+ 263  TARA.SOC.NCLDV.00023                       95.29%    failed      0.00%
+ 264  GVMAG-M-3300025860-20                      88.08%    failed      0.00%
+ 265  IMGM3300042337.BIN239                      93.12%    failed      0.00%
+ 266  IMGM3300022929.BIN679                      86.13%    failed      0.00%
+ 267  GVMAG-M-3300025860-25                      85.03%    failed      0.00%
+ 268  IMGM3300044859.BIN882                      93.52%    failed      0.00%
+ 269  GVMAG-M-3300023174-174                     86.65%    failed      0.00%
+ 270  bin.1382                                   96.50%    failed      0.00%
+ 271  IMGM3300003395.BIN46                       90.11%    failed      0.00%
+ 272  IMGM3300004097.BIN199                      91.65%    failed      0.00%
+ 273  IMGM3300010368.BIN175                      89.29%    failed      0.00%
+ 274  IMGM3300025596.BIN405                      89.48%    failed      0.00%
+ 275  Pithovirus.LCPAC404                        87.32%    failed      0.00%
+ 276  IMGM3300045972.BIN529                      93.54%    failed      0.00%
+ 277  TARA.MED.NCLDV.00044                       88.63%    failed      0.00%
+ 278  ERX552256-53                               87.68%    failed      0.00%
+ 279  IMGM3300017963.BIN847                      85.79%    failed      0.00%
+ 280  IMGM3300043391.BIN520                      91.96%    failed      0.00%
+ 281  TARA.ARC.NCLDV.00140                       88.55%    failed      0.00%
+ 282  GVMAG-S-3300009703-83                      85.44%    failed      0.00%
+ 283  IMGM3300004276.BIN194                      85.97%    failed      0.00%
+ 284  bin.1797                                   87.48%    failed      0.00%
+ 285  IMGS3300042691.BIN928                      81.56%    failed      0.00%
+ 286  IMGM3300037336.BIN107                      90.12%    failed      0.00%
+ 287  IMGM3300037839.BIN77                       91.56%    failed      0.00%
+ 288  IMGM3300028361.BIN118                      85.48%    failed      0.00%
+ 289  bin.3818                                   90.20%    failed      0.00%
+ 290  SRX802076-48                               85.34%    failed      0.00%
+ 291  GVMAG-M-3300014838-21                      92.38%    failed      0.00%
+ 292  IMGM3300050212.BIN926                      88.38%    failed      0.00%
+ 293  TARA.AOS.NCLDV.00002                       89.67%    failed      0.00%
+ 294  IMGM3300046001.BIN608                      85.86%    failed      0.00%
+ 295  IMGM3300027899.BIN280                      91.70%    failed      0.00%
+ 296  IMGM3300050206.BIN2544                     94.43%    failed      0.00%
+ 297  IMGM3300032226.BIN61                       89.54%    failed      0.00%
+ 298  IMGM3300025890.BIN1006                     94.72%    failed      0.00%
+ 299  bin.1098                                   87.06%    failed      0.00%
+ 300  GVMAG-M-3300005613-6                       86.30%    failed      0.00%
+ 301  IMGM3300023179.BIN1295                     90.40%    failed      0.00%
+ 302  TARA.PSW.NCLDV.00012                       93.19%    failed      0.00%
+ 303  IMGM3300027746.BIN556                      87.29%    failed      0.00%
+ 304  Harv                                       85.59%    failed      0.00%
+ 305  bin.4249                                   91.00%    failed      0.00%
+ 306  TARA.ARC.NCLDV.00155                       91.59%    failed      0.00%
+ 307  IMGM3300010158.BIN408                      85.08%    failed      0.00%
+ 308  IMGM3300013006.BIN324                      85.62%    failed      0.00%
+ 309  IMGM3300042109.BIN122                      87.88%    failed      0.00%
+ 310  bin.1254                                   87.74%    failed      0.00%
+ 311  IMGM3300010160.BIN358                      85.74%    failed      0.00%
+ 312  bin.1926                                   85.42%    failed      0.00%
+ 313  IMGM3300032315.BIN299                      85.40%    failed      0.00%
+ 314  IMGM3300040856.BIN494                      87.46%    failed      0.00%
+ 315  bin.5297                                   90.35%    failed      0.00%
+ 316  GVMAG-S-3300002186-40                      91.75%    failed      0.00%
+ 317  bin.5005                                   87.58%    failed      0.00%
+ 318  GVMAG-M-3300023184-68                      83.96%    failed      0.00%
+ 319  TARA.PSW.NCLDV.00018                       85.91%    failed      0.00%
+ 320  TARA.PON.NCLDV.00015                       92.53%    failed      0.00%
+ 321  IMGM3300012936.BIN829                      89.44%    failed      0.00%
+ 322  IMGM3300017989.BIN1280                     87.56%    failed      0.00%
+ 323  IMGM3300037794.BIN242                      91.11%    failed      0.00%
+ 324  IMGM3300025138.BIN603                      95.12%    failed      0.00%
+ 325  IMGM3300009544.BIN283                      87.38%    failed      0.00%
+ 326  ERX633345-33                               87.76%    failed      0.00%
+ 327  GVMAG-M-3300023184-62                      85.74%    failed      0.00%
+ 328  IMGM3300050208.BIN558                      91.36%    failed      0.00%
+ 329  IMGM3300017971.BIN1161                     90.11%    failed      0.00%
+ 330  IMGM3300023176.BIN648                      86.83%    failed      0.00%
+ 331  Edaf                                       86.51%    failed      0.00%
+ 332  IMGM3300023174.BIN2084                     84.08%    failed      0.00%
+ 333  IMGM3300032279.BIN96                       86.01%    failed      0.00%
+ 334  bin.4389                                   89.71%    failed      0.00%
+ 335  IMGM3300025571.BIN170                      92.25%    failed      0.00%
+ 336  IMGM3300014050.BIN168                      87.38%    failed      0.00%
+ 337  bin.4222                                   88.93%    failed      0.00%
+ 338  IMGM3300050212.BIN867                      92.76%    failed      0.00%
+ 339  TARA.AON.NCLDV.00015                       86.08%    failed      0.00%
+ 340  IMGM3300035703.BIN999                      86.46%    failed      0.00%
+ 341  TARA.MED.NCLDV.00001                       86.93%    failed      0.00%
+ 342  TARA.MED.NCLDV.00003                       85.96%    failed      0.00%
+ 343  TARA.ARC.NCLDV.00110                       89.91%    failed      0.00%
+ 344  ERX555988-97                               86.05%    failed      0.00%
+ 345  bin.4568                                   85.20%    failed      0.00%
+ 346  IMGM3300007547.BIN43                       83.02%    failed      0.00%
+ 347  bin.6074                                   83.47%    failed      0.00%
+ 348  bin.2877                                   89.24%    failed      0.00%
+ 349  IMGM3300020165.BIN615                      86.66%    failed      0.00%
+ 350  IMGM3300020213.BIN131                      88.49%    failed      0.00%
+ 351  IMGM3300050207.BIN1449                     93.91%    failed      0.00%
+ 352  IMGM3300009154.BIN311                      92.80%    failed      0.00%
+ 353  IMGM3300033289.BIN303                      91.04%    failed      0.00%
+ 354  GCA.006547245-1.ASM654724v1                85.63%    failed      0.00%
+ 355  IMGM3300009684.BIN338                      85.13%    failed      0.00%
+ 356  IMGM3300029286.BIN731                      86.63%    failed      0.00%
+ 357  bin.2984                                   91.46%    failed      0.00%
+ 358  IMGM3300006922.BIN112                      85.13%    failed      0.00%
+ 359  IMGM3300009544.BIN155                      89.04%    failed      0.00%
+ 360  bin.3835                                   86.71%    failed      0.00%
+ 361  IMGM3300004210.BIN391                      91.43%    failed      0.00%
+ 362  bin.4788                                   89.98%    failed      0.00%
+ 363  bin.3698                                   90.96%    failed      0.00%
+ 364  IMGM3300032138.BIN144                      89.06%    failed      0.00%
+ 365  GVMAG-M-3300021958-1                       92.72%    failed      0.00%
+ 366  IMGM3300000385.BIN119                      86.60%    failed      0.00%
+ 367  TARA.ARC.NCLDV.00149                       93.56%    failed      0.00%
+ 368  bin.2047                                   85.67%    failed      0.00%
+ 369  IMGM3300046010.BIN819                      84.30%    failed      0.00%
+ 370  GCA.000918955-1.ViralProj243064            88.21%    failed      0.00%
+ 371  IMGM3300020182.BIN725                      87.03%    failed      0.00%
+ 372  IMGM3300031269.BIN58                       86.04%    failed      0.00%
+ 373  IMGM3300005573.BIN635                      88.51%    failed      0.00%
+ 374  GVMAG-M-3300023184-71                      90.55%    failed      0.00%
+ 375  GVMAG-M-3300027769-4                       84.80%    failed      0.00%
+ 376  GVMAG-M-3300023179-33                      80.11%    failed      0.00%
+ 377  bin.3966                                   87.40%    failed      0.00%
+ 378  TARA.PSE.NCLDV.00014                       86.19%    failed      0.00%
+ 379  bin.4709                                   85.72%    failed      0.00%
+ 380  vOTU15..SRR28004152..SRR28004152.bin.36.   90.35%    failed      0.00%
+ 381  ERX552300-8                                84.07%    failed      0.00%
+ 382  IMGM3300036979.BIN151                      84.74%    failed      0.00%
+ 383  IMGM3300025916.BIN342                      98.18%    failed      0.00%
+ 384  bin.1803                                   89.60%    failed      0.00%
+ 385  IMGM3300047387.BIN273                      86.42%    failed      0.00%
+ 386  GVMAG-M-3300013006-15                      85.91%    failed      0.00%
+ 387  IMGM3300032579.BIN410                      89.24%    failed      0.00%
+ 388  LCMiAC01                                   92.27%    failed      0.00%
+ 389  IMGM3300000576.BIN384                      95.33%    failed      0.00%
+ 390  IMGM3300020185.BIN821                      85.23%    failed      0.00%
+ 391  IMGM3300024302.BIN155                      90.57%    failed      0.00%
+ 392  IMGM3300035703.BIN2253                     95.87%    failed      0.00%
+ 393  IMGM3300020182.BIN353                      86.14%    failed      0.00%
+ 394  TARA.MED.NCLDV.00137                       94.45%    failed      0.00%
+ 395  bin.6412                                   92.38%    failed      0.00%
+ 396  IMGM3300032138.BIN394                      83.19%    failed      0.00%
+ 397  IMGM3300032300.BIN217                      91.10%    failed      0.00%
+ 398  IMGM3300010883.BIN2825                     97.18%    failed      0.00%
+ 399  IMGM3300005987.BIN184                      92.34%    failed      0.00%
+ 400  IMGM3300050249.BIN864                      93.18%    failed      0.00%
+ 401  bin.3793                                   84.09%    failed      0.00%
+ 402  IMGM3300018414.BIN46                       88.27%    failed      0.00%
+ 403  Pithovirus.LCPAC201                        89.77%    failed      0.00%
+ 404  IMGM3300044712.BIN1251                     87.31%    failed      0.00%
+ 405  IMGM3300050183.BIN995                      88.19%    failed      0.00%
+ 406  bin.5811                                   86.30%    failed      0.00%
+ 407  TARA.PSW.NCLDV.00001                       83.70%    failed      0.00%
+ 408  IMGM3300009163.BIN222                      95.32%    failed      0.00%
+ 409  GCA.002966275-1.ASM296627v1                85.00%    failed      0.00%
+ 410  bin.4795                                   88.47%    failed      0.00%
+ 411  IMGM3300021093.BIN857                      85.33%    failed      0.00%
+ 412  GVMAG-S-3300013131-216                     85.33%    failed      0.00%
+ 413  IMGM3300020495.BIN14                       86.53%    failed      0.00%
+ 414  bin.3167                                   83.37%    failed      0.00%
+ 415  IMGM3300009702.BIN5                        90.42%    failed      0.00%
+ 416  IMGM3300028044.BIN206                      84.84%    failed      0.00%
+ 417  IMGM3300009185.BIN539                      82.67%    failed      0.00%
+ 418  IMGM3300009703.BIN311                      85.99%    failed      0.00%
+ 419  IMGM3300009426.BIN58                       87.22%    failed      0.00%
+ 420  IMGM3300032322.BIN154                      88.82%    failed      0.00%
+ 421  GVMAG-S-405408-21                          90.22%    failed      0.00%
+ 422  GVMAG-M-3300010157-4                       83.50%    failed      0.00%
+ 423  IMGM3300033558.BIN66                       92.74%    failed      0.00%
+ 424  IMGM3300027744.BIN705                      86.92%    failed      0.00%
+ 425  Marseillevirus.LCMAC101                    82.53%    failed      0.00%
+ 426  SRX327520-21                               86.86%    failed      0.00%
+ 427  IMGM3300023179.BIN522                      91.24%    failed      0.00%
+ 428  bin.5922                                   86.25%    failed      0.00%
+ 429  IMGM3300010883.BIN3240                     87.53%    failed      0.00%
+ 430  IMGM3300009159.BIN373                      90.64%    failed      0.00%
+ 431  IMGM3300006114.BIN92                       87.24%    failed      0.00%
+ 432  TARA.PSW.NCLDV.00042                       89.95%    failed      0.00%
+ 433  IMGM3300020165.BIN40                       85.86%    failed      0.00%
+ 434  IMGM3300023210.BIN505                      87.51%    failed      0.00%
+ 435  bin.1621                                   94.85%    failed      0.00%
+ 436  GVMAG-S-3300010160-180                     91.52%    failed      0.00%
+ 437  IMGM3300025138.BIN620                      90.70%    failed      0.00%
+ 438  IMGM3300047550.BIN455                      82.97%    failed      0.00%
+ 439  IMGM3300026931.BIN21                       92.82%    failed      0.00%
+ 440  bin.6845                                   87.99%    failed      0.00%
+ 441  bin.3809                                   84.63%    failed      0.00%
+ 442  TARA.ARC.NCLDV.00008                       87.82%    failed      0.00%
+ 443  Tric                                       93.22%    failed      0.00%
+ 444  IMGM3300027861.BIN305                      89.49%    failed      0.00%
+ 445  IMGM3300021961.BIN1637                     91.16%    failed      0.00%
+ 446  IMGM3300009505.BIN165                      91.05%    failed      0.00%
+ 447  IMGM3300012033.BIN142                      87.06%    failed      0.00%
+ 448  bin.1834                                   84.88%    failed      0.00%
+ 449  IMGM3300027659.BIN267                      84.00%    failed      0.00%
+ 450  bin.6041                                   89.49%    failed      0.00%
+ 451  GVMAG-S-1074258-81                         90.91%    failed      0.00%
+ 452  IMGM3300020420.BIN317                      86.86%    failed      0.00%
+ 453  GCA.003814265-1.ASM381426v1                82.37%    failed      0.00%
+ 454  IMGM3300010430.BIN57                       83.23%    failed      0.00%
+ 455  bin.4248                                   84.98%    failed      0.00%
+ 456  TARA.AOS.NCLDV.00011                       87.56%    failed      0.00%
+ 457  Soli                                       90.11%    failed      0.00%
+ 458  bin.3547                                   90.15%    failed      0.00%
+ 459  IMGM3300010160.BIN784                      82.75%    failed      0.00%
+ 460  TARA.MED.NCLDV.00133                       92.82%    failed      0.00%
+ 461  IMGM3300050207.BIN160                      89.78%    failed      0.00%
+ 462  IMGM3300040856.BIN415                      86.97%    failed      0.00%
+ 463  moka                                       87.47%    failed      0.00%
+ 464  IMGM3300032291.BIN409                      90.77%    failed      0.00%
+ 465  IMGM3300043395.BIN421                      84.03%    failed      0.00%
+ 466  ERX552246-27                               84.07%    failed      0.00%
+ 467  GVMAG-M-3300005987-10                      93.73%    failed      0.00%
+ 468  IMGM3300028195.BIN408                      85.81%    failed      0.00%
+ 469  IMGM3300018426.BIN283                      88.04%    failed      0.00%
+ 470  GVMAG-M-3300023184-3                       87.25%    failed      0.00%
+ 471  IMGM3300024252.BIN167                      85.98%    failed      0.00%
+ 472  IMGS3300047126.BIN6                        94.15%    failed      0.00%
+ 473  IMGM3300010883.BIN4828                     85.77%    failed      0.00%
+ 474  IMGM3300018421.BIN505                      86.10%    failed      0.00%
+ 475  bin.4344                                   84.57%    failed      0.00%
+ 476  IMGM3300009785.BIN324                      87.45%    failed      0.00%
+ 477  IMGM3300046009.BIN1010                     86.18%    failed      0.00%
+ 478  IMGM3300009161.BIN630                      86.52%    failed      0.00%
+ 479  IMGM3300037808.BIN645                      94.01%    failed      0.00%
+ 480  bin.4323                                   85.75%    failed      0.00%
+ 481  IMGM3300009788.BIN714                      91.94%    failed      0.00%
+ 482  IMGM3300042923.BIN626                      95.80%    failed      0.00%
+ 483  IMGM3300021963.BIN616                      91.16%    failed      0.00%
+ 484  GVMAG-S-1101164-76                         83.88%    failed      0.00%
+ 485  IMGM3300045994.BIN331                      91.66%    failed      0.00%
+ 486  TARA.MED.NCLDV.00120                       86.63%    failed      0.00%
+ 487  TARA.PSW.NCLDV.00009                       86.02%    failed      0.00%
+ 488  IMGM3300006810.BIN708                      89.82%    failed      0.00%
+ 489  IMGM3300010334.BIN292                      85.25%    failed      0.00%
+ 490  ERX552261-56                               88.86%    failed      0.00%
+ 491  IMGS3300050570.BIN45                       84.03%    failed      0.00%
+ 492  ERX552299-29                               90.90%    failed      0.00%
+ 493  IMGS3300051492.BIN21                       90.99%    failed      0.00%
+ 494  TARA.AON.NCLDV.00018                       94.10%    failed      0.00%
+ 495  Tetr                                       86.57%    failed      0.00%
+ 496  IMGM3300021389.BIN525                      84.40%    failed      0.00%
+ 497  GVMAG-S-1004661-13                         85.24%    failed      0.00%
+ 498  IMGM3300043393.BIN24                       90.95%    failed      0.00%
+ 499  GVMAG-S-1101166-70                         82.88%    failed      0.00%
+ 500  bin.4072                                   87.25%    failed      0.00%
+ 501  IMGM3300034954.BIN366                      87.40%    failed      0.00%
+ 502  GVMAG-S-ERX556028-72                       85.97%    failed      0.00%
+ 503  IMGM3300009163.BIN498                      89.55%    failed      0.00%
+ 504  IMGM3300047550.BIN362                      92.59%    failed      0.00%
+ 505  bin.4752                                   88.25%    failed      0.00%
+ 506  IMGM3300030119.BIN500                      89.21%    failed      0.00%
+ 507  IMGM3300043400.BIN40                       91.56%    failed      0.00%
+ 508  TARA.PSW.NCLDV.00005                       84.93%    failed      0.00%
+ 509  IMGM3300048505.BIN167                      93.58%    failed      0.00%
+ 510  bin.4263                                   87.52%    failed      0.00%
+ 511  IMGM3300005613.BIN692                      87.15%    failed      0.00%
+ 512  IMGM3300022925.BIN411                      84.43%    failed      0.00%
+ 513  bin.5332                                   86.41%    failed      0.00%
+ 514  GVMAG-M-3300021425-14                      85.92%    failed      0.00%
+ 515  GVMAG-M-3300009161-25                      87.40%    failed      0.00%
+ 516  IMGM3300036945.BIN610                      86.55%    failed      0.00%
+ 517  IMGM3300035703.BIN1947                     87.12%    failed      0.00%
+ 518  vOTU11..SRR28004138..SRR28004138.bin.37.   86.67%    failed      0.00%
+ 519  IMGM3300048437.BIN173                      90.47%    failed      0.00%
+ 520  IMGM3300012952.BIN332                      91.83%    failed      0.00%
+ 521  IMGM3300032239.BIN230                      90.40%    failed      0.00%
+ 522  IMGM3300029268.BIN208                      85.14%    failed      0.00%
+ 523  IMGM3300046368.BIN301                      89.04%    failed      0.00%
+ 524  GVMAG-S-1021933-23                         92.40%    failed      0.00%
+ 525  IMGM3300020455.BIN811                      90.24%    failed      0.00%
+ 526  bin.3521                                   83.49%    failed      0.00%
+ 527  IMGM3300026483.BIN115                      89.89%    failed      0.00%
+ 528  bin.4990                                   87.07%    failed      0.00%
+ 529  bin.2374                                   83.13%    failed      0.00%
+ 530  bin.4633                                   85.17%    failed      0.00%
+ 531  IMGM3300027980.BIN196                      94.64%    failed      0.00%
+ 532  IMGM3300010368.BIN340                      90.31%    failed      0.00%
+ 533  IMGM3300043411.BIN864                      87.53%    failed      0.00%
+ 534  vOTU13..SRR28004137..SRR28004137.bin.11.   97.29%    failed      0.00%
+ 535  IMGM3300032132.BIN444                      86.46%    failed      0.00%
+ 536  bin.4490                                   89.88%    failed      0.00%
+ 537  IMGM3300009788.BIN339                      89.42%    failed      0.00%
+ 538  GVMAG-M-3300027708-5                       82.73%    failed      0.00%
+ 539  bin.3759                                   88.49%    failed      0.00%
+ 540  bin.3999                                   87.73%    failed      0.00%
+ 541  IMGM3300022836.BIN47                       92.81%    failed      0.00%
+ 542  Nama                                       86.10%    failed      0.00%
+ 543  IMGM3300042886.BIN269                      89.19%    failed      0.00%
+ 544  IMGM3300046746.BIN157                      84.60%    failed      0.00%
+ 545  IMGM3300028197.BIN218                      86.45%    failed      0.00%
+ 546  SRX559902-76                               89.20%    failed      0.00%
+ 547  TARA.PSE.NCLDV.00009                       90.71%    failed      0.00%
+ 548  GVMAG-S-1074260-58                         86.09%    failed      0.00%
+ 549  IMGM3300022752.BIN415                      91.14%    failed      0.00%
+ 550  ERX552270-51                               86.16%    failed      0.00%
+ 551  IMGM3300025138.BIN828                      94.22%    failed      0.00%
+ 552  IMGM3300021376.BIN1153                     86.67%    failed      0.00%
+ 553  IMGM3300024327.BIN533                      86.54%    failed      0.00%
+ 554  bin.6596                                   85.30%    failed      0.00%
+ 555  TARA.PSE.NCLDV.00002                       86.14%    failed      0.00%
+ 556  IMGM3300024327.BIN261                      88.05%    failed      0.00%
+ 557  IMGM3300031676.BIN102                      92.82%    failed      0.00%
+ 558  IMGM3300042355.BIN97                       89.16%    failed      0.00%
+ 559  IMGM3300046655.BIN263                      85.23%    failed      0.00%
+ 560  TARA.AON.NCLDV.00019                       87.84%    failed      0.00%
+ 561  IMGM3300011013.BIN398                      85.49%    failed      0.00%
+ 562  IMGM3300047357.BIN250                      87.18%    failed      0.00%
+ 563  GVMAG-M-3300014838-63                      92.37%    failed      0.00%
+ 564  GVMAG-S-1102237-47                         86.45%    failed      0.00%
+ 565  TARA.ARC.NCLDV.00104                       88.47%    failed      0.00%
+ 566  oPacV-421                                  86.21%    failed      0.00%
+ 567  bin.4830                                   85.70%    failed      0.00%
+ 568  PS401                                      91.72%    failed      0.00%
+ 569  TARA.SOC.NCLDV.00003                       93.40%    failed      0.00%
+ 570  IMGM3300012919.BIN190                      87.78%    failed      0.00%
+ 571  TARA.MED.NCLDV.00002                       90.95%    failed      0.00%
+ 572  LKH427.P07.Ci-128                          88.34%    failed      0.00%
+ 573  IMGM3300042313.BIN149                      95.49%    failed      0.00%
+ 574  TARA.ARC.NCLDV.00033                       86.68%    failed      0.00%
+ 575  IMGM3300041402.BIN230                      91.95%    failed      0.00%
+ 576  GVMAG-M-3300005613-55                      84.88%    failed      0.00%
+ 577  TARA.AOS.NCLDV.00025                       94.26%    failed      0.00%
+ 578  bin.4354                                   85.49%    failed      0.00%
+ 579  IMGM3300004773.BIN54                       86.26%    failed      0.00%
+ 580  IMGM3300004155.BIN19                       93.34%    failed      0.00%
+ 581  IMGM3300009161.BIN364                      86.99%    failed      0.00%
+ 582  IMGM3300013010.BIN256                      88.94%    failed      0.00%
+ 583  IMGM3300042140.BIN445                      91.19%    failed      0.00%
+ 584  GVMAG-M-3300009436-15                      87.01%    failed      0.00%
+ 585  IMGM3300022916.BIN834                      85.61%    failed      0.00%
+ 586  bin.5263                                   85.88%    failed      0.00%
+ 587  mPacV.611                                  86.50%    failed      0.00%
+ 588  bin.4057                                   85.41%    failed      0.00%
+ 589  IMGM3300042367.BIN116                      91.80%    failed      0.00%
+ 590  bin.3096                                   86.62%    failed      0.00%
+ 591  GVMAG-M-3300023179-27                      84.83%    failed      0.00%
+ 592  GVMAG-M-3300023179-119                     95.91%    failed      0.00%
+ 593  GVMAG-M-3300010158-36                      85.35%    failed      0.00%
+ 594  IMGM3300050355.BIN139                      95.61%    failed      0.00%
+ 595  vOTU03..SRR28004137..SRR28004137.bin.6.    82.82%    failed      0.00%
+ 596  IMGM3300035703.BIN1172                     88.69%    failed      0.00%
+ 597  TARA.MED.NCLDV.00047                       92.40%    failed      0.00%
+ 598  TARA.MED.NCLDV.00145                       92.49%    failed      0.00%
+ 599  IMGM3300018421.BIN198                      89.61%    failed      0.00%
+ 600  IMGM3300044630.BIN1891                     87.27%    failed      0.00%
+ 601  GVMAG-S-1062768-28                         88.36%    failed      0.00%
+ 602  IMGM3300010157.BIN106                      94.02%    failed      0.00%
+ 603  IMGM3300051209.BIN387                      96.73%    failed      0.12%
+ 604  bin.4309                                   84.69%    failed      0.00%
+ 605  ERX555933-5                                85.58%    failed      0.00%
+ 606  IMGM3300017986.BIN384                      85.26%    failed      0.00%
+ 607  IMGM3300020441.BIN38                       86.23%    failed      0.00%
+ 608  IMGM3300025596.BIN187                      92.34%    failed      0.00%
+ 609  bin.1620                                   85.55%    failed      0.00%
+ 610  IMGM3300035145.BIN336                      93.67%    failed      0.00%
+ 611  LCMAC201                                   87.80%    failed      0.00%
+ 612  bin.6974                                   86.50%    failed      0.00%
+ 613  bin.3915                                   91.20%    failed      0.00%
+ 614  TARA.MED.NCLDV.00041                       89.40%    failed      0.00%
+ 615  IMGM3300030119.BIN14                       85.54%    failed      0.00%
+ 616  bin.6708                                   85.49%    failed      0.00%
+ 617  bin.4189                                   89.01%    failed      0.00%
+ 618  IMGM3300002186.BIN113                      85.02%    failed      0.00%
+ 619  GVMAG-M-3300009182-9                       91.25%    failed      0.00%
+ 620  bin.5271                                   87.00%    failed      0.00%
+ 621  GVMAG-S-1041349-163                        88.34%    failed      0.00%
+ 622  bin.6621                                   85.66%    failed      0.00%
+ 623  TARA.MED.NCLDV.00049                       91.93%    failed      0.00%
+ 624  IMGM3300027503.BIN91                       86.11%    failed      0.00%
+ 625  bin.7080                                   90.47%    failed      0.00%
+ 626  IMGM3300026483.BIN142                      85.47%    failed      0.00%
+ 627  bin.4584                                   81.96%    failed      0.00%
+ 628  IMGM3300024991.BIN235                      87.93%    failed      0.00%
+ 629  TARA.PON.NCLDV.00017                       92.67%    failed      0.00%
+ 630  IMGM3300047354.BIN614                      95.26%    failed      0.00%
+ 631  IMGM3300032246.BIN288                      87.55%    failed      0.00%
+ 632  GVMAG-M-3300023174-131                     86.67%    failed      0.00%
+ 633  GCA.000839605-1.ViralProj14081             94.00%    failed      0.00%
+ 634  bin.3237                                   92.12%    failed      0.00%
+ 635  GVMAG-M-3300025880-76                      85.90%    failed      0.00%
+ 636  bin.3262                                   87.51%    failed      0.00%
+ 637  bin.3492                                   88.43%    failed      0.00%
+ 638  IMGM3300010883.BIN1732                     91.09%    failed      0.00%
+ 639  IMGM3300027339.BIN5                        92.91%    failed      0.00%
+ 640  IMGM3300025838.BIN399                      90.71%    failed      0.00%
+ 641  IMGM3300034066.BIN526                      92.20%    failed      0.00%
+ 642  IMGM3300044991.BIN725                      94.66%    failed      0.00%
+ 643  IMGM3300047994.BIN543                      85.14%    failed      0.00%
+ 644  bin.3218                                   85.79%    failed      0.00%
+ 645  IMGM3300014206.BIN5                        91.64%    failed      0.00%
+ 646  GVMAG-M-3300010368-17                      86.39%    failed      0.00%
+ 647  IMGM3300009436.BIN425                      85.93%    failed      0.00%
+ 648  ERX552261-23                               87.56%    failed      0.00%
+ 649  IMGM3300018416.BIN582                      85.88%    failed      0.00%
+ 650  bin.2495                                   95.64%    failed      0.00%
+ 651  bin.3667                                   85.14%    failed      0.00%
+ 652  IMGM3300018426.BIN705                      88.52%    failed      0.00%
+ 653  bin.3258                                   86.87%    failed      0.00%
+ 654  IMGM3300031966.BIN10                       93.79%    failed      0.00%
+ 655  SRX327520-331                              85.69%    failed      0.00%
+ 656  bin.1406                                   91.78%    failed      0.00%
+ 657  IMGM3300045993.BIN378                      85.83%    failed      0.00%
+ 658  IMGM3300032561.BIN12                       93.53%    failed      0.00%
+ 659  IMGM3300050206.BIN2316                     84.62%    failed      0.00%
+ 660  GVMAG-S-3300012000-62                      84.77%    failed      0.00%
+ 661  IMGM3300027896.BIN939                      88.35%    failed      0.00%
+ 662  GVMAG-S-ERX556045-52                       85.65%    failed      0.00%
+ 663  IMGM3300009085.BIN19                       96.41%    failed      0.00%
+ 664  IMGM3300009710.BIN127                      87.07%    failed      0.00%
+ 665  IMGM3300007072.BIN270                      89.86%    failed      0.00%
+ 666  IMGM3300027899.BIN421                      93.72%    failed      0.00%
+ 667  IMGM3300009497.BIN170                      86.00%    failed      0.00%
+ 668  IMGM3300006174.BIN74                       94.90%    failed      0.00%
+ 669  IMGM3300050212.BIN1713                     89.90%    failed      0.00%
+ 670  Scad                                       94.00%    failed      0.00%
+ 671  bin.2934                                   89.10%    failed      0.00%
+ 672  TARA.PON.NCLDV.00016                       88.66%    failed      0.00%
+ 673  bin.3684                                   90.09%    failed      0.00%
+ 674  IMGM3300027899.BIN341                      95.12%    failed      0.00%
+ 675  GVMAG-M-3300023179-92                      88.54%    failed      0.00%
+ 676  IMGM3300051198.BIN2448                     87.68%    failed      0.00%
+ 677  IMGM3300025138.BIN334                      92.99%    failed      0.00%
+ 678  GVMAG-M-3300023110-24                      86.70%    failed      0.00%
+ 679  IMGM3300010219.BIN14                       90.10%    failed      0.00%
+ 680  IMGM3300020421.BIN390                      87.30%    failed      0.00%
+ 681  GVMAG-M-3300002242-2                       84.92%    failed      0.00%
+ 682  IMGM3300043423.BIN125                      93.00%    failed      0.00%
+ 683  IMGS3300050407.BIN27                       90.18%    failed      0.00%
+ 684  IMGM3300009085.BIN113                      88.99%    failed      0.00%
+ 685  Marseillevirus.LCMAC102                    86.20%    failed      0.00%
+ 686  IMGM3300037317.BIN280                      90.12%    failed      0.00%
+ 687  IMGM3300029286.BIN1357                     91.89%    failed      0.00%
+ 688  IMGM3300032249.BIN187                      84.40%    failed      0.00%
+ 689  bin.2650                                   86.50%    failed      0.00%
+ 690  bin.6455                                   92.18%    failed      0.00%
+ 691  vOTU14..SRR28004151..SRR28004151.bin.1.    89.14%    failed      0.00%
+ 692  LKH577.P12.Am-4                            87.84%    failed      0.00%
+ 693  bin.1054                                   83.86%    failed      0.00%
+ 694  bin.6718                                   85.16%    failed      0.00%
+ 695  IMGM3300022935.BIN786                      87.01%    failed      0.00%
+ 696  IMGM3300046171.BIN828                      88.03%    failed      0.00%
+ 697  IMGM3300020165.BIN648                      85.90%    failed      0.00%
+ 698  IMGM3300009180.BIN193                      92.66%    failed      0.00%
+ 699  IMGM3300003430.BIN55                       90.60%    failed      0.00%
+ 700  IMGM3300020497.BIN37                       92.75%    failed      0.00%
+ 701  GVMAG-M-3300017987-33                      85.11%    failed      0.00%
+ 702  IMGM3300030231.BIN123                      87.56%    failed      0.00%
+ 703  bin.4971                                   87.17%    failed      0.00%
+ 704  GVMAG-M-3300018415-13                      91.72%    failed      0.00%
+ 705  IMGM3300017742.BIN316                      83.88%    failed      0.00%
+ 706  IMGM3300027890.BIN43                       90.20%    failed      0.00%
+ 707  IMGM3300032286.BIN160                      84.51%    failed      0.00%
+ 708  IMGM3300013285.BIN107                      87.37%    failed      0.00%
+ 709  bin.6688                                   92.72%    failed      0.00%
+ 710  SRX327520-18                               84.58%    failed      0.00%
+ 711  bin.1470                                   92.95%    failed      0.00%
+ 712  IMGM3300032287.BIN52                       90.49%    failed      0.00%
+ 713  LKH431.P08.Am-65                           88.17%    failed      0.00%
+ 714  IMGM3300024261.BIN417                      91.89%    failed      0.00%
+ 715  IMGM3300005613.BIN208                      89.60%    failed      0.00%
+ 716  bin.3537                                   85.36%    failed      0.00%
+ 717  bin.1739                                   81.58%    failed      0.00%
+ 718  IMGM3300020194.BIN66                       87.72%    failed      0.00%
+ 719  IMGM3300010334.BIN356                      92.73%    failed      0.00%
+ 720  IMGM3300009467.BIN229                      86.32%    failed      0.00%
+ 721  bin.7104                                   84.35%    failed      0.00%
+ 722  IMGM3300050249.BIN1282                     96.37%    failed      0.00%
+ 723  bin.6085                                   86.27%    failed      0.00%
+ 724  IMGM3300050207.BIN2361                     93.00%    failed      0.00%
+ 725  LKH577.P12.Am-72                           89.07%    failed      0.00%
+ 726  Rama                                       92.33%    failed      0.00%
+ 727  IMGM3300007522.BIN498                      91.89%    failed      0.00%
+ 728  IMGM3300043392.BIN298                      94.91%    failed      0.00%
+ 729  IMGM3300042562.BIN623                      86.71%    failed      0.00%
+ 730  IMGM3300049783.BIN1519                     92.29%    failed      0.00%
+ 731  TARA.AON.NCLDV.00001                       86.61%    failed      0.00%
+ 732  IMGM3300023174.BIN818                      84.04%    failed      0.00%
+ 733  IMGM3300043416.BIN145                      87.09%    failed      0.00%
+ 734  IMGM3300034111.BIN818                      91.91%    failed      0.00%
+ 735  IMGM3300009180.BIN410                      93.12%    failed      0.00%
+ 736  bin.1078                                   85.61%    failed      0.00%
+ 737  IMGM3300007519.BIN461                      88.59%    failed      0.00%
+ 738  bin.6731                                   89.66%    failed      0.00%
+ 739  TARA.ARC.NCLDV.00021                       85.25%    failed      0.00%
+ 740  IMGM3300028410.BIN150                      93.95%    failed      0.00%
+ 741  IMGM3300010158.BIN344                      83.55%    failed      0.00%
+ 742  IMGM3300020185.BIN1140                     86.48%    failed      0.00%
+ 743  bin.1008                                   85.60%    failed      0.00%
+ 744  TARA.PSE.NCLDV.00023                       93.11%    failed      0.00%
+ 745  IMGM3300036985.BIN986                      92.34%    failed      0.00%
+ 746  ERX552287-8                                85.30%    failed      0.00%
+ 747  bin.6736                                   84.61%    failed      0.00%
+ 748  TARA.SOC.NCLDV.00014                       93.18%    failed      0.00%
+ 749  IMGM3300051198.BIN614                      90.77%    failed      0.00%
+ 750  GVMAG-M-3300009169-13                      87.73%    failed      0.00%
+ 751  GVMAG-S-1101180-74                         85.31%    failed      0.00%
+ 752  IMGM3300028025.BIN641                      93.43%    failed      0.00%
+ 753  IMGM3300025695.BIN184                      83.90%    failed      0.00%
+ 754  bin.6290                                   83.43%    failed      0.00%
+ 755  IMGM3300042386.BIN115                      95.43%    failed      0.00%
+ 756  ERX552270-117                              88.60%    failed      0.00%
+ 757  GVMAG-M-3300023184-167                     86.29%    failed      0.00%
+ 758  IMGM3300025704.BIN722                      92.94%    failed      0.00%
+ 759  GVMAG-M-3300023179-114                     85.61%    failed      0.00%
+ 760  IMGM3300043465.BIN452                      86.25%    failed      0.00%
+ 761  bin.4698                                   85.13%    failed      0.00%
+ 762  IMGM3300032286.BIN273                      90.23%    failed      0.00%
+ 763  GVMAG-M-3300017788-2                       87.59%    failed      0.00%
+ 764  IMGM3300032324.BIN7                        89.24%    failed      0.00%
+ 765  IMGM3300020387.BIN89                       87.02%    failed      0.00%
+ 766  IMGM3300044957.BIN159                      86.68%    failed      0.00%
+ 767  IMGM3300025894.BIN810                      92.90%    failed      0.00%
+ 768  IMGM3300032073.BIN594                      93.92%    failed      0.00%
+ 769  IMGM3300035199.BIN1161                     86.26%    failed      0.00%
+ 770  IMGM3300041585.BIN157                      95.53%    failed      0.00%
+ 771  IMGM3300031519.BIN383                      90.11%    failed      0.00%
+ 772  IMGM3300033111.BIN162                      87.62%    failed      0.00%
+ 773  IMGM3300050184.BIN1849                     87.91%    failed      0.00%
+ 774  IMGM3300042197.BIN219                      87.32%    failed      0.00%
+ 775  IMGM3300017952.BIN591                      88.64%    failed      0.00%
+ 776  bin.2950                                   89.44%    failed      0.00%
+ 777  IMGM3300032282.BIN49                       87.28%    failed      0.00%
+ 778  IMGM3300004242.BIN69                       89.43%    failed      0.00%
+ 779  IMGM3300029908.BIN331                      88.82%    failed      0.00%
+ 780  GCA.900323535-1.PRJEB25578                 90.51%    failed      0.00%
+ 781  ERX552296-13                               88.25%    failed      0.00%
+ 782  GVMAG-M-3300020187-69                      84.75%    failed      0.00%
+ 783  IMGM3300009173.BIN65                       87.00%    failed      0.00%
+ 784  bin.4201                                   85.07%    failed      0.00%
+ 785  bin.1861                                   84.91%    failed      0.00%
+ 786  IMGM3300017741.BIN89                       89.83%    failed      0.00%
+ 787  IMGM3300017967.BIN132                      87.43%    failed      0.00%
+ 788  IMGM3300009467.BIN42                       88.84%    failed      0.00%
+ 789  IMGM3300020166.BIN507                      85.89%    failed      0.00%
+ 790  IMGM3300020165.BIN434                      85.61%    failed      0.00%
+ 791  IMGM3300027779.BIN460                      87.16%    failed      0.00%
+ 792  IMGM3300042563.BIN948                      85.05%    failed      0.00%
+ 793  IMGM3300024996.BIN263                      87.30%    failed      0.00%
+ 794  IMGM3300032269.BIN227                      91.83%    failed      0.00%
+ 795  IMGM3300008050.BIN139                      95.82%    failed      0.00%
+ 796  IMGM3300031519.BIN629                      85.28%    failed      0.00%
+ 797  bin.3780                                   84.55%    failed      0.00%
+ 798  bin.1037                                   89.72%    failed      0.00%
+ 799  ERX552270-55                               86.24%    failed      0.00%
+ 800  IMGM3300027744.BIN293                      86.45%    failed      0.00%
+ 801  IMGM3300035703.BIN2324                     84.82%    failed      0.00%
+ 802  IMGM3300034954.BIN165                      91.22%    failed      0.00%
+ 803  IMGM3300048547.BIN127                      95.26%    failed      0.00%
+ 804  IMGM3300032244.BIN34                       93.58%    failed      0.00%
+ 805  IMGS3300050407.BIN46                       92.70%    failed      0.00%
+ 806  IMGM3300017989.BIN674                      90.94%    failed      0.00%
+ 807  IMGM3300031224.BIN311                      88.58%    failed      0.00%
+ 808  IMGM3300010430.BIN1044                     89.31%    failed      0.00%
+ 809  IMGM3300025597.BIN265                      93.02%    failed      0.00%
+ 810  LCMiAC02                                   88.39%    failed      0.00%
+ 811  IMGM3300010334.BIN321                      82.61%    failed      0.00%
+ 812  IMGM3300027899.BIN250                      93.60%    failed      0.00%
+ 813  bin.5122                                   85.47%    failed      0.00%
+ 814  bin.6867                                   95.35%    failed      0.00%
+ 815  TARA.PSW.NCLDV.00031                       92.96%    failed      0.00%
+ 816  TARA.AOS.NCLDV.00004                       88.42%    failed      0.00%
+ 817  IMGM3300035703.BIN1193                     92.68%    failed      0.00%
+ 818  IMGM3300017987.BIN512                      90.32%    failed      0.00%
+ 819  LKH583.P13.Ci-71                           93.94%    failed      0.00%
+ 820  IMGM3300020595.BIN622                      84.98%    failed      0.00%
+ 821  IMGM3300044701.BIN301                      95.60%    failed      0.00%
+ 822  LKH483.P10.Am-11                           92.49%    failed      0.00%
+ 823  IMGM3300042394.BIN109                      92.08%    failed      0.00%
+ 824  bin.2662                                   87.06%    failed      0.00%
+ 825  IMGM3300034357.BIN532                      84.78%    failed      0.00%
+ 826  IMGM3300014050.BIN473                      86.68%    failed      0.00%
+ 827  IMGM3300022752.BIN828                      90.20%    failed      0.00%
+ 828  Plc8                                       92.99%    failed      0.00%
+ 829  IMGM3300042355.BIN184                      88.54%    failed      0.00%
+ 830  IMGM3300046532.BIN1103                     87.38%    failed      0.00%
+ 831  TARA.MED.NCLDV.00097                       90.55%    failed      0.00%
+ 832  GVMAG-S-1037377-56                         85.15%    failed      0.00%
+ 833  IMGM3300010430.BIN2907                     87.66%    failed      0.00%
+ 834  LKH577.P12.Am-223                          83.69%    failed      0.00%
+ 835  IMGM3300004112.BIN104                      92.81%    failed      0.00%
+ 836  Pithovirus.LCPAC403                        88.45%    failed      0.00%
+ 837  GCA.004151645-1.ASM415164v1                85.36%    failed      0.00%
+ 838  IMGM3300025141.BIN1048                     96.60%    failed      0.00%
+ 839  IMGM3300046733.BIN256                      86.82%    failed      0.00%
+ 840  bin.1068                                   85.73%    failed      0.00%
+ 841  IMGM3300050181.BIN439                      92.10%    failed      0.00%
+ 842  GVMAG-S-1101174-64                         85.40%    failed      0.00%
+ 843  bin.6957                                   87.36%    failed      0.00%
+ 844  IMGM3300009185.BIN240                      87.27%    failed      0.00%
+ 845  bin.6851                                   84.74%    failed      0.00%
+ 846  IMGM3300000172.BIN47                       92.41%    failed      0.00%
+ 847  vOTU01..SRR28004148..SRR28004148.bin.1.    87.84%    failed      0.00%
+ 848  bin.1424                                   86.95%    failed      0.00%
+ 849  IMGM3300047546.BIN251                      90.55%    failed      0.00%
+ 850  GVMAG-M-3300023109-37                      86.35%    failed      0.00%
+ 851  bin.4073                                   87.22%    failed      0.00%
+ 852  IMGM3300036768.BIN847                      90.65%    failed      0.00%
+ 853  IMGM3300047294.BIN183                      93.90%    failed      0.00%
+ 854  IMGM3300022939.BIN813                      86.75%    failed      0.00%
+ 855  TARA.ION.NCLDV.00003                       94.81%    failed      0.00%
+ 856  IMGM3300040806.BIN788                      84.50%    failed      0.00%
+ 857  IMGM3300022865.BIN102                      86.39%    failed      0.00%
+ 858  IMGM3300050206.BIN2131                     86.23%    failed      0.00%
+ 859  TARA.MED.NCLDV.00017                       86.72%    failed      0.00%
+ 860  LKH583.P13.Ci-86                           89.84%    failed      0.00%
+ 861  IMGM3300027689.BIN310                      96.32%    failed      0.00%
+ 862  IMGM3300025121.BIN286                      95.54%    failed      0.00%
+ 863  TARA.ARC.NCLDV.00059                       86.32%    failed      0.00%
+ 864  vOTU04..SRR34748664..SRR34748664.bin.2.    85.87%    failed      0.00%
+ 865  IMGM3300027779.BIN408                      87.90%    failed      0.00%
+ 866  bin.1568                                   89.77%    failed      0.00%
+ 867  TARA.PSE.NCLDV.00021                       91.59%    failed      0.00%
+ 868  IMGM3300037343.BIN300                      89.68%    failed      0.00%
+ 869  IMGM3300050354.BIN264                      92.30%    failed      0.00%
+ 870  IMGM3300034790.BIN173                      95.49%    failed      0.00%
+ 871  IMGM3300037328.BIN5                        88.23%    failed      0.00%
+ 872  bin.6593                                   86.02%    failed      0.00%
+ 873  bin.2875                                   84.27%    failed      0.00%
+ 874  GVMAG-M-3300012920-30                      92.20%    failed      0.00%
+ 875  TARA.ARC.NCLDV.00180                       94.06%    failed      0.00%
+ 876  GVMAG-M-3300022752-26                      96.59%    failed      0.00%
+ 877  TARA.ARC.NCLDV.00007                       85.93%    failed      0.00%
+ 878  IMGM3300023174.BIN990                      85.62%    failed      0.00%
+ 879  TARA.MED.NCLDV.00021                       86.11%    failed      0.00%
+ 880  bin.1642                                   84.80%    failed      0.00%
+ 881  GCA.009909525-1.ASM990952v1                93.25%    failed      0.00%
+ 882  IMGM3300042860.BIN738                      89.57%    failed      0.00%
+ 883  TARA.AON.NCLDV.00026                       94.06%    failed      0.00%
+ 884  TARA.MED.NCLDV.00121                       93.71%    failed      0.00%
+ 885  IMGM3300032289.BIN205                      87.46%    failed      0.00%
+ 886  LKH426.P07.Ci-304                          93.24%    failed      0.00%
+ 887  LCPAC001                                   93.23%    failed      0.00%
+ 888  IMGM3300025590.BIN441                      94.92%    failed      0.00%
+ 889  IMGM3300031576.BIN1299                     91.23%    failed      0.00%
+ 890  IMGM3300010334.BIN534                      85.65%    failed      0.00%
+ 891  IMGM3300047550.BIN436                      86.16%    failed      0.00%
+ 892  GVMAG-S-1030632-69                         84.55%    failed      0.00%
+ 893  IMGM3300023179.BIN729                      86.85%    failed      0.00%
+ 894  IMGM3300010883.BIN1413                     94.04%    failed      0.00%
+ 895  IMGM3300004687.BIN15                       94.06%    failed      0.00%
+ 896  IMGS3300051434.BIN54                       89.30%    failed      0.00%
+ 897  IMGM3300009703.BIN47                       84.69%    failed      0.00%
+ 898  IMGM3300012936.BIN102                      86.02%    failed      0.00%
+ 899  bin.5880                                   92.85%    failed      0.00%
+ 900  IMGM3300042922.BIN71                       88.79%    failed      0.00%
+ 901  IMGM3300009182.BIN332                      87.58%    failed      0.00%
+ 902  IMGM3300009496.BIN20                       86.32%    failed      0.00%
+ 903  IMGM3300035703.BIN1269                     85.92%    failed      0.00%
+ 904  IMGM3300010368.BIN342                      88.51%    failed      0.00%
+ 905  IMGM3300023174.BIN1812                     96.37%    failed      0.00%
+ 906  IMGM3300020207.BIN884                      86.71%    failed      0.00%
+ 907  IMGM3300005961.BIN132                      91.01%    failed      0.00%
+ 908  bin.6022                                   91.98%    failed      0.00%
+ 909  IMGM3300046317.BIN52                       86.21%    failed      0.00%
+ 910  IMGM3300013123.BIN67                       86.93%    failed      0.00%
+ 911  IMGM3300018868.BIN484                      87.44%    failed      0.00%
+ 912  GVMAG-S-1035112-32                         83.17%    failed      0.00%
+ 913  IMGM3300033495.BIN262                      87.59%    failed      0.00%
+ 914  IMGM3300051198.BIN2392                     91.95%    failed      0.00%
+ 915  IMGM3300050206.BIN2483                     90.44%    failed      0.00%
+ 916  bin.7114                                   94.90%    failed      0.00%
+ 917  IMGM3300014819.BIN114                      90.10%    failed      0.00%
+ 918  bin.4796                                   90.97%    failed      0.00%
+ 919  IMGM3300013094.BIN267                      91.61%    failed      0.00%
+ 920  IMGM3300020408.BIN365                      88.43%    failed      0.00%
+ 921  IMGM3300017783.BIN270                      88.16%    failed      0.00%
+ 922  IMGM3300007074.BIN161                      85.88%    failed      0.00%
+ 923  IMGM3300009786.BIN154                      89.63%    failed      0.00%
+ 924  IMGM3300044535.BIN1034                     87.06%    failed      0.00%
+ 925  bin.3981                                   87.32%    failed      0.00%
+ 926  IMGM3300037010.BIN573                      94.20%    failed      0.00%
+ 927  IMGM3300032224.BIN188                      84.71%    failed      0.00%
+ 928  IMGM3300014818.BIN84                       89.52%    failed      0.00%
+ 929  IMGM3300032722.BIN405                      89.60%    failed      0.00%
+ 930  bin.1010                                   90.28%    failed      0.00%
+ 931  TARA.PSW.NCLDV.00049                       93.35%    failed      0.00%
+ 932  bin.1206                                   92.83%    failed      0.00%
+ 933  IMGM3300013006.BIN390                      82.38%    failed      0.00%
+ 934  bin.6378                                   85.45%    failed      0.00%
+ 935  IMGM3300028569.BIN314                      86.99%    failed      0.00%
+ 936  GVMAG-M-3300024258-14                      83.46%    failed      0.00%
+ 937  GVMAG-M-3300009155-19                      86.31%    failed      0.00%
+ 938  IMGM3300009182.BIN321                      97.01%    failed      0.03%
+ 939  IMGM3300045541.BIN65                       95.96%    failed      0.00%
+ 940  bin.6126                                   85.61%    failed      0.00%
+ 941  IMGM3300051198.BIN2407                     84.09%    failed      0.00%
+ 942  IMGM3300037245.BIN518                      91.76%    failed      0.00%
+ 943  GVMAG-M-3300022752-94                      94.47%    failed      0.00%
+ 944  IMGS3300050435.BIN3                        91.96%    failed      0.00%
+ 945  IMGM3300017967.BIN609                      92.19%    failed      0.00%
+ 946  LKH578.P12.Am-115                          92.31%    failed      0.00%
+ 947  GVMAG-M-3300023112-4                       82.04%    failed      0.00%
+ 948  TARA.MED.NCLDV.00085                       91.93%    failed      0.00%
+ 949  TARA.PSE.NCLDV.00008                       90.17%    failed      0.00%
+ 950  GVMAG-M-3300021364-5                       93.71%    failed      0.00%
+ 951  bin.1793                                   85.15%    failed      0.00%
+ 952  IMGM3300042562.BIN491                      86.63%    failed      0.00%
+ 953  bin.1079                                   84.79%    failed      0.00%
+ 954  bin.1550                                   84.93%    failed      0.00%
+ 955  IMGM3300017963.BIN244                      89.42%    failed      0.00%
+ 956  Drel                                       84.82%    failed      0.00%
+ 957  IMGM3300009071.BIN47                       90.24%    failed      0.00%
+ 958  IMGM3300051383.BIN147                      92.64%    failed      0.00%
+ 959  IMGM3300004273.BIN89                       89.77%    failed      0.00%
+ 960  bin.3055                                   91.18%    failed      0.00%
+ 961  IMGM3300000576.BIN301                      94.85%    failed      0.00%
+ 962  IMGM3300050206.BIN2034                     89.24%    failed      0.00%
+ 963  LKH583.P13.Ci-162                          87.32%    failed      0.00%
+ 964  IMGM3300029286.BIN1227                     88.94%    failed      0.00%
+ 965  IMGM3300024259.BIN766                      84.16%    failed      0.00%
+ 966  IMGS3300042691.BIN1443                     83.26%    failed      0.00%
+ 967  bin.3727                                   84.41%    failed      0.00%
+ 968  bin.3956                                   91.64%    failed      0.00%
+ 969  IMGM3300050671.BIN379                      87.45%    failed      0.00%
+ 970  TARA.MED.NCLDV.00111                       90.72%    failed      0.00%
+ 971  IMGM3300040815.BIN264                      96.24%    failed      0.00%
+ 972  TARA.MED.NCLDV.00117                       95.45%    failed      0.00%
+ 973  IMGM3300040815.BIN900                      87.28%    failed      0.00%
+ 974  IMGM3300010883.BIN2496                     86.24%    failed      0.00%
+ 975  IMGM3300021444.BIN34                       90.17%    failed      0.00%
+ 976  IMGM3300035069.BIN95                       95.28%    failed      0.00%
+ 977  ERX552270-108                              85.85%    failed      0.00%
+ 978  IMGM3300051374.BIN139                      94.38%    failed      0.00%
+ 979  IMGM3300047458.BIN69                       91.17%    failed      0.00%
+ 980  bin.6261                                   96.26%    failed      0.00%
+ 981  IMGM3300032286.BIN197                      87.34%    failed      0.00%
+ 982  IMGM3300025154.BIN979                      87.02%    failed      0.00%
+ 983  bin.3382                                   89.50%    failed      0.00%
+ 984  bin.1439                                   91.47%    failed      0.00%
+ 985  bin.6606                                   86.55%    failed      0.00%
+ 986  IMGM3300023210.BIN92                       88.68%    failed      0.00%
+ 987  TARA.ARC.NCLDV.00045                       86.37%    failed      0.00%
+ 988  IMGM3300017971.BIN805                      90.83%    failed      0.00%
+ 989  bin.6059                                   94.73%    failed      0.00%
+ 990  bin.2733                                   87.08%    failed      0.00%
+ 991  bin.4471                                   89.81%    failed      0.00%
+ 992  bin.2265                                   85.75%    failed      0.00%
+ 993  IMGM3300013126.BIN744                      91.75%    failed      0.00%
+ 994  IMGM3300034105.BIN948                      91.32%    failed      0.00%
+ 995  bin.3801                                   88.79%    failed      0.00%
+ 996  IMGM3300005861.BIN65                       95.93%    failed      0.00%
+ 997  IMGM3300009436.BIN179                      85.86%    failed      0.00%
+ 998  IMGM3300026007.BIN80                       91.50%    failed      0.00%
+ 999  GVMAG-M-3300009151-44                      81.65%    failed      0.00%
+1000  GVMAG-S-1102238-66                         85.92%    failed      0.00%
+1001  GVMAG-S-ERX555907-102                      84.14%    failed      0.00%
+1002  GCA.000922335-1.ViralProj258005            86.68%    failed      0.00%
+1003  IMGM3300040816.BIN114                      85.87%    failed      0.00%
+1004  ERX552270-89                               87.83%    failed      0.00%
+1005  GCA.006451655-1.ASM645165v1                94.11%    failed      0.00%
+1006  IMGM3300050184.BIN573                      95.12%    failed      0.00%
+1007  bin.5417                                   88.99%    failed      0.00%
+1008  IMGM3300012954.BIN172                      88.33%    failed      0.00%
+1009  IMGM3300025137.BIN379                      87.82%    failed      0.00%
+1010  IMGM3300028189.BIN26                       87.41%    failed      0.00%
+1011  IMGM3300025138.BIN742                      91.01%    failed      0.00%
+1012  IMGM3300028833.BIN1971                     85.52%    failed      0.00%
+1013  LKH583.P13.Ci-128                          87.44%    failed      0.00%
+1014  IMGM3300018080.BIN798                      90.41%    failed      0.00%
+1015  bin.4001                                   87.45%    failed      0.00%
+1016  IMGM3300050213.BIN996                      93.47%    failed      0.00%
+1017  IMGM3300017967.BIN213                      89.06%    failed      0.00%
+1018  IMGM3300025311.BIN31                       89.12%    failed      0.00%
+1019  IMGM3300009441.BIN227                      91.60%    failed      0.00%
+1020  IMGM3300032117.BIN132                      86.84%    failed      0.00%
+1021  LCPAC103                                   88.05%    failed      0.00%
+1022  oPacV-662                                  86.50%    failed      0.00%
+1023  ERX552244-11                               85.30%    failed      0.00%
+1024  IMGM3300032073.BIN1196                     86.19%    failed      0.00%
+1025  IMGM3300035183.BIN789                      96.55%    failed      0.00%
+1026  bin.5135                                   96.47%    failed      0.00%
+1027  IMGM3300021375.BIN614                      93.09%    failed      0.00%
+1028  bin.6357                                   89.05%    failed      0.00%
+1029  IMGM3300042369.BIN185                      87.09%    failed      0.00%
+1030  IMGM3300009684.BIN78                       90.33%    failed      0.00%
+1031  SRX802073-99                               87.03%    failed      0.00%
+1032  IMGM3300005613.BIN109                      84.87%    failed      0.00%
+1033  GVMAG-M-3300013004-50                      84.04%    failed      0.00%
+1034  TARA.SOC.NCLDV.00010                       93.65%    failed      0.00%
+1035  IMGM3300020185.BIN453                      86.18%    failed      0.00%
+1036  GVMAG-M-3300023184-38                      85.47%    failed      0.00%
+1037  GVMAG-S-1017745-26                         91.09%    failed      0.00%
+1038  IMGM3300044527.BIN428                      93.43%    failed      0.00%
+1039  GVMAG-M-3300023179-71                      85.60%    failed      0.00%
+1040  GVMAG-M-3300023179-62                      87.95%    failed      0.00%
+1041  bin.3670                                   87.71%    failed      0.00%
+1042  TARA.MED.NCLDV.00089                       93.39%    failed      0.00%
+1043  GCA.004788555-1.ASM478855v1                87.23%    failed      0.00%
+1044  IMGM3300046331.BIN136                      96.27%    failed      0.00%
+1045  IMGM3300014491.BIN126                      89.88%    failed      0.00%
+1046  TARA.ARC.NCLDV.00001                       85.52%    failed      0.00%
+1047  IMGM3300033555.BIN26                       88.27%    failed      0.00%
+1048  IMGM3300023174.BIN1004                     86.07%    failed      0.00%
+1049  TARA.ARC.NCLDV.00003                       86.23%    failed      0.00%
+1050  TARA.AOS.NCLDV.00010                       91.25%    failed      0.00%
+1051  ERX556315-47                               80.95%    failed      0.00%
+1052  vOTU08..SRR28004139..SRR28004139.bin.22.   85.38%    failed      0.00%
+1053  IMGM3300027807.BIN258                      85.37%    failed      0.00%
+1054  IMGM3300023174.BIN1490                     85.57%    failed      0.00%
+1055  bin.1617                                   85.00%    failed      0.00%
+1056  LCDPAC01                                   93.52%    failed      0.00%
+1057  IMGM3300050358.BIN165                      92.38%    failed      0.00%
+1058  IMGM3300031216.BIN143                      85.58%    failed      0.00%
+1059  IMGM3300005584.BIN156                      93.54%    failed      0.00%
+1060  bin.1723                                   85.92%    failed      0.00%
+1061  IMGM3300045855.BIN32                       84.34%    failed      0.00%
+1062  IMGM3300013004.BIN179                      89.65%    failed      0.00%
+1063  ERX552255-64                               86.76%    failed      0.00%
+1064  TARA.PON.NCLDV.00014                       89.87%    failed      0.00%
+1065  IMGM3300032320.BIN388                      92.15%    failed      0.00%
+1066  IMGM3300005838.BIN124                      85.63%    failed      0.00%
+1067  bin.3095                                   87.58%    failed      0.00%
+1068  GCA.002966255-1.ASM296625v1                84.56%    failed      0.00%
+1069  IMGM3300014818.BIN188                      90.91%    failed      0.00%
+1070  IMGM3300037300.BIN52                       96.84%    failed      0.00%
+1071  IMGM3300025138.BIN618                      92.00%    failed      0.00%
+1072  TARA.PSW.NCLDV.00025                       84.87%    failed      0.00%
+1073  GVMAG-M-3300023179-108                     87.08%    failed      0.00%
+1074  IMGM3300030231.BIN129                      94.16%    failed      0.00%
+1075  IMGM3300023179.BIN1357                     83.57%    failed      0.00%
+1076  bin.4359                                   90.55%    failed      0.00%
+1077  IMGM3300044723.BIN279                      95.03%    failed      0.00%
+1078  IMGM3300023174.BIN1914                     85.58%    failed      0.00%
+1079  cPacV.1605                                 85.85%    failed      0.00%
+1080  IMGS3300042691.BIN840                      93.94%    failed      0.00%
+1081  IMGM3300027732.BIN623                      90.79%    failed      0.00%
+1082  ERX552270-68                               87.56%    failed      0.00%
+1083  IMGM3300017963.BIN910                      87.22%    failed      0.00%
+1084  IMGM3300017963.BIN272                      89.07%    failed      0.00%
+1085  TARA.PSW.NCLDV.00065                       86.43%    failed      0.00%
+1086  IMGM3300017967.BIN619                      86.73%    failed      0.00%
+1087  bin.1759                                   83.31%    failed      0.00%
+1088  bin.4007                                   86.03%    failed      0.00%
+1089  IMGM3300050207.BIN2276                     86.94%    failed      0.00%
+1090  bin.4384                                   87.41%    failed      0.00%
+1091  ERX552270-42                               85.66%    failed      0.00%
+1092  TARA.PSW.NCLDV.00019                       85.81%    failed      0.00%
+1093  IMGM3300021516.BIN123                      92.05%    failed      0.00%
+1094  GCA.000923155-1.ViralProj253719            88.04%    failed      0.00%
+1095  TARA.PSW.NCLDV.00022                       90.81%    failed      0.00%
+1096  bin.3857                                   87.78%    failed      0.00%
+1097  IMGM3300021964.BIN562                      90.12%    failed      0.00%
+1098  IMGM3300032331.BIN349                      85.02%    failed      0.00%
+1099  IMGM3300031563.BIN90                       91.01%    failed      0.00%
+1100  bin.4477                                   86.87%    failed      0.00%
+1101  IMGM3300002092.BIN123                      91.40%    failed      0.00%
+1102  IMGM3300005294.BIN93                       89.13%    failed      0.00%
+1103  bin.2682                                   87.10%    failed      0.00%
+1104  TARA.ARC.NCLDV.00069                       86.73%    failed      0.00%
+1105  IMGM3300042562.BIN322                      86.61%    failed      0.00%
+1106  GVMAG-S-1101172-89                         83.04%    failed      0.00%
+1107  TARA.ARC.NCLDV.00079                       87.90%    failed      0.00%
+1108  IMGM3300043570.BIN700                      87.19%    failed      0.00%
+1109  IMGM3300021375.BIN206                      89.95%    failed      0.00%
+1110  bin.3802                                   91.67%    failed      0.00%
+1111  IMGM3300008012.BIN129                      90.57%    failed      0.00%
+1112  IMGM3300022539.BIN478                      92.25%    failed      0.00%
+1113  IMGM3300031785.BIN255                      88.93%    failed      0.00%
+1114  IMGM3300020477.BIN665                      91.23%    failed      0.00%
+1115  LKH583.P13.Ci-89                           94.79%    failed      0.00%
+1116  IMGM3300015194.BIN124                      96.06%    failed      0.00%
+1117  IMGM3300047353.BIN274                      90.61%    failed      0.00%
+1118  vOTU10..SRR28004148..SRR28004148.bin.93.   90.16%    failed      0.00%
+1119  IMGM3300032249.BIN253                      88.86%    failed      0.00%
+1120  TARA.PSW.NCLDV.00016                       88.31%    failed      0.00%
+1121  IMGM3300025597.BIN105                      92.96%    failed      0.00%
+1122  ERX555967-32                               93.22%    failed      0.00%
+1123  IMGM3300001349.BIN355                      84.46%    failed      0.00%
+1124  IMGM3300043395.BIN303                      90.66%    failed      0.00%
+1125  TARA.MED.NCLDV.00124                       91.42%    failed      0.00%
+1126  IMGM3300028197.BIN338                      85.79%    failed      0.00%
+1127  IMGM3300023179.BIN880                      85.72%    failed      0.00%
+1128  GVMAG-M-3300012954-26                      87.35%    failed      0.00%
+1129  IMGM3300047376.BIN287                      86.43%    failed      0.00%
+1130  GVMAG-M-3300009706-33                      90.23%    failed      0.00%
+1131  GVMAG-M-3300018080-53                      89.83%    failed      0.00%
+1132  TARA.AOS.NCLDV.00001                       85.66%    failed      0.00%
+1133  GVMAG-M-3300023184-77                      84.70%    failed      0.00%
+1134  IMGM3300050244.BIN1163                     85.59%    failed      0.00%
+1135  GVMAG-M-3300021389-12                      90.51%    failed      0.00%
+1136  IMGM3300032319.BIN110                      85.54%    failed      0.00%
+1137  ERX552297-51                               85.74%    failed      0.00%
+1138  IMGM3300025466.BIN68                       93.93%    failed      0.00%
+1139  IMGM3300027749.BIN582                      86.63%    failed      0.00%
+1140  IMGM3300008255.BIN753                      90.18%    failed      0.00%
+1141  bin.3933                                   83.35%    failed      0.00%
+1142  IMGM3300042539.BIN173                      87.32%    failed      0.00%
+1143  IMGM3300009702.BIN110                      86.22%    failed      0.00%
+1144  IMGM3300032132.BIN151                      86.36%    failed      0.00%
+1145  IMGM3300045855.BIN25                       89.00%    failed      0.00%
+1146  GVMAG-S-1059906-5                          84.77%    failed      0.00%
+1147  LKH217.P03.Ci-2                            91.33%    failed      0.00%
+1148  GVMAG-M-3300020165-43                      84.75%    failed      0.00%
+1149  GVMAG-S-ERX555954-49                       88.51%    failed      0.00%
+1150  IMGM3300013093.BIN306                      88.45%    failed      0.00%
+1151  TARA.PSW.NCLDV.00028                       92.72%    failed      0.00%
+1152  bin.7094                                   86.31%    failed      0.00%
+1153  IMGM3300044997.BIN87                       90.76%    failed      0.00%
+1154  IMGM3300021365.BIN165                      92.29%    failed      0.00%
+1155  ERX552302-47                               85.34%    failed      0.00%
+1156  bin.1443                                   84.62%    failed      0.00%
+1157  IMGM3300046335.BIN11                       85.82%    failed      0.00%
+1158  TARA.PSW.NCLDV.00035                       90.03%    failed      0.00%
+1159  IMGM3300045971.BIN640                      95.12%    failed      0.00%
+1160  IMGM3300045973.BIN163                      92.95%    failed      0.00%
+1161  SRX802189-61                               88.73%    failed      0.00%
+1162  IMGM3300050674.BIN93                       91.92%    failed      0.00%
+1163  IMGM3300009159.BIN633                      90.94%    failed      0.00%
+1164  ERX555931-51                               93.04%    failed      0.00%
+1165  IMGM3300012000.BIN399                      85.95%    failed      0.00%
+1166  IMGM3300032268.BIN131                      86.61%    failed      0.00%
+1167  IMGM3300018080.BIN727                      85.33%    failed      0.00%
+1168  bin.4278                                   85.37%    failed      0.00%
+1169  IMGM3300002502.BIN541                      86.77%    failed      0.00%
+1170  IMGM3300005286.BIN176                      90.12%    failed      0.00%
+1171  IMGM3300049215.BIN985                      89.08%    failed      0.00%
+1172  bin.3637                                   94.17%    failed      0.00%
+1173  ERX552244-9                                87.27%    failed      0.00%
+1174  IMGM3300025880.BIN574                      89.04%    failed      0.00%
+1175  TARA.PSW.NCLDV.00024                       86.89%    failed      0.00%
+1176  bin.3331                                   84.47%    failed      0.00%
+1177  IMGM3300023178.BIN703                      89.37%    failed      0.00%
+1178  bin.6620                                   88.91%    failed      0.00%
+1179  bin.2989                                   91.73%    failed      0.00%
+1180  IMGM3300017742.BIN315                      92.78%    failed      0.00%
+1181  bin.2670                                   82.22%    failed      0.00%
+1182  GCA.000881595-1.ViralProj32133             93.66%    failed      0.00%
+1183  IMGM3300009084.BIN628                      88.57%    failed      0.00%
+1184  bin.3532                                   88.68%    failed      0.00%
+1185  IMGM3300032314.BIN98                       95.85%    failed      0.00%
+1186  IMGM3300021389.BIN488                      96.04%    failed      0.00%
+1187  IMGM3300013132.BIN991                      93.89%    failed      0.00%
+1188  IMGM3300036716.BIN483                      86.09%    failed      0.00%
+1189  IMGM3300021091.BIN233                      86.41%    failed      0.00%
+1190  IMGM3300042451.BIN773                      89.41%    failed      0.00%
+1191  TARA.AON.NCLDV.00002                       87.97%    failed      0.00%
+1192  IMGM3300037161.BIN369                      94.63%    failed      0.00%
+1193  GCA.001654305-1.ViralProj323872            87.77%    failed      0.00%
+1194  IMGM3300014959.BIN74                       86.61%    failed      0.00%
+1195  IMGM3300041997.BIN35                       96.92%    failed      0.00%
+1196  bin.1506                                   91.85%    failed      0.00%
+1197  IMGM3300022752.BIN702                      86.84%    failed      0.00%
+1198  bin.2340                                   92.21%    failed      0.00%
+1199  IMGM3300021389.BIN566                      87.19%    failed      0.00%
+1200  bin.3693                                   85.83%    failed      0.00%
+1201  ChoanoV.1                                  85.08%    failed      0.00%
+1202  bin.4553                                   91.10%    failed      0.00%
+1203  IMGM3300021185.BIN255                      86.26%    failed      0.00%
+1204  IMGM3300042899.BIN602                      92.23%    failed      0.00%
+1205  GVMAG-S-3300013131-119                     84.91%    failed      0.00%
+1206  GVMAG-M-3300017967-22                      83.12%    failed      0.00%
+1207  IMGM3300018868.BIN503                      86.93%    failed      0.00%
+1208  GVMAG-S-3300012000-65                      87.78%    failed      0.00%
+1209  IMGM3300020185.BIN384                      87.11%    failed      0.00%
+1210  bin.4872                                   82.68%    failed      0.00%
+1211  IMGM3300018868.BIN368                      95.99%    failed      0.00%
+1212  IMGM3300051209.BIN411                      92.51%    failed      0.00%
+1213  TARA.PON.NCLDV.00031                       98.57%    passed     58.16%
+1214  vOTU12..SRR28004154..SRR28004154.bin.8.    86.12%    failed      0.00%
+1215  bin.6581                                   86.50%    failed      0.00%
+1216  LKH426.P07.Ci-278                          88.14%    failed      0.00%
+1217  TARA.ARC.NCLDV.00010                       86.98%    failed      0.00%
+1218  IMGM3300023174.BIN1847                     85.46%    failed      0.00%
+1219  IMGM3300025164.BIN315                      93.85%    failed      0.00%
+1220  GVMAG-M-3300024261-37                      84.96%    failed      0.00%
+1221  IMGM3300025767.BIN651                      93.00%    failed      0.00%
+1222  IMGM3300025470.BIN4                        92.32%    failed      0.00%
+1223  bin.2212                                   94.29%    failed      0.00%
+1224  GVMAG-M-3300017963-43                      83.63%    failed      0.00%
+1225  IMGM3300042465.BIN771                      88.44%    failed      0.00%
+1226  SRX802143-100                              83.39%    failed      0.00%
+1227  IMGM3300037492.BIN109                      93.78%    failed      0.00%
+1228  IMGM3300006125.BIN26                       91.76%    failed      0.00%
+1229  IMGM3300046018.BIN306                      89.12%    failed      0.00%
+1230  IMGM3300020201.BIN631                      84.28%    failed      0.00%
+1231  TARA.MED.NCLDV.00015                       90.39%    failed      0.00%
+1232  bin.4902                                   87.63%    failed      0.00%
+1233  bin.4205                                   90.43%    failed      0.00%
+1234  IMGM3300025894.BIN851                      88.12%    failed      0.00%
+1235  IMGS3300050451.BIN2                        91.14%    failed      0.00%
+1236  TARA.PON.NCLDV.00007                       86.20%    failed      0.00%
+1237  LKH426.P07.Ci-727                          92.90%    failed      0.00%
+1238  IMGM3300050208.BIN1585                     90.62%    failed      0.00%
+1239  IMGM3300004128.BIN76                       90.75%    failed      0.00%
+1240  IMGM3300050183.BIN856                      90.36%    failed      0.00%
+1241  bin.6191                                   92.86%    failed      0.00%
+1242  IMGM3300025018.BIN574                      88.19%    failed      0.00%
+1243  GCA.011604445-1.ASM1160444v1               84.42%    failed      0.00%
+1244  IMGM3300004770.BIN246                      87.83%    failed      0.00%
+1245  GVMAG-M-3300020187-47                      85.95%    failed      0.00%
+1246  IMGM3300050246.BIN70                       83.47%    failed      0.00%
+1247  IMGM3300032138.BIN90                       85.89%    failed      0.00%
+1248  ERX555933-51                               84.31%    failed      0.00%
+1249  IMGM3300042939.BIN508                      92.36%    failed      0.00%
+1250  GVMAG-S-3300013006-138                     86.66%    failed      0.00%
+1251  TARA.PON.NCLDV.00057                       96.67%    failed      0.00%
+1252  IMGM3300009703.BIN597                      90.72%    failed      0.00%
+1253  bin.4271                                   83.94%    failed      0.00%
+1254  bin.5177                                   89.76%    failed      0.00%
+1255  IMGM3300040810.BIN95                       93.08%    failed      0.00%
+1256  GVMAG-S-1014582-52                         85.78%    failed      0.00%
+1257  IMGM3300009425.BIN110                      95.14%    failed      0.00%
+1258  vOTU07..SRR28004154..SRR28004154.bin.7.    86.12%    failed      0.00%
+1259  Tupa                                       85.19%    failed      0.00%
+1260  bin.3188                                   87.30%    failed      0.00%
+1261  IMGM3300007520.BIN400                      93.86%    failed      0.00%
+1262  IMGM3300020169.BIN179                      86.84%    failed      0.00%
+1263  GVMAG-M-3300024258-28                      85.62%    failed      0.00%
+1264  IMGM3300025874.BIN1135                     88.05%    failed      0.00%
+1265  vOTU17..SRR28004154..SRR28004154.bin.6.    86.07%    failed      0.00%
+1266  IMGM3300020165.BIN579                      85.52%    failed      0.00%
+1267  IMGM3300032236.BIN347                      87.20%    failed      0.00%
+1268  IMGM3300050206.BIN315                      90.10%    failed      0.00%
+1269  IMGM3300010883.BIN1521                     88.69%    failed      0.00%
+1270  TARA.ARC.NCLDV.00060                       89.73%    failed      0.00%
+1271  LKH424.P07.Ci-122                          96.24%    failed      0.00%
+1272  IMGM3300025617.BIN820                      87.56%    failed      0.00%
+1273  SRX331950-48                               89.87%    failed      0.00%
+1274  IMGM3300035145.BIN625                      88.68%    failed      0.00%
+1275  TARA.ARC.NCLDV.00005                       86.60%    failed      0.00%
+1276  TARA.ION.NCLDV.00005                       92.63%    failed      0.00%
+1277  bin.1864                                   89.71%    failed      0.00%
+1278  IMGM3300020469.BIN285                      90.12%    failed      0.00%
+1279  GVMAG-S-1016728-84                         87.08%    failed      0.00%
+1280  TARA.PON.NCLDV.00047                       87.00%    failed      0.00%
+1281  IMGM3300034065.BIN104                      93.19%    failed      0.00%
+1282  ERX552270-107                              87.65%    failed      0.00%
+1283  ERX552270-10                               85.80%    failed      0.00%
+1284  GVMAG-M-3300014838-26                      89.35%    failed      0.00%
+1285  GVMAG-M-3300023184-135                     83.77%    failed      0.00%
+1286  IMGM3300027828.BIN379                      90.01%    failed      0.00%
+1287  IMGM3300010334.BIN284                      85.57%    failed      0.00%
+1288  GVMAG-S-1035435-20                         87.35%    failed      0.00%
+1289  IMGM3300005913.BIN38                       92.57%    failed      0.00%
+1290  GVMAG-S-ERX555967-130                      86.41%    failed      0.00%
+1291  IMGM3300017950.BIN523                      90.53%    failed      0.00%
+1292  IMGM3300020595.BIN790                      86.22%    failed      0.00%
+1293  IMGM3300035204.BIN814                      92.15%    failed      0.00%
+1294  IMGM3300023184.BIN934                      86.11%    failed      0.00%
+1295  IMGM3300036713.BIN217                      86.68%    failed      0.00%
+1296  IMGM3300009420.BIN417                      92.67%    failed      0.00%
+1297  IMGM3300000575.BIN331                      95.10%    failed      0.00%
+1298  bin.6617                                   84.45%    failed      0.00%
+1299  IMGM3300046171.BIN2120                     85.95%    failed      0.00%
+1300  clandest                                   92.87%    failed      0.00%
+1301  vOTU09..SRR28004154..SRR28004154.bin.24.   86.01%    failed      0.00%
+1302  IMGM3300025770.BIN313                      86.01%    failed      0.00%
+1303  TARA.MED.NCLDV.00025                       88.01%    failed      0.00%
+1304  IMGM3300017757.BIN371                      95.05%    failed      0.00%
+1305  ERX552270-76                               84.34%    failed      0.00%
+1306  IMGM3300043448.BIN218                      92.02%    failed      0.00%
+1307  IMGM3300031975.BIN52                       89.37%    failed      0.00%
+1308  IMGM3300017735.BIN140                      87.60%    failed      0.00%
+1309  bin.4182                                   86.90%    failed      0.00%
+1310  TARA.PSW.NCLDV.00002                       87.11%    failed      0.00%
+1311  GVMAG-S-1101166-76                         89.82%    failed      0.00%
+1312  IMGM3300017967.BIN792                      85.47%    failed      0.00%
+1313  IMGM3300034021.BIN766                      89.68%    failed      0.00%
+1314  IMGM3300027777.BIN117                      94.36%    failed      0.00%
+1315  bin.3028                                   89.33%    failed      0.00%
+1316  IMGM3300042314.BIN516                      87.42%    failed      0.00%
+1317  IMGM3300005573.BIN633                      89.27%    failed      0.00%
+1318  IMGM3300017971.BIN1314                     88.55%    failed      0.00%
+1319  GVMAG-M-3300023174-102                     87.30%    failed      0.00%
+1320  bin.1082                                   89.88%    failed      0.00%
+1321  TARA.MED.NCLDV.00030                       86.39%    failed      0.00%
+1322  TARA.MED.NCLDV.00046                       85.54%    failed      0.00%
+1323  IMGM3300009550.BIN221                      90.36%    failed      0.00%
+1324  IMGM3300044299.BIN131                      91.16%    failed      0.00%
+1325  IMGM3300024504.BIN12                       91.76%    failed      0.00%
+1326  IMGM3300025832.BIN415                      89.94%    failed      0.00%
+1327  IMGM3300022928.BIN123                      86.22%    failed      0.00%
+1328  bin.3091                                   85.66%    failed      0.00%
+1329  bin.4318                                   85.56%    failed      0.00%
+1330  IMGM3300044729.BIN711                      87.25%    failed      0.00%
+1331  IMGM3300020595.BIN409                      85.87%    failed      0.00%
+1332  bin.6763                                   92.67%    failed      0.00%
+1333  bin.4331                                   83.27%    failed      0.00%
+1334  IMGM3300013093.BIN348                      85.44%    failed      0.00%
+1335  GVMAG-S-3300002466-75                      82.32%    failed      0.00%
+1336  IMGM3300042451.BIN261                      83.75%    failed      0.00%
+1337  IMGM3300007523.BIN175                      89.67%    failed      0.00%
+1338  IMGM3300044956.BIN151                      86.39%    failed      0.00%
+1339  IMGM3300021962.BIN663                      86.61%    failed      0.00%
+1340  GVMAG-S-3300013132-210                     86.90%    failed      0.00%
+1341  IMGM3300009182.BIN407                      86.73%    failed      0.00%
+1342  bin.4744                                   84.20%    failed      0.00%
+1343  IMGM3300010883.BIN1085                     89.06%    failed      0.00%
+1344  IMGM3300021091.BIN861                      89.34%    failed      0.00%
+1345  ERX552270-38                               94.47%    failed      0.00%
+1346  IMGM3300028045.BIN212                      88.33%    failed      0.00%
+1347  IMGM3300028287.BIN136                      87.75%    failed      0.00%
+1348  bin.5594                                   96.69%    failed      0.00%
+1349  GVMAG-M-3300005589-24                      88.50%    failed      0.00%
+1350  IMGM3300006865.BIN470                      90.63%    failed      0.00%
+1351  TARA.ARC.NCLDV.00099                       90.13%    failed      0.00%
+1352  IMGM3300032303.BIN141                      87.19%    failed      0.00%
+1353  TARA.ARC.NCLDV.00039                       92.27%    failed      0.00%
+1354  GVMAG-M-3300009697-1                       90.41%    failed      0.00%
+1355  GVMAG-M-3300020716-5                       89.66%    failed      0.00%
+1356  IMGM3300047370.BIN161                      92.05%    failed      0.00%
+1357  IMGM3300009505.BIN491                      86.13%    failed      0.00%
+1358  vOTU02..SRR28004154..SRR28004154.bin.22.   82.92%    failed      0.00%
+1359  IMGM3300020595.BIN91                       89.18%    failed      0.00%
+1360  bin.1378                                   85.39%    failed      0.00%
+1361  IMGM3300023179.BIN1754                     90.01%    failed      0.00%
+1362  IMGM3300010158.BIN329                      87.24%    failed      0.00%
+1363  TARA.PON.NCLDV.00004                       86.08%    failed      0.00%
+1364  IMGM3300042401.BIN461                      86.40%    failed      0.00%
+1365  GVMAG-M-3300005613-23                      86.52%    failed      0.00%
+1366  GVMAG-S-1035100-96                         93.25%    failed      0.00%
+1367  GVMAG-S-1016713-165                        87.00%    failed      0.00%
+1368  IMGM3300024252.BIN247                      87.83%    failed      0.00%
+1369  bin.1023                                   86.56%    failed      0.00%
+1370  IMGM3300030687.BIN430                      89.22%    failed      0.00%
+1371  GCA.006465565-1.ASM646556v1                93.27%    failed      0.00%
+1372  IMGM3300009544.BIN182                      86.88%    failed      0.00%
+1373  vOTU16..SRR28004148..SRR28004148.bin.29.   86.35%    failed      0.00%
+1374  IMGM3300035701.BIN2510                     94.61%    failed      0.00%
+1375  GVMAG-S-3300002153-41                      85.79%    failed      0.00%
+1376  GVMAG-S-3300000576-45                      82.56%    failed      0.00%
+1377  TARA.MED.NCLDV.00051                       89.90%    failed      0.00%
+1378  IMGM3300001349.BIN332                      85.86%    failed      0.00%
+1379  TARA.PSE.NCLDV.00020                       89.36%    failed      0.00%
+1380  IMGM3300022856.BIN64                       88.11%    failed      0.00%
+1381  IMGM3300042384.BIN535                      89.90%    failed      0.00%
+1382  GVMAG-M-3300009488-16                      92.35%    failed      0.00%
+1383  IMGM3300009409.BIN510                      86.79%    failed      0.00%
+1384  IMGM3300045996.BIN3531                     91.13%    failed      0.00%
+1385  IMGM3300044505.BIN31                       90.35%    failed      0.00%
+1386  IMGM3300044610.BIN400                      90.76%    failed      0.00%
+1387  IMGM3300035107.BIN306                      86.89%    failed      0.00%
+1388  GVMAG-M-3300012936-34                      86.24%    failed      0.00%
+1389  IMGM3300005607.BIN310                      97.22%    failed      0.00%
+1390  IMGM3300024258.BIN214                      84.61%    failed      0.00%
+1391  IMGM3300044957.BIN147                      86.81%    failed      0.00%
+1392  SRX696246-4                                83.45%    failed      0.00%
+1393  IMGM3300002091.BIN84                       87.29%    failed      0.00%
+1394  GVMAG-M-3300020726-3                       88.40%    failed      0.00%
+1395  bin.1200                                   88.82%    failed      0.00%
+1396  IMGM3300050183.BIN1289                     85.90%    failed      0.00%
+1397  IMGM3300046171.BIN618                      86.28%    failed      0.00%
+1398  IMGM3300021958.BIN89                       92.68%    failed      0.00%
+1399  IMGM3300009161.BIN179                      88.80%    failed      0.00%
+1400  IMGM3300012919.BIN181                      86.25%    failed      0.00%
+1401  IMGM3300043413.BIN38                       86.77%    failed      0.00%
+1402  IMGM3300035703.BIN829                      92.65%    failed      0.00%
+1403  TARA.ARC.NCLDV.00040                       88.75%    failed      0.00%
+1404  IMGM3300024324.BIN336                      85.48%    failed      0.00%
+1405  IMGM3300007345.BIN500                      89.42%    failed      0.00%
+1406  IMGM3300004277.BIN57                       86.21%    failed      0.00%
+1407  IMGM3300028132.BIN105                      85.87%    failed      0.00%
+1408  IMGM3300009510.BIN241                      90.17%    failed      0.00%
+1409  GVMAG-S-3300009084-278                     95.07%    failed      0.00%
+1410  IMGM3300025366.BIN55                       89.14%    failed      0.00%
+1411  IMGM3300010883.BIN1295                     98.27%    failed      0.63%
+1412  IMGM3300017989.BIN225                      88.43%    failed      0.00%
+1413  IMGM3300013126.BIN655                      85.44%    failed      0.00%
+1414  bin.3965                                   92.11%    failed      0.00%
+1415  IMGS3300042691.BIN2117                     95.39%    failed      0.00%
+1416  IMGM3300002242.BIN123                      87.06%    failed      0.00%
+1417  IMGM3300045973.BIN190                      91.25%    failed      0.00%
+1418  TARA.AON.NCLDV.00016                       93.91%    failed      0.00%
+1419  GCA.006457375-1.ASM645737v1                91.71%    failed      0.00%
+1420  IMGM3300010299.BIN37                       95.08%    failed      0.00%
+1421  IMGM3300020578.BIN875                      86.53%    failed      0.00%
+1422  IMGM3300048021.BIN137                      88.48%    failed      0.00%
+1423  TARA.ARC.NCLDV.00026                       86.67%    failed      0.00%
+1424  IMGM3300013094.BIN121                      89.63%    failed      0.00%
+1425  IMGM3300006193.BIN164                      88.08%    failed      0.00%
+1426  bin.1708                                   88.79%    failed      0.00%
+1427  Indi                                       85.21%    failed      0.00%
+1428  IMGM3300005613.BIN418                      86.65%    failed      0.00%
+1429  IMGM3300050207.BIN2556                     97.34%    failed      0.00%
+1430  IMGM3300034789.BIN273                      92.06%    failed      0.00%
+1431  IMGM3300044293.BIN290                      88.61%    failed      0.00%
+1432  IMGM3300047560.BIN477                      90.63%    failed      0.00%
+1433  TARA.PSE.NCLDV.00004                       86.34%    failed      0.00%
+1434  bin.5124                                   89.45%    failed      0.00%
+1435  IMGM3300020469.BIN742                      90.57%    failed      0.00%
+1436  ERX288947-11                               85.17%    failed      0.00%
+1437  IMGM3300020457.BIN508                      86.25%    failed      0.00%
+1438  IMGM3300010368.BIN33                       84.53%    failed      0.00%
+1439  GCA.000869125-1.ViralProj17099             89.28%    failed      0.00%
+1440  IMGM3300035703.BIN1560                     85.44%    failed      0.00%
+1441  GVMAG-S-1015567-928                        84.50%    failed      0.00%
+1442  PkV-RF01                                   85.50%    failed      0.00%
+1443  bin.2744                                   88.68%    failed      0.00%
+1444  IMGM3300034019.BIN351                      92.93%    failed      0.00%
+1445  bin.4307                                   87.32%    failed      0.00%
+1446  IMGM3300020461.BIN149                      94.45%    failed      0.00%
+1447  TARA.MED.NCLDV.00013                       90.44%    failed      0.00%
+1448  IMGM3300023112.BIN62                       86.43%    failed      0.00%
+1449  TARA.ARC.NCLDV.00061                       92.06%    failed      0.00%
+1450  TARA.MED.NCLDV.00018                       85.01%    failed      0.00%
+1451  IMGM3300025010.BIN209                      95.15%    failed      0.00%
+1452  IMGM3300028196.BIN189                      84.23%    failed      0.00%
+1453  bin.4723                                   86.66%    failed      0.00%
+1454  IMGM3300050670.BIN120                      93.15%    failed      0.00%
+1455  IMGM3300047356.BIN269                      89.31%    failed      0.00%
+1456  IMGM3300020473.BIN697                      86.56%    failed      0.00%
+1457  IMGM3300050208.BIN375                      90.84%    failed      0.00%
+1458  IMGM3300033544.BIN16                       91.53%    failed      0.00%
+1459  IMGM3300047497.BIN30                       90.23%    failed      0.00%
+1460  IMGS3300050429.BIN78                       88.26%    failed      0.00%
+1461  IMGM3300032738.BIN124                      93.19%    failed      0.00%
+1462  IMGM3300043465.BIN563                      88.47%    failed      0.00%
+1463  IMGM3300020438.BIN1109                     86.70%    failed      0.00%
+1464  IMGM3300035145.BIN258                      92.07%    failed      0.00%
+1465  GVMAG-S-ERX555947-70                       91.16%    failed      0.00%
+1466  IMGM3300007522.BIN602                      84.81%    failed      0.00%
+1467  IMGM3300042894.BIN995                      89.11%    failed      0.00%
+1468  IMGM3300021959.BIN1185                     91.63%    failed      0.00%
+1469  IMGM3300032235.BIN247                      87.24%    failed      0.00%
+1470  IMGM3300032334.BIN217                      85.40%    failed      0.00%
+1471  ERX552270-122                              94.82%    failed      0.00%
+1472  IMGM3300047354.BIN267                      90.70%    failed      0.00%
+1473  IMGM3300046171.BIN1172                     85.86%    failed      0.00%
+1474  GVMAG-M-3300023184-13                      84.18%    failed      0.00%
+1475  IMGM3300010158.BIN547                      93.51%    failed      0.00%
+1476  IMGM3300034102.BIN641                      93.33%    failed      0.00%
+1477  IMGM3300050245.BIN1656                     92.67%    failed      0.00%
+1478  GVMAG-S-3300011013-114                     92.51%    failed      0.00%
+1479  TARA.PSW.NCLDV.00029                       91.36%    failed      0.00%
+1480  IMGM3300023174.BIN1270                     85.07%    failed      0.00%
+1481  IMGM3300044995.BIN115                      97.17%    failed      0.00%
+1482  IMGM3300046171.BIN1113                     88.75%    failed      0.00%
+1483  IMGM3300027333.BIN44                       90.35%    failed      0.00%
+1484  LKH577.P12.Am-203                          86.67%    failed      0.00%
+1485  LKH577.P12.Am-144                          92.20%    failed      0.00%
+1486  IMGM3300045921.BIN560                      87.76%    failed      0.00%
+1487  IMGM3300033995.BIN288                      90.92%    failed      0.00%
+1488  bin.1148                                   84.33%    failed      0.00%
+1489  GVMAG-S-1029409-49                         87.45%    failed      0.00%
+1490  IMGM3300032243.BIN145                      81.74%    failed      0.00%
+1491  IMGM3300001589.BIN285                      89.09%    failed      0.00%
+1492  IMGM3300034106.BIN1265                     88.63%    failed      0.00%
+1493  IMGM3300040806.BIN181                      94.30%    failed      0.00%
+1494  TARA.ARC.NCLDV.00064                       90.90%    failed      0.00%
+1495  IMGM3300026319.BIN429                      93.45%    failed      0.00%
+1496  Marseillevirus.LCMAC103                    87.99%    failed      0.00%
+1497  IMGM3300027810.BIN461                      88.14%    failed      0.00%
+1498  IMGM3300005613.BIN786                      94.68%    failed      0.00%
+1499  SRX331950-28                               85.22%    failed      0.00%
+1500  LKH583.P13.Ci-253                          90.50%    failed      0.00%
+1501  IMGM3300009702.BIN253                      91.46%    failed      0.00%
+1502  Pithovirus.LCPAC104                        90.43%    failed      0.00%
+1503  IMGM3300042894.BIN480                      89.39%    failed      0.00%
+1504  IMGM3300002933.BIN242                      84.39%    failed      0.00%
+1505  bin.6827                                   89.93%    failed      0.00%
+1506  GVMAG-S-3300013285-28                      83.05%    failed      0.00%
+1507  IMGM3300043772.BIN1854                     96.23%    failed      0.00%
+1508  IMGM3300004692.BIN57                       91.38%    failed      0.00%
+1509  vOTU06..SRR28004144..SRR28004144.bin.70.   85.62%    failed      0.00%
+1510  bin.3313                                   86.58%    failed      0.00%
+1511  LKH582.P12.Am-75                           86.37%    failed      0.00%
+1512  IMGM3300042923.BIN887                      88.96%    failed      0.00%
+1513  IMGM3300050184.BIN685                      88.57%    failed      0.00%
+1514  IMGM3300031213.BIN68                       86.61%    failed      0.00%
+1515  bin.6119                                   89.30%    failed      0.00%
+1516  GVMAG-M-3300018080-29                      86.24%    failed      0.00%
+1517  bin.5923                                   84.95%    failed      0.00%
+1518  IMGM3300034068.BIN287                      89.66%    failed      0.00%
+1519  IMGM3300046328.BIN25                       95.59%    failed      0.00%
+1520  bin.3062                                   89.70%    failed      0.00%
+1521  bin.2659                                   84.95%    failed      0.00%
+1522  bin.6734                                   85.39%    failed      0.00%
+1523  IMGM3300032328.BIN184                      84.26%    failed      0.00%
+1524  ERX552270-56                               86.27%    failed      0.00%
+1525  IMGM3300023184.BIN903                      91.78%    failed      0.00%
+1526  GVMAG-M-3300023184-150                     81.54%    failed      0.00%
+1527  TARA.MED.NCLDV.00075                       94.34%    failed      0.00%
+1528  bin.3512                                   86.75%    failed      0.00%
+1529  GVMAG-M-3300021964-8                       85.23%    failed      0.00%
+1530  IMGM3300046820.BIN1157                     90.30%    failed      0.00%
+1531  IMGM3300046413.BIN248                      88.70%    failed      0.00%
+1532  IMGM3300032073.BIN155                      88.18%    failed      0.00%
+1533  IMGM3300034022.BIN347                      88.61%    failed      0.00%
+1534  bin.2482                                   91.80%    failed      0.00%
+1535  TARA.PSW.NCLDV.00003                       92.04%    failed      0.00%
+1536  IMGM3300040856.BIN554                      86.14%    failed      0.00%
+1537  TARA.ARC.NCLDV.00011                       90.86%    failed      0.00%
+1538  GCA.002826725-1.ASM282672v1                87.72%    failed      0.00%
+1539  ERX552255-53                               86.59%    failed      0.00%
+1540  IMGM3300025822.BIN117                      86.39%    failed      0.00%
+1541  bin.5329                                   87.79%    failed      0.00%
+1542  bin.1400                                   92.80%    failed      0.00%
+1543  IMGM3300021091.BIN1157                     91.59%    failed      0.00%
+1544  IMGM3300032214.BIN204                      91.79%    failed      0.00%
+1545  GCA.000914535-1.ViralProj239736            89.03%    failed      0.00%
+1546  GVMAG-M-3300005613-11                      84.75%    failed      0.00%
+1547  IMGM3300040806.BIN471                      90.45%    failed      0.00%
+1548  bin.6808                                   87.24%    failed      0.00%
+1549  bin.3690                                   85.72%    failed      0.00%
+1550  bin.3378                                   85.42%    failed      0.00%
+1551  IMGM3300021185.BIN848                      88.16%    failed      0.00%
+1552  IMGM3300047376.BIN324                      88.76%    failed      0.00%
+1553  IMGM3300029952.BIN882                      86.70%    failed      0.00%
+1554  IMGM3300027503.BIN140                      88.82%    failed      0.00%
+1555  IMGS3300042691.BIN2123                     91.52%    failed      0.00%
+1556  bin.1884                                   86.00%    failed      0.00%
+1557  IMGM3300030231.BIN218                      89.01%    failed      0.00%
+1558  IMGM3300042562.BIN708                      86.63%    failed      0.00%
+1559  IMGM3300024255.BIN913                      83.56%    failed      0.00%
+1560  TARA.AOS.NCLDV.00007                       86.35%    failed      0.00%
+1561  bin.1810                                   87.28%    failed      0.00%
+1562  Homa                                       95.93%    failed      0.00%
+1563  IMGM3300032254.BIN202                      86.96%    failed      0.00%
+1564  IMGM3300025886.BIN593                      85.25%    failed      0.00%
+WARNING: 1564 sequences contain more than 50% gaps/ambiguity
+****  TOTAL                                      88.78%  1561 sequences failed composition chi2 test (p-value<5%; df=19)
+
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 68.975 seconds
+Perform fast likelihood tree search using LG+I+G model...
+Estimate model parameters (epsilon = 5.000)
+Perform nearest neighbor interchange...
+Estimate model parameters (epsilon = 1.000)
+1. Initial log-likelihood: -9894318.614
+2. Current log-likelihood: -9894307.125
+3. Current log-likelihood: -9894304.944
+Optimal log-likelihood: -9894304.204
+Proportion of invariable sites: 0.001
+Gamma shape alpha: 1.153
+Parameters optimization took 3 rounds (49.459 sec)
+Time for fast ML tree search: 261.499 seconds
+
+NOTE: ModelFinder requires 31811 MB RAM!
+ModelFinder will test up to 60 protein models (sample size: 37739 epsilon: 0.100) ...
+ No. Model         -LnL         df  AIC          AICc         BIC
+  1  LG            10438066.841 3125 20882383.683 20882948.138 20909066.337
+  2  LG+I          10434989.879 3126 20876231.758 20876796.591 20902922.951
+  3  LG+G4         9894815.950  3126 19795883.900 19796448.733 19822575.093
+  4  LG+I+G4       9894302.930  3127 19794859.861 19795425.072 19821559.592
+  5  LG+R2         10023771.690 3127 20053797.380 20054362.591 20080497.111
+  6  LG+R3         9931370.409  3129 19868998.818 19869564.785 19895715.626
+  7  LG+R4         9890780.012  3131 19787822.024 19788388.747 19814555.909
+  8  LG+I+R2       10022469.319 3128 20051194.638 20051760.227 20077902.908
+  9  LG+I+R3       9927975.788  3130 19862211.575 19862777.920 19888936.921
+ 10  LG+I+R4       9889286.889  3132 19784837.779 19785404.880 19811580.202
+ 20  LG+F+I+R4     9865167.996  3151 19736637.992 19737212.309 19763542.645
+ 30  WAG+I+R4      9896634.393  3132 19799532.787 19800099.888 19826275.210
+NOTE: 3.417 seconds to dump checkpoint file, increase to 69.000
+ 40  WAG+F+I+R4    9856688.253  3151 19719678.507 19720252.824 19746583.161
+ 50  JTT+I+R4      9977294.850  3132 19960853.701 19961420.802 19987596.124
+ 60  JTT+F+I+R4    9924828.751  3151 19855959.503 19856533.820 19882864.157
+Akaike Information Criterion:           WAG+F+I+R4
+Corrected Akaike Information Criterion: WAG+F+I+R4
+Bayesian Information Criterion:         WAG+F+I+R4
+Best-fit model: WAG+F+I+R4 chosen according to BIC
+
+All model information printed to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.model.gz
+CPU time for ModelFinder: 405520.375 seconds (112h:38m:40s)
+Wall-clock time for ModelFinder: 6673.842 seconds (1h:51m:13s)
+Generating 1000 samples for ultrafast bootstrap (seed: 12345)...
+
+NOTE: 31811 MB RAM (31 GB) is required!
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -9858629.178
+2. Current log-likelihood: -9856792.948
+3. Current log-likelihood: -9856689.093
+4. Current log-likelihood: -9856688.255
+Optimal log-likelihood: -9856688.207
+Proportion of invariable sites: 0.001
+Site proportion and rates:  (0.058,0.098) (0.175,0.368) (0.341,0.785) (0.425,1.557)
+Parameters optimization took 4 rounds (126.436 sec)
+Wrote distance file to... 
+Computing ML distances based on estimated model parameters...
+Calculating distance matrix: done in 3.8173 secs using 6373% CPU
+Computing ML distances took 3.832724 sec (of wall-clock time) 244.058973 sec (of CPU time)
+WARNING: Some pairwise ML distances are too long (saturated)
+Setting up auxiliary I and S matrices: done in 0.0109363 secs using 640.8% CPU
+Computing RapidNJ tree took 22.134476 sec (of wall-clock time) 7.460285 sec (of CPU time)
+Log-likelihood of RapidNJ tree: -10154082.371
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 7435.186 second
+Computing log-likelihood of 98 initial trees ... 865.126 seconds
+Current best score: -9856688.207
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -9856066.684
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 2: -9854624.821
+Iteration 10 / LogL: -9856587.930 / Time: 4h:50m:16s
+Iteration 20 / LogL: -9857053.996 / Time: 5h:24m:11s
+Finish initializing candidate tree set (20)
+Current best tree score: -9854624.821 / CPU time: 12400.723
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 24: -9854436.343
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 28: -9854417.770
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 30: -9854256.432
+Iteration 30 / LogL: -9854256.432 / Time: 5h:54m:36s (13h:59m:13s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 35: -9854211.315
+Iteration 40 / LogL: -9854883.141 / Time: 6h:23m:0s (11h:2m:0s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 42: -9854111.450
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 47: -9854035.311
+Iteration 50 / LogL: -9854377.985 / Time: 6h:51m:22s (9h:54m:9s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 56: -9853939.661
+Iteration 60 / LogL: -9854214.765 / Time: 7h:18m:20s (8h:52m:15s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 63: -9853711.858
+Iteration 70 / LogL: -9856481.993 / Time: 7h:46m:29s (7h:58m:49s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 75: -9853694.080
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 78: -9853654.072
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 79: -9853522.473
+Iteration 80 / LogL: -9853910.483 / Time: 8h:16m:6s (8h:2m:19s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 89: -9853507.187
+Iteration 90 / LogL: -9854099.624 / Time: 8h:43m:48s (7h:38m:55s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 93: -9853479.332
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 99: -9853468.455
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 100: -9853442.806
+Iteration 100 / LogL: -9853442.806 / Time: 9h:12m:40s (7h:25m:53s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 110: -9853419.054
+Iteration 110 / LogL: -9853419.054 / Time: 9h:40m:33s (7h:10m:34s left)
+NOTE: 3.543 seconds to dump checkpoint file, increase to 71.000
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 117: -9853395.873
+Iteration 120 / LogL: -9853641.158 / Time: 10h:7m:1s (6h:44m:7s left)
+Iteration 130 / LogL: -9853724.958 / Time: 10h:32m:23s (5h:51m:28s left)
+Iteration 140 / LogL: -9853520.479 / Time: 10h:58m:5s (5h:2m:56s left)
+Iteration 150 / LogL: -9853535.883 / Time: 11h:23m:51s (4h:17m:29s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 155: -9853282.780
+Iteration 160 / LogL: -9853449.338 / Time: 11h:51m:59s (5h:58m:56s left)
+Iteration 170 / LogL: -9853500.770 / Time: 12h:18m:5s (5h:15m:17s left)
+Iteration 180 / LogL: -9853997.586 / Time: 12h:44m:8s (4h:33m:33s left)
+Iteration 190 / LogL: -9853963.896 / Time: 13h:10m:24s (3h:53m:34s left)
+Iteration 200 / LogL: -9854165.481 / Time: 13h:37m:10s (3h:15m:6s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 203: -9853138.328
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 208: -9853125.733
+Iteration 210 / LogL: -9853310.616 / Time: 14h:6m:52s (5h:44m:56s left)
+Iteration 220 / LogL: -9853951.961 / Time: 14h:32m:34s (5h:5m:55s left)
+Iteration 230 / LogL: -9854429.173 / Time: 14h:57m:56s (4h:27m:57s left)
+Iteration 240 / LogL: -9853563.425 / Time: 15h:23m:59s (3h:51m:14s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 249: -9853093.085
+Iteration 250 / LogL: -9853309.372 / Time: 15h:51m:32s (5h:34m:5s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 254: -9852617.230
+Iteration 260 / LogL: -9853632.728 / Time: 16h:18m:53s (5h:14m:54s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 267: -9852545.807
+Iteration 270 / LogL: -9853780.543 / Time: 16h:47m:27s (5h:23m:10s left)
+Iteration 280 / LogL: -9852752.205 / Time: 17h:13m:38s (4h:47m:38s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 286: -9852407.385
+Iteration 290 / LogL: -9852662.668 / Time: 17h:42m:13s (5h:15m:54s left)
+Iteration 300 / LogL: -9852457.871 / Time: 18h:8m:0s (4h:40m:56s left)
+NOTE: 6.606 seconds to dump checkpoint file, increase to 133.000
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 308: -9852403.676
+Iteration 310 / LogL: -9852924.419 / Time: 18h:34m:40s (5h:18m:14s left)
+Iteration 320 / LogL: -9852630.264 / Time: 19h:1m:5s (4h:44m:5s left)
+Iteration 330 / LogL: -9852699.281 / Time: 19h:27m:59s (4h:10m:32s left)
+Iteration 340 / LogL: -9852839.767 / Time: 19h:54m:38s (3h:37m:19s left)
+Iteration 350 / LogL: -9852487.017 / Time: 20h:20m:29s (3h:4m:20s left)
+Iteration 360 / LogL: -9852858.948 / Time: 20h:46m:29s (2h:31m:47s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 364: -9852380.094
+Iteration 370 / LogL: -9852660.628 / Time: 21h:15m:43s (4h:56m:38s left)
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 374: -9852357.065
+Iteration 380 / LogL: -9852901.541 / Time: 21h:45m:47s (4h:56m:16s left)
+Iteration 390 / LogL: -9853611.028 / Time: 22h:11m:49s (4h:23m:34s left)
+Iteration 400 / LogL: -9852471.991 / Time: 22h:39m:10s (3h:51m:26s left)
+Iteration 410 / LogL: -9853025.428 / Time: 23h:5m:26s (3h:19m:23s left)
+Iteration 420 / LogL: -9852495.222 / Time: 23h:34m:11s (2h:47m:55s left)
+Iteration 430 / LogL: -9852734.970 / Time: 24h:1m:2s (2h:16m:23s left)
+Iteration 440 / LogL: -9852783.638 / Time: 24h:27m:35s (1h:45m:2s left)
+Iteration 450 / LogL: -9852767.943 / Time: 24h:53m:20s (1h:13m:52s left)
+Iteration 460 / LogL: -9852450.943 / Time: 25h:18m:43s (0h:42m:55s left)
+Iteration 470 / LogL: -9852685.868 / Time: 25h:45m:23s (0h:12m:13s left)
+Refining ufboot trees with NNI 1 branch...
+100 samples done
+200 samples done
+300 samples done
+400 samples done
+500 samples done
+600 samples done
+700 samples done
+800 samples done
+900 samples done
+1000 samples done
+Total 1000 ufboot trees refined
+TREE SEARCH COMPLETED AFTER 475 ITERATIONS / Time: 35h:40m:41s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -9852357.065
+2. Current log-likelihood: -9852357.005
+3. Current log-likelihood: -9852356.941
+4. Current log-likelihood: -9852356.896
+5. Current log-likelihood: -9852356.864
+Optimal log-likelihood: -9852356.848
+Proportion of invariable sites: 0.001
+Site proportion and rates:  (0.058,0.099) (0.177,0.371) (0.341,0.788) (0.423,1.561)
+Parameters optimization took 5 rounds (90.566 sec)
+BEST SCORE FOUND : -9852356.848
+Creating bootstrap support values...
+Split supports printed to NEXUS file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.splits.nex
+Total tree length: 1075.223
+
+Total number of iterations: 475
+CPU time used for tree search: 7210452.664 sec (2002h:54m:12s)
+Wall-clock time used for tree search: 121390.347 sec (33h:43m:10s)
+Total CPU time used: 7643609.867 sec (2123h:13m:29s)
+Total wall-clock time used: 128539.122 sec (35h:42m:19s)
+UFBoot trees printed to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot
+
+Computing bootstrap consensus tree...
+Reading input file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.splits.nex...
+1564 taxa and 6891 splits.
+Consensus tree written to /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.contree
+Reading input trees file /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.contree
+Log-likelihood of consensus tree: -9852342.663
+
+Analysis results written to: 
+  IQ-TREE report:                /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.iqtree
+  Maximum-likelihood tree:       /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.treefile
+  Likelihood distances:          /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.mldist
+
+Ultrafast bootstrap approximation results written to:
+  Split support values:          /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.splits.nex
+  Consensus tree:                /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.contree
+  UFBoot trees:                  /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.ufboot
+  Screen log file:               /sciclone/home/iadanforth/scr10/data/kbrevis/tree/kbrevis_gvmags.log
+
+Date and Time: Wed Nov 18 01:28:00 2026

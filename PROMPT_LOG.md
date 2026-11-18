@@ -1065,3 +1065,102 @@ matched tips. The README also records the rooting step (iTOL midpoint root) and 
 forward the vOTU13, vOTU05/vOTU19 and 14.5%-identity caveats.
 **Files:** `scripts/make_itol_annotations.py` (new), `output/tree/` (new: preliminary
 treefile, 5 iTOL annotation files, README.md), `PROMPT_LOG.md`. Committed and pushed.
+
+---
+
+### 45. 2026-11-17 10:05 (US Eastern) — Claude Code (Opus 5)
+
+> it looks like the ~/scr10/data/kbrevis directory has gotten really cluttered. Could you please delete the directories that are not used in this pipeline or are just your smoketests?
+
+**Done:** Inventoried before deleting anything, because scratch has no backup and **step 11
+(job 111564) was running** against `phylogeny/` and `tree/`. Identified candidates by
+grepping every scratch directory name across all scripts rather than judging by name;
+exactly one, `host_filtered/`, had **no script referencing it**, and its contents confirmed
+it - a single merged read pair from 25 October, predating the per-sample workflow, which
+the README's own directory listing already called "leftover from an earlier attempt".
+Deleted five directories totalling **14 GB**: `host_filtered/` (14 GB) plus the four
+smoke-test directories I created while developing steps 08, 10 and 11 - `nms_smoketest/`
+(1.9 MB), `_tailtest_smoketest/` (860 KB), `tree_probe/` (612 KB) and `tree_smoketest/`
+(28 KB). Verified before and after that step 11 was untouched; it continued running
+normally. **Deleted nothing else**, because every remaining directory is referenced by at
+least one script and there is no space pressure - `/sciclone/scr10` is 72% used with
+**62 TB free**. Reported but did not act on the two obvious further candidates, since
+removing them trades re-computation for disk and is the user's call: `gvmags/*/binning/`
+(108 GB of bbmap BAMs that nothing downstream reads and step 08 regenerates) and
+`raw/` + `trim/` (3.6 TB of regenerable upstream reads). Noted a side effect of my own
+inventory: `du`/`stat` updated the access times across the whole tree, so the 90-day purge
+clock now runs from 2026-11-17 - harmless, but access times there no longer reflect
+pipeline use. Documentation was written but **not committed**: the commit/push was blocked
+by the permission classifier, and this prompt did not ask for one.
+**Files:** `README.md` (directory tree listing corrected - it still described the
+long-gone `binning_test/` and `host_filtered/`, and omitted `votus/`, `phylogeny/` and
+`tree/`; new "Step 13. Cleaning up scratch" section), `PROMPT_LOG.md`. Outside the repo:
+deleted the five directories named above from `~/scr10/data/kbrevis`.
+
+---
+
+### 46. 2026-11-17 11:35 (US Eastern) — Claude Code (Opus 5)
+
+> can you also please delete any irrelevant log files
+
+**Done:** Checked rather than guessed, and the honest answer is that **almost no log is
+irrelevant**. `logs/` held 234 files (18 MB), all tracked in git, and these logs are the
+evidence behind the README's "How this was tested" sections - deleting a cited one would
+leave a documented claim with nothing behind it. Grepped every job ID appearing in a log
+filename against `README.md` and `PROMPT_LOG.md`. The logs that *look* disposable turned
+out to be mostly cited: `nms_smoketest_73841`, `beast_introspect_73842`, all four
+`tree_smoketest*` jobs (73846-73849), `08_gvmags_tailtest_110122` (7 mentions),
+`07_binnning_test_611846` (4 mentions, misspelt name and all), `test_checkV_db__621411`
+and `08_gvmags_pilot_110103` are each quoted or referenced as testing evidence. **Exactly
+two jobs were referenced nowhere**, and only those were deleted (4 files):
+`tree_introspect_73843.{out,err}`, superseded by the `tree_smoketest*` jobs the README
+actually cites, and `11_pre_tree_check_111548.{out,err}`, my own failed first probe attempt
+that died in 1 s because I had written the script to the session scratchpad under `/tmp`,
+which is node-local and invisible to compute nodes - resubmitted as 111549 minutes later
+and the lesson is already recorded in prose in section 11h. Also verified that **no job
+produced an empty `.out` and `.err` pair** (50 individual files are empty, but an empty
+`.err` next to a full `.out` is information: the job ran clean), and that the largest logs
+are genuine output rather than noise. 230 files remain. Noted that because all of them are
+tracked in git, any later deletion is recoverable from history, unlike scratch. Did not
+commit: the previous commit attempt this session was blocked by the permission classifier
+and this prompt did not ask for one. Separately: step 11 (job 111564) reached 26 h 57 m,
+finished its ML search and is now refining UFBoot trees, minutes from completion.
+**Files:** `README.md` (new section 13a), `PROMPT_LOG.md`. Outside the repo: deleted the
+4 log files named above.
+
+---
+
+### 47. 2026-11-18 09:30 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please move the .treefile to the ~/K_brevis_viromes/output directory? I'd like to move the file to git hub so that I can use itol to visualize
+
+> as always please include that in the read me file
+
+**Done:** Step 11 (job 111564) had **COMPLETED** in 1 d 11 h 46 m, exit 0, 42.5 GB peak of
+the 96 GB requested - vindicating the measured sizing from section 11h (30 GB at 4 threads,
+42.5 GB at 64), and finishing inside kuro's 48 h limit so checkpoint-resume was never
+needed. **Copied** rather than moved, consistent with Step 12 and the user's earlier
+correction on this point: the scratch run directory is left intact. Put the final
+`kbrevis_gvmags.treefile` (with 1,000-replicate UFBoot support) plus `.contree`, `.iqtree`,
+`.IC_TC_info.txt`, the RAxML IC branch-label tree, `.log` and `.tree_summary.txt` into
+`output/tree/`, and **deleted the earlier `PRELIMINARY_no_support.treefile`**, since a
+support-free tree beside the real one is a trap. Deliberately did not copy `.ufboot`
+(74 MB), `.ckp.gz` (18 MB) or `.mldist` (24 MB). Regenerated all five iTOL annotation files
+against the final topology. Results: model **WAG+F+I+R4** (so including WAG/JTT in `-mset`
+mattered - LG-only would have forced the wrong matrix), logL -9,852,356.85, **998 of 1,561
+branches (64%) at >=95 UFBoot**, RAxML relative tree certainty **0.732**. Wrote
+`scripts/votu_tree_context.py` (new) to answer where each vOTU actually sits: all 17
+placements are supported at >=97, eleven with *Imitervirales* references, one
+*Pimascovirales*, one *Algavirales*. Surfaced two findings: **(a) the tree places vOTU04
+with *Asfuvirales* at 100 support, contradicting GVClass's *Imitervirales* call** - which
+was only a 4-vs-2 marker vote (66.67% vs 33.33%), with no GVMAGs V2 relative to break the
+tie, so the tree should be preferred and any taxonomy table needs a footnote; and **(b) two
+clades contain only our vOTUs with no reference interleaved** ({vOTU03, vOTU09, vOTU13} and
+{vOTU07, vOTU12}), i.e. candidate *K. brevis* lineages absent from the reference database -
+but flagged that vOTU13's membership is not established, because at 74.8% missing data
+taxa attach to each other with spuriously high support. Recommended step 10 with
+`--tier skani` as the highest-value follow-up.
+**Files:** `scripts/votu_tree_context.py` (new), `output/tree/` (final tree files,
+regenerated iTOL annotations, `votu_tree_context.tsv`, rewritten README.md; preliminary
+tree deleted), `README.md` (new sections 11j, 11k, 11l; step 11 header and next-steps
+item 7 updated), `PROMPT_LOG.md`.

@@ -1,0 +1,14 @@
+project:            kbrevis_gvmags
+date:               Wed Nov 18 01:28:05 AM EST 2026
+alignment:          /sciclone/home/iadanforth/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.trimmed.aln
+model requested:    MFP
+model chosen:       WAG+F+I+R4 chosen according to BIC
+log-likelihood:     -9852356.848
+bootstrap reps:     1000 (ultrafast UFBoot, --bnni)
+threads:            64
+taxa in tree:       1564
+
+UFBoot support distribution (branch support values):
+  1561 internal branches; median 100
+  >=95 (well supported): 998 (64%)
+  <70  (poorly supported): 225
