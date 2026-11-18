@@ -1,0 +1,15 @@
+# R for the abundance figure. Deliberately NOT the full tidyverse: r-base plus the five
+# packages the plot script actually uses solves far faster and installs a fraction of the
+# files, which matters on a 50 GB home quota.
+name: r-plot-env
+channels:
+  - conda-forge
+dependencies:
+  - r-base=4.4
+  - r-ggplot2=3.5.1
+  - r-readr=2.1.5
+  - r-dplyr=1.1.4
+  - r-tidyr=1.3.1
+  - r-scales=1.3.0
+  - r-viridislite=0.4.2
+  - r-patchwork=1.2.0

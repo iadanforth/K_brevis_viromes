@@ -1,0 +1,14 @@
+[smoke] subset 200000 read pairs from SRR28004148
+[smoke] CoverM exited 0
+[smoke] ---- column names produced ----
+     1	Genome
+     2	r1.fastq Mean
+     3	r1.fastq Covered Bases
+     4	r1.fastq Length
+     5	r1.fastq Read Count
+     6	r1.fastq RPKM
+     7	r1.fastq TPM
+     8	r1.fastq Relative Abundance (%)
+     9	r1.fastq Variance
+[smoke] ---- is every requested method present for vOTU01? ----
+  vOTU01 columns: 0 (expect 8)

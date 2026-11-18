@@ -1,0 +1,26 @@
+/sciclone/apps/miniforge3-24.9.2-0/lib/python3.12/argparse.py:2006: FutureWarning: `remote_definition` is deprecated and will be removed in 25.9. Use `conda env create --file=URL` instead.
+  action(self, namespace, argument_values, option_string)
+
+
+==> WARNING: A newer version of conda exists. <==
+    current version: 24.9.2
+    latest version: 26.10.0
+
+Please update conda by running
+
+    $ conda update -n base -c conda-forge conda
+
+
+/sciclone/apps/miniforge3-24.9.2-0/lib/python3.12/argparse.py:2006: FutureWarning: `remote_definition` is deprecated and will be removed in 25.9. Use `conda env create --file=URL` instead.
+  action(self, namespace, argument_values, option_string)
+
+
+==> WARNING: A newer version of conda exists. <==
+    current version: 24.9.2
+    latest version: 26.10.0
+
+Please update conda by running
+
+    $ conda update -n base -c conda-forge conda
+
+

@@ -1,0 +1,12 @@
+# CoverM computes how much of each genome is covered by a read set, and at what depth.
+# It is the standard tool for vOTU abundance because it aggregates per-contig coverage up
+# to the GENOME level (a GVMAG is many contigs) and because it implements the breadth
+# filters the MIUViG standard asks for. It bundles minimap2, so no separate aligner is
+# needed.
+name: coverm-env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - coverm=0.7.0
+  - samtools=1.21

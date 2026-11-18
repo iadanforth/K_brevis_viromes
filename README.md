@@ -6946,6 +6946,207 @@ in this tree currently reflect inspection, not pipeline use.
 
 ----------------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------------------
+
+# Step 14. vOTU abundance in the environment through time (2026-11-18)
+
+Written by Claude Code on 2026-11-18 (prompt 48 in `PROMPT_LOG.md`). Files:
+`envs/coverm-env.yml`, `envs/r-plot-env.yml`, `scripts/14_abundance_setup.slurm`,
+`scripts/14_votu_reference.sh`, `scripts/14_abundance_smoketest.slurm`,
+`scripts/14_votu_abundance.slurm`, `scripts/merge_votu_abundance.py`,
+`scripts/plot_votu_abundance.R`.
+
+#### 14a. The question, and what the sample metadata actually says
+
+The question: **the giant viruses recovered from the incubation experiment - how abundant
+were they in the environment, month by month?** Steps 08-11 say what these viruses are and
+how they are related; nothing so far says whether they are out there in the water.
+
+Two things in `metadata/SraRunTable.csv` shaped the design and both need stating, because
+neither is obvious from the sample list.
+
+**First, the vOTUs do not all come from the incubation.** Of the 19 vOTUs, **12 were
+discovered in incubation samples and 7 in environmental samples**:
+
+| discovered in | vOTUs | source samples |
+|---|---|---|
+| incubation | 02, 03, 06, 07, 08, 09, 11, 12, 13, 17, 18, 19 | SRR28004137, 138, 139, 144, 154 |
+| environmental | 01, 10, 16 · 05, 14 · 15 · 04 | SRR28004148 · SRR28004151 · SRR28004152 · SRR34748664 |
+
+All 19 were mapped, not just the 12. The 7 environmental-derived vOTUs are a **positive
+control that costs nothing**: each one must be detected in the sample it was assembled
+from, and if it is not, the mapping is broken. That check is worth more than the compute it
+saves to skip it.
+
+**Second, the "environmental samples" are two different surveys.**
+
+| samples | n | dates | source |
+|---|---|---|---|
+| SRR28004145-153 | 9 | 2020-12 to 2021-08, **one per month** | Gulf of Mexico |
+| SRR34748663, SRR34748664 | 2 | 2021-09-29, 2022-03-08 | **coastal Florida waters**, a separate study, with recorded depths and day-resolution dates |
+
+The nine Gulf samples are a genuine monthly time series. The two Florida samples are not
+part of it - different location, different study, different accession series. Drawing one
+line through all eleven would imply a continuous 15-month survey that does not exist, so
+the figures draw the connecting line through the Gulf series only and mark the Florida
+samples as separate points beyond a dotted divider. For orientation, the incubation
+experiment's two batches (CH1 2021-05, CH2 2021-08) sit inside the Gulf series, which is
+what makes "were these viruses in the water before and after?" answerable at all.
+
+#### 14b. Method, and the three parameter choices that matter
+
+**CoverM 0.7.0** maps the reads and summarises coverage **per genome** rather than per
+contig. That is the reason for using it rather than the bbmap/`jgi_summarize_bam_contig_depths`
+combination already installed for step 08: a GVMAG is many contigs, and a per-contig table
+would turn 19 vOTUs into hundreds of uninterpretable rows. CoverM bundles minimap2, so no
+separate aligner was needed. Neither CoverM nor R was installed on this system; both
+environments were created by `14_abundance_setup.slurm`.
+
+Each vOTU is represented by **one genome - its step 09 representative - not all its
+members**. Including every member would split reads from a shared virus across
+near-identical genomes and make each look less abundant than it is.
+
+| choice | value | why |
+|---|---|---|
+| read identity | **>=95%** | the MIUViG species boundary, and the same cut-off that defined the vOTUs in step 09. Without it, reads from a related-but-different virus inflate a vOTU's abundance and closely related vOTUs steal each other's reads |
+| read aligned | **>=75%** | rejects reads that match only through a short conserved patch |
+| presence | **>=75% genome breadth** | MIUViG (Roux et al. 2019). A real detection covers most of the genome; a few conserved genes attracting stray reads covers very little. **Depth alone cannot tell these apart**, which is the whole point - see 14d |
+| CoverM's own breadth filter | **disabled** (`--min-covered-fraction 0`) | its default of 10 silently rewrites low-breadth abundances to zero, baking a threshold into the raw numbers. Keeping the raw values and applying the 75% rule in `merge_votu_abundance.py` makes the threshold explicit and changeable **without re-mapping ~200 GB of reads** |
+
+#### 14c. Three bugs the smoke test caught (`14_abundance_smoketest.slurm`)
+
+Before committing an 11-task array to ~200 GB of reads, the exact CoverM command was run on
+200,000 read pairs. It cost 3 seconds and caught three faults, each of which would have been
+silent or late:
+
+1. **`--min-read-percent-identity` takes a PERCENTAGE, not a fraction.** The command had
+   `0.95`. CoverM accepts that without complaint and reads it as **0.95% identity** - no
+   filtering at all. Every abundance would have been inflated by cross-mapping between
+   related vOTUs, with nothing in any log to show for it. This is the one that would have
+   quietly corrupted the result. `coverm genome --full-help` is explicit: "e.g. 95 for 95%".
+2. **There is no `covered_fraction` method in CoverM 0.7.0.** Its methods are
+   `relative_abundance, mean, trimmed_mean, coverage_histogram, covered_bases, variance,
+   length, count, reads_per_base, rpkm, tpm`. Breadth is now computed in the merge step as
+   `covered_bases / length`, which is the same number with the arithmetic visible.
+3. **CoverM writes LONG format** - one row per genome, with columns named
+   `<sample> <Method>`. `merge_votu_abundance.py` had assumed the opposite (one row,
+   `<genome> <Method>` columns) and would have matched nothing, producing an empty table.
+
+The smoke test also failed once on a fault of its own - `grep -c` exits 1 when it counts
+zero matches, which `set -e` treats as fatal, so the job reported FAILED even though CoverM
+had succeeded. Fixed with `|| true`; the corrected run (job 73931) exits 0.
+
+It also gave the first positive control: 200,000 reads from SRR28004148 returned vOTU01,
+vOTU10 and vOTU16 - exactly the three vOTUs assembled from that sample - as the top three
+by breadth and RPKM.
+
+#### 14d. Results
+
+Mapping: job **651382** (bora `hima`, array of 11, 8 cores, 24 GB), **3-6 minutes per
+sample**, all COMPLETED, no errors. Resources came from the smoke test rather than a guess;
+the script's original 16 cores / 32 GB / 8 h was cut to 8 / 24 GB / 2 h.
+
+**Seven detections out of 209 vOTU-sample pairs. All seven are environmental-derived vOTUs,
+each detected in exactly the one sample it was assembled from.**
+
+| vOTU | sample | date | mean coverage | breadth | RPKM |
+|---|---|---|---|---|---|
+| vOTU05 | SRR28004151 | 2021-02 | 97.3x | 1.000 | 4072.9 |
+| vOTU16 | SRR28004148 | 2021-05 | 27.9x | 1.000 | 650.4 |
+| vOTU10 | SRR28004148 | 2021-05 | 17.9x | 0.999 | 414.9 |
+| vOTU15 | SRR28004152 | 2021-01 | 17.2x | 1.000 | 3104.5 |
+| vOTU14 | SRR28004151 | 2021-02 | 15.5x | 0.999 | 644.1 |
+| vOTU04 | SRR34748664 | 2021-09 | 11.9x | 1.000 | 2553.6 |
+| vOTU01 | SRR28004148 | 2021-05 | 9.7x | 0.999 | 222.6 |
+
+**None of the 12 incubation-derived vOTUs is detected in any environmental sample.** That
+is the answer to the question as asked, and it is a real result rather than a failed
+analysis - the positive controls prove the mapping works.
+
+**The threshold is not doing arbitrary work.** Breadth in these data is sharply bimodal:
+
+| mean coverage | n pairs | median breadth | max breadth |
+|---|---|---|---|
+| 0 (no reads) | 12 | 0.000 | 0.000 |
+| <0.1x | 157 | 0.001 | 0.051 |
+| 0.1-0.5x | 28 | 0.045 | 0.152 |
+| 0.5-1.4x | 1 | 0.088 | 0.088 |
+| **>=1.4x** | 11 | **0.999** | 1.000 |
+
+Only **1 of 209** pairs falls between 15% and 99% breadth, so any threshold in that range
+gives the same seven detections. (The 1.4x boundary is not arbitrary either: breadth
+saturates as `1 - e^-coverage`, so >=75% breadth is unreachable below ~1.4x coverage. Every
+pair that clears 1.4x here has ~100% breadth, so nothing is being lost to depth limitation.)
+
+**Why breadth, not RPKM: the vOTU13 artifact.** Four pairs reach >=1.4x mean coverage and
+still fail. The clearest is **vOTU13 in SRR34748664: 32x mean coverage over 0.9% of its
+genome** - roughly 2,800 bp of 309,356 bp. Reads are piling onto one small region, almost
+certainly a conserved or repetitive element, not a virus that is present. Plotted as RPKM
+alone, vOTU13 would have looked like one of the more abundant environmental viruses in the
+dataset. This is the same genome that carried only 2 of 7 marker genes and whose tree
+placement section 11k flags as untrustworthy; three independent lines now say it is a poor
+genome.
+
+#### 14e. What this means, and what it does not
+
+The giant viruses that came out of the incubation experiment were **not detectable in the
+monthly environmental survey**. Reasonable readings, which this analysis cannot separate:
+
+- they are genuinely rare *in situ* and the incubation enriched them from below the
+  detection limit - the most likely explanation, and the usual reason for incubating;
+- the environmental sequencing is not deep enough to cover them at >=1.4x;
+- they are incubation-specific, for example induced from a lysogenic state or favoured by
+  bottle conditions.
+
+**A limitation that constrains all of it:** each environmental vOTU is detected *only* in
+its own source sample, never in an adjacent month. The nine monthly samples therefore share
+essentially no giant viruses with one another. The most economical explanation is that this
+analysis is **assembly-detection-limited** - a virus is recovered from a sample only when it
+is abundant enough there to assemble, and at that abundance it is detectable, while
+everywhere else it falls below ~1.4x. So these data support "vOTU X was abundant in month
+Y" but are weak evidence for absence elsewhere. **Deeper sequencing, or pooling the monthly
+samples, is the way to test persistence.** The figures should not be read as showing viral
+turnover between months.
+
+#### 14f. Outputs
+
+In `output/abundance/`:
+
+| file | what it is |
+|---|---|
+| `votu_abundance_long.tsv` | tidy, one row per vOTU per sample: dates, breadth, mean coverage, RPKM, TPM, relative abundance, read count, and the `present` flag |
+| `votu_abundance_matrix.tsv` | vOTU x sample matrix of breadth-gated RPKM |
+| `votu_abundance_timeseries.{pdf,png}` | **the requested figure** - abundance against time, one panel per vOTU, filled = detected, hollow = recruited but absent, with the 12 undetected panels labelled "never detected" |
+| `votu_abundance_heatmap.{pdf,png}` | genome breadth for all 19 vOTUs x 11 samples; the clearest single view of the result |
+
+Figure design notes worth keeping: the time series plots **raw** RPKM rather than the
+breadth-gated value, so that read recruitment which fails the breadth test is still visible
+as a hollow point - plotting the gated value would show twelve flat zero lines, true but
+mute. The y-axes are free per panel, which makes a tall hollow curve (vOTU13) look like
+abundance, so every never-detected panel carries a "never detected" label. An early version
+of the script dropped never-detected vOTUs to avoid empty panels, which was exactly backwards:
+those twelve panels **are** the answer. An early version also rendered with a transparent
+background (black in most viewers) and invisible titles, fixed with `bg = "white"` and an
+explicit `plot.background`.
+
+#### 14g. Caveats
+
+- **Absence of evidence**: see 14e. Non-detection here means "below ~1.4x coverage in this
+  sample", not "absent from the Gulf of Mexico".
+- The two coastal Florida samples are a different study and location. They are shown, but
+  they are not month 10 and month 16 of the Gulf series.
+- Mapping used vOTU **representatives**. A vOTU member genome that differs from its
+  representative by more than 5% in some region will lose those reads to the 95% identity
+  filter.
+- RPKM is normalised by library size and genome length, so it is comparable across samples
+  and vOTUs, but it is still a *relative* measure - it says nothing about absolute viral
+  particle counts.
+- The incubation samples themselves were **not** mapped. Comparing abundance in the
+  incubation against the environment would need that, and it is a one-line change to the
+  sample list in `14_votu_abundance.slurm`.
+
+----------------------------------------------------------------------------------------
+
 # Next steps
 
 1. ~~Wait for the metaSPAdes jobs (step 05b), then run the merge (step 06).~~ **Done
@@ -6985,8 +7186,15 @@ in this tree currently reflect inspection, not pipeline use.
    **Highest-value next run: step 10 with `--tier skani`** (6,266 taxa), to test whether a
    reference falls inside those clades and dissolves them. The tree is **unrooted** -
    midpoint-root it before interpreting.
-8. Still unwritten: CoverM prevalence across the field samples, and a check for endogenous
-   viral elements in the *K. brevis* genome (prompt 19).
+8. ~~CoverM prevalence across the field samples~~ **Done 2026-11-18** (Step 14, job
+   651382): **none of the 12 incubation-derived vOTUs is detectable in any of the 11
+   environmental samples**; the only 7 detections are the environmental-derived vOTUs in
+   their own source samples, which are the positive controls. Most likely the incubation
+   enriched viruses that are rare *in situ*, but the analysis is detection-limited (14e) -
+   deeper sequencing or pooling the monthly samples is the way to test persistence.
+   Still unwritten: a check for endogenous viral elements in the *K. brevis* genome
+   (prompt 19), and mapping the incubation samples themselves, which is a one-line change
+   to the sample list in `14_votu_abundance.slurm`.
 9. ~~Copy final results out of scratch~~ **Partly done 2026-11-16** (Step 12, job 111460):
    steps 08 and 09 results are now in `output/` (4.4 GB), excluding the 108 GB of `binning/`
    BAMs, which cannot fit in the 50 GB home quota and are regenerable. Still to do: copy

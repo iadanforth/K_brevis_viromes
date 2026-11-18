@@ -1,0 +1,38 @@
+[smoke] subset 200000 read pairs from SRR28004148
+[smoke] CoverM exited 0
+[smoke] ---- column names produced ----
+     1	Genome
+     2	r1.fastq Mean
+     3	r1.fastq Covered Bases
+     4	r1.fastq Length
+     5	r1.fastq Read Count
+     6	r1.fastq RPKM
+     7	r1.fastq TPM
+     8	r1.fastq Relative Abundance (%)
+     9	r1.fastq Variance
+[smoke] ---- method columns found (CoverM 0.7.0 is LONG format: one row per genome,
+[smoke]      columns named '<sample> <Method>', so these are per-sample, not per-genome) ----
+  method columns: 8 (expect 8)
+  vOTU rows:      19 (expect 19)
+[smoke] ---- breadth sanity for the three vOTUs assembled FROM this sample ----
+  vOTU      covered_bases     length  breadth     mean      rpkm
+  vOTU01            55324    2187896    0.025    0.038   231.090  <- assembled from this sample
+  vOTU02               26    1226811    0.000    0.000     0.000
+  vOTU03                0     530439    0.000    0.000     0.000
+  vOTU04                0     348214    0.000    0.000     0.000
+  vOTU05                0     203021    0.000    0.000     0.000
+  vOTU06                0     421742    0.000    0.000     0.000
+  vOTU07                0     495517    0.000    0.000     0.000
+  vOTU08                0     857067    0.000    0.000     0.000
+  vOTU09               39     361245    0.000    0.000     0.000
+  vOTU10            13827     351669    0.039    0.060   373.764  <- assembled from this sample
+  vOTU11                0     671956    0.000    0.000     0.000
+  vOTU12                0     343608    0.000    0.000     0.000
+  vOTU13               45     309356    0.000    0.001     0.000
+  vOTU14              475     261816    0.002    0.005    28.525
+  vOTU15                0     295015    0.000    0.000     0.000
+  vOTU16            35418     555967    0.064    0.103   634.034  <- assembled from this sample
+  vOTU17                0     399831    0.000    0.000     0.000
+  vOTU18                0     510911    0.000    0.000     0.000
+  vOTU19              176     216065    0.001    0.002    13.826
+[smoke] done

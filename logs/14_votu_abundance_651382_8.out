@@ -1,0 +1,4 @@
+[abund] sample SRR28004146 (task 8), 19 vOTU genomes, 8 threads
+[abund] reads: 6.8G + 6.8G
+coverm 0.7.0
+[abund] wrote /sciclone/home/iadanforth/scr10/data/kbrevis/abundance/per_sample/SRR28004146_coverm.tsv (21 lines)

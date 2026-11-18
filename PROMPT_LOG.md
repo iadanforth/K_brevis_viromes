@@ -1164,3 +1164,49 @@ taxa attach to each other with spuriously high support. Recommended step 10 with
 regenerated iTOL annotations, `votu_tree_context.tsv`, rewritten README.md; preliminary
 tree deleted), `README.md` (new sections 11j, 11k, 11l; step 11 header and next-steps
 item 7 updated), `PROMPT_LOG.md`.
+
+---
+
+### 48. 2026-11-18 05:40 (US Eastern) — Claude Code (Opus 5)
+
+> Ok, this is great thanks so much for your help! The last thing that I'd like to try is to map the reads from the environmental samples (SRR34748663, SRR34748664, SRR28004145, SRR28004146,  SRR28004147, SRR28004148, SRR28004149, SRR28004150, SRR28004151, SRR28004152, SRR28004153) onto my vOTUs that were found in the samples coming from the incubation experiment (SRR28004142, SRR28004143, SRR28004144, SRR28004140, SRR28004141, SRR28004137, SRR28004154, SRR28004139, SRR28004138) to figure out how abundant each vOTU was through time in the environment.
+>
+> I then ultimately want to plot this in R, resulting in a figure that shows vOTU abundance as a function of time
+
+**Done:** Built the whole step (new Step 14) and ran it. Two metadata findings shaped the
+design: **only 12 of the 19 vOTUs come from incubation samples** (7 come from environmental
+samples - SRR28004148, 151, 152 and SRR34748664), and the **11 "environmental" samples are
+two different surveys** - nine monthly Gulf of Mexico samples (2020-12 to 2021-08) plus two
+coastal-Florida samples from a separate study with day-resolution dates and depths. Mapped
+all 19 vOTUs rather than just the 12, using the 7 environmental-derived ones as free
+positive controls, and kept the two Florida samples visually separate from the Gulf series
+rather than implying a continuous 15-month survey. Neither CoverM nor R existed on the
+system, so created `coverm-env` and `r-plot-env` (job 73928 on astral, after cancelling my
+own kuro job 111948 when kuro's queue pushed it ~10 h out). A smoke test on 200,000 reads
+(job 73931, 3 s) caught **three bugs** before an 11-task array touched ~200 GB:
+`--min-read-percent-identity` takes a percentage, not a fraction, so my `0.95` meant 0.95%
+identity and **no filtering at all** - silent inflation of every abundance; CoverM 0.7.0 has
+**no `covered_fraction` method**, only `covered_bases`; and CoverM writes **long** format,
+one row per genome, the opposite of what my merge script assumed. The smoke test itself
+first reported FAILED on a fault of my own (`grep -c` exits 1 at zero matches, fatal under
+`set -e`), fixed with `|| true`. Mapping ran as job 651382 (bora hima, array of 11, 8 cores,
+24 GB, 3-6 min each, all COMPLETED), right-sized from the smoke test rather than guessed.
+**Result: 7 detections of 209 pairs, every one an environmental-derived vOTU in its own
+source sample; none of the 12 incubation-derived vOTUs is detected anywhere.** Verified the
+>=75% breadth threshold is not doing arbitrary work - breadth is bimodal, with only 1 of 209
+pairs between 15% and 99% - and identified a telling artifact: **vOTU13 reaches 32x mean
+coverage over 0.9% of its genome**, so RPKM alone would have shown it as a highly abundant
+environmental virus. That is the third independent signal that vOTU13 is a poor genome
+(2/7 markers, untrustworthy tree placement). Wrote the figures in R and **inspected the
+rendered PNGs**, which caught a transparent background rendering black with invisible
+titles and legend labels, a reversed fill mapping, and - most importantly - that my script
+dropped never-detected vOTUs, which would have hidden all 12 incubation vOTUs when "absent
+everywhere" is the answer; every panel is now shown and labelled "never detected".
+Flagged in 14e that the analysis is assembly-detection-limited, so it supports "abundant in
+month Y" but is weak evidence of absence elsewhere.
+**Files:** `envs/coverm-env.yml`, `envs/r-plot-env.yml` (new), `scripts/14_abundance_setup.slurm`,
+`scripts/14_votu_reference.sh`, `scripts/14_abundance_smoketest.slurm`,
+`scripts/14_votu_abundance.slurm`, `scripts/merge_votu_abundance.py`,
+`scripts/plot_votu_abundance.R` (all new), `output/abundance/` (long table, matrix, two
+figures as PDF and PNG), `README.md` (new Step 14 with sections 14a-14g; next-steps item 8),
+`PROMPT_LOG.md`.
