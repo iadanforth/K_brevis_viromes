@@ -1248,3 +1248,48 @@ pairwise table in both directions.
 `output/booker_gvmag_ani_all_pairs.csv` (new), `README.md` (new Step 15, sections 15a-15f;
 next-steps items 10-11), `PROMPT_LOG.md`. Outside the repo:
 `~/scr10/data/kbrevis/booker_gvmags/` (downloaded contigs, 10 grouped genomes, fastANI output).
+
+---
+
+### 50. 2026-11-19 09:15 (US Eastern) — Claude Code (Opus 5)
+
+> Ok I feel confident that this entire pipelines is good to go and is complete. Could you please look at the structure of my ~/scr10/data/kbrevis and ~/K_brevis_viromes and make sure that if a completely new user were to clone my GitHub repository, they would be able to reproduce everything present in both of these directories?
+>
+> The idea is that I will soon delete the files in both directories (except scripts) and then re-run everything. The only thing that I don't want to fully re-run is the 03_download_refs.slurm since that only needs to be run once and would take forever.
+
+**Done:** Audited both directories against the repository and **found eight gaps, fixed
+five of them in code and documented three.** First confirmed GitHub is current (remote
+`main` is `019c44d`; my earlier "4 commits unpushed" was stale - the user had pushed).
+Gaps fixed: **(1)** the "Rebuilding everything from scratch" runbook stopped at step 11, so
+steps 12, 14 and 15 and every manual post-processing command were undocumented - rewritten
+to cover 00-15 with the exact commands; **(2)** `output/tree/` had been populated by an
+ad-hoc `cp` loop I typed, not by any script, so a re-run would not have recreated it -
+`copy_results.slurm` now copies the named tree files while still excluding the 116 MB of
+`.ufboot`/`.ckp.gz`/`.mldist`; **(3)** steps 01-06 assumed their six conda environments
+already existed and nothing created them - added `scripts/00_create_envs.slurm`, which
+builds them from `envs/*.yml` and then verifies every tool those steps call is on PATH;
+**(4)** `03_download_refs.slurm` wrote `datasets-env.yml` into the repository root on every
+run - now writes `envs/datasets-env.lock.yml` with the machine-specific `prefix:` stripped;
+**(5)** untracked the stale root-level `datasets-env.yml` and `sra-toolkit-env.yml`
+duplicates. Documented rather than fixed: **(6) `fastp` is a standalone binary on PATH via
+`~/.bashrc`, in no `envs/*.yml`** - it works here only because jobs inherit the submitting
+shell, and a new account would fail at step 02; **(7)** `output/Kbrevis_virome_tree.png` is
+a hand-exported iTOL image with no generating script; **(8)** step 07 needs
+`--export=ALL,GVMAGS_V2_FULL=1` or step 10 fails later. On the user's specific request,
+confirmed **skipping step 03 is safe**: `04_clean_refs.sh` rebuilds the bowtie2 index only
+if absent, and all six required reference FASTAs plus the 6-file 42 GB index are present,
+so keeping `reference/` skips both the download and several hours of `bowtie2-build`.
+Checked and found already correct: every `.sh` creates its own scratch directory (so the
+short `00_directory_setup.sh` is harmless), all 44 scripts, 25 env files and the SRA table
+are committed, and the `.bak`/`.orig`/`__pycache__` strays are correctly ignored.
+**Verified rather than asserted:** cloned the repository to a temporary directory and
+syntax-checked all 32 shell and 11 Python scripts in the clone (all pass), confirmed every
+script named in the new runbook exists, and checked the documented CLI flags against each
+script's actual argparse. Finally flagged a portability limit the question invites:
+**23 scripts hardcode `/sciclone/home/iadanforth/` (59 times) and 17 hardcode the
+`--mail-user`**, so the repo is reproducible by this user but needs two `sed` substitutions
+for anyone else, and real work to move off SciClone.
+**Files:** `scripts/00_create_envs.slurm` (new), `scripts/copy_results.slurm` (tree files),
+`scripts/03_download_refs.slurm` (no longer writes to the repo root), `README.md`
+(runbook rewritten for steps 00-15, new audit section R and a porting subsection),
+`PROMPT_LOG.md`. Untracked: root-level `datasets-env.yml`, `sra-toolkit-env.yml`.

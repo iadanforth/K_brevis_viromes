@@ -10,12 +10,13 @@
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/copy_results_%j.out
 #SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/copy_results_%j.err
 
-# Copy the step 08 (gvmags) and step 09 (votus) results out of scratch and into the
+# Copy the step 08 (gvmags), 09 (votus) and 11 (tree) results out of scratch and into the
 # repository, so they survive the 90-day scratch purge and sit next to the scripts that
 # made them.
 #
 #   ~/scr10/data/kbrevis/gvmags  ->  ~/K_brevis_viromes/output/gvmags
 #   ~/scr10/data/kbrevis/votus   ->  ~/K_brevis_viromes/output/votus
+#   ~/scr10/data/kbrevis/tree    ->  ~/K_brevis_viromes/output/tree  (selected files only)
 #
 # This COPIES; the scratch originals are left untouched.
 #
@@ -64,6 +65,30 @@ for d in gvmags votus; do
         --exclude='binning/' --exclude='gvclass_in/' \
         "$SRC/$d/" "$DEST/$d/"
 done
+
+# ---- step 11 tree: named files only -------------------------------------------------
+# The tree directory is NOT copied wholesale. Three of its files are large and are not
+# needed to read or re-draw the tree: .ufboot (74 MB of bootstrap replicates), .ckp.gz
+# (18 MB IQ-TREE checkpoint) and .mldist (24 MB distance matrix). Committing 116 MB to git
+# is exactly what this script exists to avoid. They stay in scratch; copy them to
+# ~/data10 before the 90-day purge if the bootstrap trees are ever needed again.
+TREE_SRC="$SRC/tree"
+if [[ -d "$TREE_SRC" ]]; then
+    mkdir -p "$DEST/tree"
+    for f in kbrevis_gvmags.treefile kbrevis_gvmags.contree kbrevis_gvmags.iqtree \
+             kbrevis_gvmags.tree_summary.txt kbrevis_gvmags.IC_TC_info.txt \
+             kbrevis_gvmags.log; do
+        [[ -s "$TREE_SRC/$f" ]] && cp "$TREE_SRC/$f" "$DEST/tree/" \
+            && echo "[copy] tree: $f"
+    done
+    # RAxML writes the IC-labelled tree into its own subdirectory under a fixed name.
+    [[ -s "$TREE_SRC/ic/RAxML_IC_Score_BranchLabels.ic" ]] && \
+        cp "$TREE_SRC/ic/RAxML_IC_Score_BranchLabels.ic" \
+           "$DEST/tree/kbrevis_gvmags.IC_branch_labels.nwk" \
+        && echo "[copy] tree: IC branch-label tree"
+else
+    echo "[copy] no $TREE_SRC yet; skipping the step 11 tree files"
+fi
 
 echo
 echo "[copy] verifying: every file present in the source (minus exclusions) is in the copy"

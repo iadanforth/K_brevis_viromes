@@ -6139,33 +6139,213 @@ Kept so the history makes sense. Their outputs either no longer exist or aren't 
 
 # Rebuilding everything from scratch (order of commands)
 
-From `~/K_brevis_viromes` on dev, after creating the conda environments (section B) in a
-batch job. Wait for each step's jobs to finish before starting the next.
+**Audited end to end on 2026-11-19 (prompt 50 in `PROMPT_LOG.md`)** against the actual
+contents of `~/scr10/data/kbrevis` and `~/K_brevis_viromes`, to confirm that a new user
+cloning the repository can reproduce both. The gaps found are listed in section R below;
+all of them are fixed in the commands here.
 
-```
-bash scripts/00_directory_setup.sh                                                 # step 00
-cp metadata/SraRunTable.csv ~/scr10/data/kbrevis/
-( module purge; module load slurm/bora; sbatch scripts/01_download_files.slurm )   # step 01
-( module purge; module load slurm/bora; sbatch scripts/02_fastp.slurm )            # step 02
-( module purge; module load slurm/bora; sbatch scripts/03_download_refs.slurm )    # step 03
-( module purge; module load slurm/bora; sbatch scripts/03b_download_phix.slurm )   # step 03
-( module purge; module load slurm/bora; sbatch -p hima scripts/04_clean_refs.slurm )  # step 04
-( module purge; module load slurm/kuro; bash scripts/05_metaspades.sh )            # step 05a (20 jobs)
-( module purge; module load slurm/kuro; bash scripts/05_metaspades_nov.sh )        # step 05b (20 jobs)
-( module purge; module load slurm/kuro; bash scripts/06_merge_assemblies.sh )      # step 06 (20 jobs)
-( module purge; module load slurm/astral; sbatch -p batch -c 4 --exclude=as01 --mem=16G -t 6:00:00 scripts/07_gvmag_setup.slurm )  # step 07, once (job 73832); also downloads the CheckV db v1.5
-( module purge; module load slurm/kuro; bash scripts/08_gvmags.sh -p serial )      # step 08 (array, ≤10 at once)
-( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/09_gvmag_votus.slurm )  # step 09 (once)
-( module purge; module load slurm/kuro; sbatch -p serial scripts/10_gvmag_phylogeny.slurm )  # step 10 (once; needs GVMAGS_V2_FULL=1 setup)
-( module purge; module load slurm/femto; sbatch -p batch scripts/11_gvmag_tree.slurm )       # step 11 (once; 72 h partition)
-# the two removed steps have no scripts any more (a binning test and the CheckV database download,
-# which step 07 now does); step 08 bins the merged contigs itself
+Run everything **from the repository root on dev**. This is not a style preference: the
+step 01-03 `.slurm` wrappers invoke their worker script by a relative path
+(`bash ./scripts/02_fastp.sh`), and `sbatch` starts a job in the directory it was
+submitted from, so submitting from anywhere else fails with "No such file or directory".
+
+Wait for each step's jobs to finish before starting the next. Before each submission,
+check which cluster will finish soonest with `~/hpc/best_cluster.sh -c CORES -m MEM_GB
+-H HOURS` and override `-p` (and `-t`) on the `sbatch` line; the partitions below are
+the ones that worked on the dates given, not permanent recommendations.
+
+### 0. Prerequisites a clone does not provide
+
+```bash
+bash scripts/00_directory_setup.sh                     # creates the scratch and repo folders
+cp metadata/SraRunTable.csv ~/scr10/data/kbrevis/      # step 01 reads it from scratch
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/00_create_envs.slurm )
 ```
 
-Before each submission, check which cluster will finish soonest with
-`~/hpc/best_cluster.sh -c CORES -m MEM_GB -H HOURS` and override `-p` (and `-t`) on the
-`sbatch` line. Bora `batch` gives a 20-core, 125 GB node, so it can't run the 360 GB
-assembly jobs; those need kuro `serial` or gulf `gz`.
+`00_create_envs.slurm` builds the six environments steps 01-06 need from `envs/*.yml`
+and then verifies that every tool those steps call is actually on `PATH`. Steps 07 and 14
+build their own environments later, so they are not duplicated here.
+
+**`fastp` is not provided by any environment file.** On this account it is a standalone
+binary at `~/programs/fastp`, placed on `PATH` by `~/.bashrc`. Jobs inherit the submitting
+shell's environment, which is why step 02 works here - but `sbatch` never sources
+`~/.bashrc`, so on a new account `fastp` must be installed and made visible to jobs or
+step 02 fails with "fastp is not available". `00_create_envs.slurm` reports this rather
+than letting step 02 discover it.
+
+### 1-6. Reads, references, cleaning, assembly, merge
+
+```bash
+( module purge; module load slurm/bora;   sbatch scripts/01_download_files.slurm )      # ~2.0 TB into raw/
+( module purge; module load slurm/bora;   sbatch scripts/02_fastp.slurm )               # -> trim/ (~1.6 TB)
+( module purge; module load slurm/bora;   sbatch scripts/03_download_refs.slurm )       # -> reference/  (SEE BELOW)
+( module purge; module load slurm/bora;   sbatch scripts/03b_download_phix.slurm )      # -> reference/phix174.fna
+( module purge; module load slurm/bora;   sbatch -p hima scripts/04_clean_refs.slurm )  # -> clean/ (~1.1 TB)
+( module purge; module load slurm/kuro;   bash scripts/05_metaspades.sh )               # 20 jobs -> contigs/
+( module purge; module load slurm/kuro;   bash scripts/05_metaspades_nov.sh )           # 20 jobs -> contigs_no_v/
+( module purge; module load slurm/kuro;   bash scripts/06_merge_assemblies.sh )         # 20 jobs -> contigs_merged/
+```
+
+**Skipping step 03 on a re-run.** Steps 03 and 03b download ~79 GB of host and contaminant
+genomes and take a long time. They only need to run once. To keep them:
+
+```bash
+# keep ~/scr10/data/kbrevis/reference/ when clearing scratch, then skip 03 and 03b entirely
+```
+
+This is safe, and the reason is worth stating. Step 04 needs six FASTAs in `reference/`
+(`dog_ref_genome.fna`, `cat_ref_genome.fna`, `mouse_ref_genome.fna`,
+`human_ref_genome.fna`, `phix174.fna`, `kbrevis_ref.fna`) and exits with a clear error
+naming any that are missing, so a partial `reference/` fails loudly rather than silently
+producing badly cleaned reads. The 42 GB bowtie2 index (`host_index.*.bt2l`, 6 files) also
+lives in `reference/`, and `04_clean_refs.sh` rebuilds it **only if absent**
+(`if ! bowtie2-inspect "$INDEX_PREFIX"`), so keeping `reference/` also skips several hours
+of `bowtie2-build`. Verified present and complete on 2026-11-19.
+
+### 7-11. GVMAGs, vOTUs, phylogeny, tree
+
+```bash
+( module purge; module load slurm/astral; sbatch -p batch -c 4 --exclude=as01 --mem=16G -t 6:00:00 \
+    --export=ALL,GVMAGS_V2_FULL=1 scripts/07_gvmag_setup.slurm )      # envs, GVClass, CheckV/geNomad/GVMAGs V2 dbs
+( module purge; module load slurm/kuro;   bash scripts/08_gvmags.sh -p serial )          # array -> gvmags/
+( module purge; module load slurm/kuro;   sbatch -p serial -c 16 --mem=64G -t 4:00:00 \
+    scripts/09_gvmag_votus.slurm --with-refs )                                           # -> votus/
+( module purge; module load slurm/kuro;   sbatch -p serial -c 32 --mem=16G -t 4:00:00 \
+    scripts/10_gvmag_phylogeny.slurm )                                                   # -> phylogeny/
+( module purge; module load slurm/kuro;   sbatch -p serial scripts/11_pre_tree_check.slurm )   # optional: sizes step 11
+( module purge; module load slurm/kuro;   sbatch -p serial scripts/11_pre_tree_check2.slurm )  # optional: X vs gap
+( module purge; module load slurm/kuro;   sbatch -p serial -c 64 --mem=96G -t 48:00:00 \
+    scripts/11_gvmag_tree.slurm --mset LG,WAG,JTT --cmax 4 --safe )                      # -> tree/
+```
+
+Note `--export=ALL,GVMAGS_V2_FULL=1` on step 07: without it the 1.18 GB GVMAGs V2 genome
+bundle is not downloaded and **step 10 exits with an error**, because it needs the
+reference proteomes. The original run discovered this the slow way.
+
+Step 10's `--mem=16G` is the measured requirement (3.6 GB peak); the `#SBATCH` line in the
+script still says 128 GB and should be overridden. Step 11's flags are explained in
+sections 11h-11i: unrestricted ModelFinder would consume the whole walltime before building
+a tree. If step 11 hits the 48 h limit, **resubmit the identical command** - IQ-TREE resumes
+from its checkpoint.
+
+### 12. Collect results into the repository
+
+```bash
+( module purge; module load slurm/kuro; sbatch -p serial scripts/copy_results.slurm )
+```
+
+Copies `gvmags/`, `votus/` and the step 11 tree files into `output/`, excluding the large
+regenerable intermediates (`binning/`, `gvclass_in/`, `.ufboot`, `.ckp.gz`, `.mldist`).
+
+### 13. iTOL annotations and vOTU tree placement
+
+These are small, pure-Python, and run on dev:
+
+```bash
+python3 -I scripts/make_itol_annotations.py \
+    --tree     output/tree/kbrevis_gvmags.treefile \
+    --manifest ~/scr10/data/kbrevis/phylogeny/reference_manifest.tsv \
+    --votus    output/votus/gvmags_votus.tsv \
+    --nearest  output/votus/votu_nearest_reference.tsv \
+    --out-dir  output/tree
+
+python3 -I scripts/votu_tree_context.py \
+    --tree     output/tree/kbrevis_gvmags.treefile \
+    --manifest ~/scr10/data/kbrevis/phylogeny/reference_manifest.tsv \
+    --out      output/tree/votu_tree_context.tsv
+```
+
+`output/Kbrevis_virome_tree.png` is **not** produced by any script: it is an image exported
+by hand from iTOL after uploading `output/tree/kbrevis_gvmags.treefile` and the annotation
+files (see `output/tree/README.md`). A re-run will not recreate it; export it again from
+iTOL if it is wanted.
+
+### 14. vOTU abundance in the environment through time
+
+```bash
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/14_abundance_setup.slurm )
+bash scripts/14_votu_reference.sh                       # 19 vOTU representatives -> abundance/votu_ref
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/14_abundance_smoketest.slurm )  # optional but recommended
+( module purge; module load slurm/bora;   sbatch -p hima -C hi --exclude=hi04,hi05,hi07 \
+    scripts/14_votu_abundance.slurm )                   # array of 11 -> abundance/per_sample
+
+python3 -I scripts/merge_votu_abundance.py \
+    --coverm-dir ~/scr10/data/kbrevis/abundance/per_sample \
+    --manifest   ~/scr10/data/kbrevis/abundance/votu_reference_manifest.tsv \
+    --sra-table  metadata/SraRunTable.csv \
+    --out-long   output/abundance/votu_abundance_long.tsv \
+    --out-matrix output/abundance/votu_abundance_matrix.tsv
+
+module load miniforge3 && eval "$(conda shell.bash hook)" && conda activate r-plot-env
+Rscript scripts/plot_votu_abundance.R output/abundance/votu_abundance_long.tsv output/abundance
+conda deactivate
+```
+
+`14_votu_reference.sh` must run before the array; the array checks for its output and exits
+with an instruction if it is missing.
+
+### 15. ANI against the published GVMAGs
+
+```bash
+bash scripts/15_fetch_booker_gvmags.sh                  # downloads 74 GenBank contigs -> 10 genomes
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/15_booker_ani.slurm )
+```
+
+Writes the three CSVs in `output/` directly, so no separate collection step is needed.
+
+### R. What the 2026-11-19 reproducibility audit found
+
+| # | finding | status |
+|---|---|---|
+| 1 | The runbook stopped at step 11. Steps 12, 14 and 15 and every manual post-processing command were undocumented, so a new user would have reproduced the scratch directory but not most of `output/` | **fixed** - this section now covers 00-15 |
+| 2 | `output/tree/` was populated by an ad-hoc `cp` loop typed into a terminal, not by any script, so a re-run would not recreate it | **fixed** - `copy_results.slurm` now copies the named tree files |
+| 3 | Steps 01-06 assumed their conda environments already existed; nothing created them | **fixed** - new `scripts/00_create_envs.slurm` |
+| 4 | `03_download_refs.slurm` wrote `datasets-env.yml` into the **repository root** on every run, leaving a stray duplicate of `envs/datasets-env.yml` | **fixed** - writes `envs/datasets-env.lock.yml`, with the machine-specific `prefix:` line stripped |
+| 5 | Root-level `datasets-env.yml` and `sra-toolkit-env.yml` were tracked duplicates of the `envs/` copies | **fixed** - untracked |
+| 6 | `fastp` is a standalone binary on `PATH` via `~/.bashrc`, not in any `envs/*.yml`. It works here only because jobs inherit the submitting shell; a new account would fail at step 02 | **documented and checked** - `00_create_envs.slurm` reports it; installing fastp remains a manual prerequisite |
+| 7 | `output/Kbrevis_virome_tree.png` is a hand-exported iTOL image with no generating script | **documented** as a manual step |
+| 8 | Step 07 needs `--export=ALL,GVMAGS_V2_FULL=1` or step 10 fails later | **documented** in the step 7-11 block |
+| 9 | **23 scripts hardcode `/sciclone/home/iadanforth/`** (59 occurrences) and 17 hardcode `--mail-user=iadanforth@wm.edu` | **documented** below - fine for re-running on this account, a blocker for anyone else |
+
+#### Porting to a different account
+
+Everything above assumes the pipeline is being re-run **on this account**, which is what
+the audit was asked to confirm. A genuinely different user cloning from GitHub hits one
+more obstacle, and it is worth being precise about it rather than claiming the repository
+is portable when it is not.
+
+23 of the 44 scripts contain the literal path `/sciclone/home/iadanforth/`, 59 times.
+**44 of those occurrences are unavoidable**: AGENTS.md requires every job's `.out`/`.err`
+to land in `<project>/logs/`, and `#SBATCH` directives cannot expand `~` or `$HOME`, so the
+absolute path has to be written out. The rest are `REPO=` assignments which could use
+`$HOME` but do not. A further 17 scripts carry `--mail-user=iadanforth@wm.edu`, which would
+send another user's job notifications to this account.
+
+For another user on SciClone, two substitutions fix all of it:
+
+```bash
+cd <their clone>
+grep -rl '/sciclone/home/iadanforth' scripts/ \
+  | xargs sed -i 's|/sciclone/home/iadanforth|/sciclone/home/<their-username>|g'
+grep -rl 'iadanforth@wm.edu' scripts/ \
+  | xargs sed -i 's|iadanforth@wm.edu|<their-address>@wm.edu|g'
+```
+
+Off SciClone the scripts need more than substitution: the `module load slurm/<cluster>`
+lines, the partition names, `/local/scr/$USER` and `~/scr10` / `~/data10` are all specific
+to this system. The *analysis* is portable - the tools, parameters and thresholds are all
+documented above - but the *job scripts* are not, and rewriting them for another cluster is
+a real piece of work rather than a find-and-replace.
+
+Checked and found **already correct**, so left alone:
+
+- Every `.sh` worker script creates the scratch directory it writes to (`mkdir -p`), so the
+  short `00_directory_setup.sh` is not a problem despite listing only `raw/` and `clean/`.
+- All 44 scripts, all 25 `envs/*.yml` and `metadata/SraRunTable.csv` are committed.
+- `scripts/__pycache__/`, `scripts/select_refs.py.bak` and `scripts/11_gvmag_tree.slurm.orig`
+  are correctly ignored and absent from a clone.
+- Every artifact in `output/` is produced by a committed script, with the single exception
+  of the hand-exported iTOL PNG above.
 
 ----------------------------------------------------------------------------------------
 
