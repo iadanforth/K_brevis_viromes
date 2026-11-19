@@ -1,0 +1,41 @@
+[envs] sra-toolkit-env already exists
+[envs] datasets-env already exists
+[envs] seqtk-env already exists
+[envs] host-screen-env already exists
+[envs] metaspades-env already exists
+[envs] seqkit-env already exists
+[envs] creating fastp-env from envs/fastp-env.yml
+Channels:
+ - conda-forge
+ - bioconda
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate fastp-env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+
+[envs] verifying the tools each step actually calls
+  sra-toolkit-env    fasterq-dump           OK
+  datasets-env       datasets               OK
+  seqtk-env          seqtk                  OK
+  host-screen-env    bowtie2                OK
+  host-screen-env    bowtie2-build          OK
+  host-screen-env    samtools               OK
+  metaspades-env     metaspades.py          OK
+  metaspades-env     metaviralspades.py     OK
+  seqkit-env         seqkit                 OK
+  fastp-env          fastp                  OK
+
+[envs] all tools for steps 01-06 are present

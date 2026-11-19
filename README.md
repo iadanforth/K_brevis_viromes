@@ -70,7 +70,7 @@ and this README ever disagree, the script in `scripts/` is what actually runs.
 |---|---|---|---|---|---|---|
 | 00 | make folders | `00_directory_setup.sh` | bash | – | folder tree | done (originally by hand; script fixed 2026-11-12) |
 | 01 | download reads from NCBI SRA | `01_download_files.sh/.slurm` | fasterq-dump (sra-tools 3.4.1) | `sra-toolkit-env` | `raw/` | done |
-| 02 | trim adapters / low-quality bases | `02_fastp.sh/.slurm` | fastp 1.3.7 | none (binary in `~/programs`) | `trim/` | done (job 577472) |
+| 02 | trim adapters / low-quality bases | `02_fastp.sh/.slurm` | fastp 1.3.7 | `fastp-env` | `trim/` | done (job 577472) |
 | 03 | download contaminant references | `03_download_refs.sh/.slurm`, `03b_download_phix.sh/.slurm` | NCBI datasets 18.39.0, seqtk 1.5 | `datasets-env`, `seqtk-env` | `reference/` | done |
 | 04 | remove reads from phiX, human, mouse, cat, dog, *K. brevis* | `04_clean_refs.sh/.slurm` | bowtie2 2.5.5, samtools 1.24 | `host-screen-env` | `clean/` | done (job 607624) |
 | 05a | viral assembly | `05_metaspades.sh/.slurm` | metaviralSPAdes (SPAdes 4.3.0) | `metaspades-env` | `contigs/` | done, all 20 samples |
@@ -126,7 +126,7 @@ touched for 90 days are deleted**, so copy anything important to `~/data10`.
 ~/data10/databases/gvmagsV2/GVDB_stats.tsv      GVMAGs V2 metadata, 18,725 giant virus genomes (step 07)
 ~/data10/programs/gvclass-v1.1.1                GVClass + its database, installed with pixi (step 07)
 ~/data10/programs/ncldv_markersearch            giant virus marker-gene search + concatenation (step 07; step 10 uses it)
-~/programs/fastp                                 fastp 1.3.7 binary (on PATH via ~/.bashrc)
+(no entry: fastp now comes from the fastp-env conda environment, not a manual binary)
 ```
 
 #### A2. Running jobs from dev
@@ -156,6 +156,7 @@ conda activate <env-name>
 | env | key tools (version installed) | used in step | file |
 |---|---|---|---|
 | `sra-toolkit-env` | sra-tools 3.4.1 (`fasterq-dump`) | 01, 03 | `envs/sra-toolkit-env.yml` |
+| `fastp-env` | fastp 1.3.7 | 02 | `envs/fastp-env.yml` |
 | `datasets-env` | ncbi-datasets-cli 18.39.0 | 03 | `envs/datasets-env.yml` |
 | `seqtk-env` | seqtk 1.5 | 03 | `envs/seqtk-env.yml` |
 | `host-screen-env` | bowtie2 2.5.5, samtools 1.24 | 04 | `envs/host-screen-env.yml` |
@@ -217,11 +218,20 @@ slightly different builds of the same versions. Some pinned versions may also di
 the channels. If a rebuild fails, relax the pins on minor libraries (e.g. `libgcc`,
 `openssl`) and keep the pins on the bioinformatics tools.
 
-**fastp** is not in conda here: it is the prebuilt binary `~/programs/fastp` (version 1.3.7,
-downloaded from the fastp GitHub releases), put on `PATH` by
-`export PATH="$HOME/programs:$PATH"` in `~/.bashrc`. To reproduce, either download the same
-binary or `conda create -n fastp-env -c bioconda fastp=1.3.7` and add
-`conda activate fastp-env` to `02_fastp.slurm`.
+**fastp moved into conda on 2026-11-19** (prompt 51). It used to be the prebuilt binary
+`~/programs/fastp` (1.3.7, from the fastp GitHub releases), put on `PATH` by `~/.bashrc`.
+That was the one genuinely unreproducible dependency in the pipeline: `sbatch` does not
+source `~/.bashrc`, so step 02 worked only because a job inherits the submitting shell's
+environment - it would have failed on any other account, and depended on the state of the
+shell it was launched from here.
+
+It is now `envs/fastp-env.yml`, **pinned to fastp 1.3.7**, the identical version, which
+bioconda carries. `02_fastp.slurm` activates it, and `00_create_envs.slurm` builds it.
+Both binaries were checked side by side and report `fastp 1.3.7`, and the invocation in
+`02_fastp.sh` is unchanged, so re-running step 02 produces the same trimmed reads. The pin
+matters: trimming parameters and fastp version together determine `trim/`, which every
+later step depends on, so this should not be floated without re-running step 02 onwards.
+The old `~/programs/fastp` binary can stay where it is; nothing references it any more.
 
 Other environments exist in `~/.conda/envs` but are not used by any current script:
 `fastqc-env`, `flye-env`, `megahit-env`, `metabat-env` (MetaBAT 2.18), `samtools`, `sra`.
@@ -6166,12 +6176,10 @@ cp metadata/SraRunTable.csv ~/scr10/data/kbrevis/      # step 01 reads it from s
 and then verifies that every tool those steps call is actually on `PATH`. Steps 07 and 14
 build their own environments later, so they are not duplicated here.
 
-**`fastp` is not provided by any environment file.** On this account it is a standalone
-binary at `~/programs/fastp`, placed on `PATH` by `~/.bashrc`. Jobs inherit the submitting
-shell's environment, which is why step 02 works here - but `sbatch` never sources
-`~/.bashrc`, so on a new account `fastp` must be installed and made visible to jobs or
-step 02 fails with "fastp is not available". `00_create_envs.slurm` reports this rather
-than letting step 02 discover it.
+`fastp` is included: it was moved out of a manual `~/programs/fastp` binary and into
+`envs/fastp-env.yml` (pinned to the same version, 1.3.7) on 2026-11-19, which removed the
+pipeline's last dependency on a shell-specific `PATH`. Nothing outside the repository and
+these environment files is needed any more.
 
 ### 1-6. Reads, references, cleaning, assembly, merge
 
@@ -6302,7 +6310,7 @@ Writes the three CSVs in `output/` directly, so no separate collection step is n
 | 3 | Steps 01-06 assumed their conda environments already existed; nothing created them | **fixed** - new `scripts/00_create_envs.slurm` |
 | 4 | `03_download_refs.slurm` wrote `datasets-env.yml` into the **repository root** on every run, leaving a stray duplicate of `envs/datasets-env.yml` | **fixed** - writes `envs/datasets-env.lock.yml`, with the machine-specific `prefix:` line stripped |
 | 5 | Root-level `datasets-env.yml` and `sra-toolkit-env.yml` were tracked duplicates of the `envs/` copies | **fixed** - untracked |
-| 6 | `fastp` is a standalone binary on `PATH` via `~/.bashrc`, not in any `envs/*.yml`. It works here only because jobs inherit the submitting shell; a new account would fail at step 02 | **documented and checked** - `00_create_envs.slurm` reports it; installing fastp remains a manual prerequisite |
+| 6 | `fastp` was a standalone binary on `PATH` via `~/.bashrc`, not in any `envs/*.yml`. It worked here only because jobs inherit the submitting shell; a new account would have failed at step 02 | **fixed 2026-11-19** - now `envs/fastp-env.yml` pinned to the same 1.3.7, activated by `02_fastp.slurm` and built by `00_create_envs.slurm` |
 | 7 | `output/Kbrevis_virome_tree.png` is a hand-exported iTOL image with no generating script | **documented** as a manual step |
 | 8 | Step 07 needs `--export=ALL,GVMAGS_V2_FULL=1` or step 10 fails later | **documented** in the step 7-11 block |
 | 9 | **23 scripts hardcode `/sciclone/home/iadanforth/`** (59 occurrences) and 17 hardcode `--mail-user=iadanforth@wm.edu` | **documented** below - fine for re-running on this account, a blocker for anyone else |

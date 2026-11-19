@@ -1293,3 +1293,33 @@ for anyone else, and real work to move off SciClone.
 `scripts/03_download_refs.slurm` (no longer writes to the repo root), `README.md`
 (runbook rewritten for steps 00-15, new audit section R and a porting subsection),
 `PROMPT_LOG.md`. Untracked: root-level `datasets-env.yml`, `sra-toolkit-env.yml`.
+
+---
+
+### 51. 2026-11-19 10:20 (US Eastern) — Claude Code (Opus 5)
+
+> Ok for fastp, could you change the script so that instead of calling fastp from my manual instal, you use a conda environment. Seems like that will avoid the issues of path names
+
+**Done:** Moved fastp from the manual `~/programs/fastp` binary into a pinned conda
+environment, removing the pipeline's last dependency on a shell-specific `PATH`. Checked
+first that bioconda carries the **exact** version already in use (1.3.7) - it does - and
+pinned that rather than floating the version, because fastp's version and flags together
+determine the contents of `trim/`, which every later step depends on; a newer fastp would
+silently change the assemblies. Created `envs/fastp-env.yml`, added `module load
+miniforge3` + `conda activate fastp-env` to `02_fastp.slurm` (which previously activated
+nothing and relied entirely on inheriting the submitting shell's PATH), made
+`02_fastp.sh`'s error message name the environment and the script that builds it, and
+added `fastp-env` to `00_create_envs.slurm`. The invocation in `02_fastp.sh` is unchanged.
+**Verified rather than assumed:** ran `00_create_envs.slurm` (job 73952, 42 s) which
+skipped the six existing environments, built `fastp-env`, and confirmed all ten tools for
+steps 01-06 resolve; compared both binaries side by side (`fastp 1.3.7` from each); and
+ran step 02's exact flag set in a shell with `~/programs` stripped from `PATH`, which is
+what a clean account sees - fastp was invisible before activation, resolved to the conda
+copy after it, and trimmed correctly (160 bp in, 132 bp out, matching
+`--trim_front 8` + `--trim_tail 20`). Updated the README in six places: the step table,
+the directory listing, section B's environment table and its fastp paragraph, the rebuild
+runbook's prerequisites, and audit finding 6, which moves from "documented" to "fixed".
+The old binary is left in place; nothing references it.
+**Files:** `envs/fastp-env.yml` (new), `scripts/02_fastp.slurm`, `scripts/02_fastp.sh`,
+`scripts/00_create_envs.slurm`, `README.md`, `PROMPT_LOG.md`. Outside the repo: created
+the `fastp-env` conda environment.

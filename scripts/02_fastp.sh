@@ -5,7 +5,9 @@ RAW_DIR="$HOME/scr10/data/kbrevis/raw"
 CLEAN_DIR="$HOME/scr10/data/kbrevis/trim"
 
 command -v fastp >/dev/null 2>&1 || {
-    echo "fastp is not available; activate the environment that contains it." >&2
+    echo "fastp is not available. Activate the pinned environment first:" >&2
+    echo "    module load miniforge3; eval \"\$(conda shell.bash hook)\"; conda activate fastp-env" >&2
+    echo "(02_fastp.slurm does this for you; create the env with 00_create_envs.slurm.)" >&2
     exit 1
 }
 

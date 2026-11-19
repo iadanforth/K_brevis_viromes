@@ -1,0 +1,13 @@
+# fastp for step 02 (adapter and quality trimming).
+#
+# Pinned to 1.3.7 deliberately: that is the version of the standalone `~/programs/fastp`
+# binary this project's step 02 was originally run with, and bioconda carries the exact
+# same version. Trimming parameters and version together determine the contents of
+# trim/, which every later step depends on, so a different fastp would silently change
+# the assemblies. Do not float this pin without re-running step 02 onwards.
+name: fastp-env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - fastp=1.3.7

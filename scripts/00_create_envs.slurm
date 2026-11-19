@@ -38,7 +38,7 @@ eval "$(conda shell.bash hook)"
 # NOT included, deliberately: binning-env, bbmpa-env and readcorr-env, which section B of
 # the README records as belonging to earlier attempts that are no longer part of the
 # pipeline.
-ENVS=(sra-toolkit-env datasets-env seqtk-env host-screen-env metaspades-env seqkit-env)
+ENVS=(sra-toolkit-env datasets-env seqtk-env host-screen-env metaspades-env seqkit-env fastp-env)
 
 for ENV in "${ENVS[@]}"; do
     YML="$REPO/envs/${ENV}.yml"
@@ -73,16 +73,7 @@ check host-screen-env bowtie2 bowtie2-build samtools
 check metaspades-env  metaspades.py metaviralspades.py
 check seqkit-env      seqkit
 
-# fastp is NOT a conda environment on this account: it is a standalone binary put on PATH
-# by ~/.bashrc. A new user must install it themselves - see README section B - because
-# sbatch does not source ~/.bashrc and step 02 will fail with "fastp is not available".
-if command -v fastp >/dev/null 2>&1; then
-    echo "  fastp (standalone)                      OK: $(command -v fastp)"
-else
-    echo "  fastp (standalone)                      ** NOT ON PATH - step 02 will fail **"
-    echo "    install it and make it available to jobs; it is not provided by any envs/*.yml"
-    MISSING=1
-fi
+check fastp-env        fastp
 
 echo
 (( MISSING == 0 )) && echo "[envs] all tools for steps 01-06 are present" \
