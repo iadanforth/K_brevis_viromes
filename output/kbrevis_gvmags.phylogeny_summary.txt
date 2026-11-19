@@ -1,0 +1,8 @@
+project:        kbrevis_gvmags
+date:           Mon Nov 16 01:07:47 PM EST 2026
+our vOTUs:      19
+total taxa:     1564
+reference tier: mcl, orders=auto, max=0
+aligner:        clustalo
+columns before trimming: 46737
+columns after trimming:  37739
