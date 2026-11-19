@@ -7,25 +7,26 @@ Re-analysis of Illumina sequences published by Booker et al. 2026.
 Harmful algal blooms, or HABs pose a growing threat to coastal 
 community well-being and economic stability globally. In Florida, the dinoflagellate *Karenia 
 brevis* is exceptionally problematic. This species produces the potent neurotoxins called brevetoxins 
-that can cause immediate damage and also chronic, long-term damage. Despite their significant impact
-on Florida residents, little is known about what drives the dynamics of Karenia blooms. Current theory 
-predicts that blooms are influenced by controls on physical, chemical and biological drivers, including virus-mediated 
+that can cause immediate damage and also chronic neurological issues. Despite their significant impact
+on Florida residents, little is known about what drives the dynamics of *Karenia* blooms. Current theory 
+predicts that blooms are influenced by controls on physical, chemical, and biological drivers, including virus-mediated 
 mortality. More recent work from other systems has shown that viral infection can sometimes prolong blooms (either 
 by providing hosts with products from viral auxiliary metabolic genes that support host survival, infecting competitor species, 
 or providing hosts with superinfection fitness), terminate blooms by causing widespread and rapid lysis, or increase toxin 
-release into the environment.Others have shown that viruses have the potential to be used a biocontrol strategy and can even 
-serve as early warning signals for growing algal blooms before they are detected by conventional methods.  Therefore, 
+release into the environment. Others have shown that viruses have the potential to be used as a biocontrol strategy and can even 
+serve as early warning signals for growing algal blooms before they are detected by conventional methods (using virus-specific peptides).  Therefore, 
 expanding our current understanding of the viral community associated with harmful algae is essential to comprehensively 
-characterizing bloom drivers. 
+characterizing bloom drivers and developing more effective early warning systems. 
 
 In this study, the authors collected 2-5L of seawater from a sampling location off the coast
 of Cayo Costa, Fl, USA in December-September 2021 and again in March 2022. Upon collection, 
 seawater was first filtered through a 100um mesh filter, followed by 10-3-0.22um polycarbonate 
 filters to size-fractionate the sample. After flash-freezing and storage at -80˚C, only the 0.22um 
-filters were used for subsequent metagenomic sequencing, as these would capture viral particles. These samples 
-were designated EH25. 
+filters were used for subsequent metagenomic sequencing, as these would capture viral particles. It is important 
+to note that only very large viruses will be retained by a 0.22uM filter. This is why their analysis focused 
+on identifying giant viruses using a set of tools specifically designed for this purpose. 
 
-In tandem, the authors inoculated a culture of K. brevis with ?? of bloom water that was either filtered 
+In tandem, the authors inoculated a culture of K. brevis bloom water that was either filtered 
 to only contain the viral fraction (VF, <0.22um filtrate) or viral and bacterial fraction (BVF, <1um filtrate). 
 After 8 or 15 days, 50mL of the culture was passed through 0.22um filters and total DNA was extracted from 
 these filters. The DNA samples were shipped to the University of Illinois at Urbana-Champaign Roy J. Carver 
@@ -34,66 +35,18 @@ DNA library prep kit (IDT, IA, USA) with a target size of 150 bp paired-end read
 quantitated by qPCR, and sequenced on one NovaSeq 6000 SP lane (Illumina, CA, USA) for 151 cycles from both fragment 
 ends. 
 
-GVMAGS captured from the incubation experiment were then mapped against the reads from the environmental 
+Giant virus "species" captured from the incubation experiment were then mapped against the reads from the environmental 
 samples to determine their prevalence through time. 
 
 ## Purpose: 
-The purpose of this re-analysis was to gain familiarity with the tools previously employed 
-by the authors and to incorporate a few additional tools to see if I could find anything interesting 
+In this project, I sought to re-analyze the metagenomes published by Booker et al. 2026 using 
+a slightly different pipeline. Most importantly, I was interested in knowing whether I would 
+be able to identify more viruses than they did by including the results of Vasquez et al. 2026. In
+this paper, the authors scanned public databases and used a novel gene prediction method that allowed 
+for alternative genetic codes. This significantly expanded giant virus databases (4 fold or 6 fold relative 
+to two previous studies). However, this paper was published after Booker et al. 2026, and so they were not able to 
+include this data. 
 
-**IS THERE A WAY TO BRING IN THE AYLWARD NCLDV PHYLOGENOMICS PAPER -- maybe add these 
-metagenomes to that paper? Maybe add other metagenomes to that paper?**
-
-## Pipeline followed by the manuscript
-#### QUALITY CONTROL 
-1. bcl2fastq v2.20 -- demultiplex fastq files (not needed if pulling from NCBI)
-	- MultiQC reports showed no samples had any adapter contamination 
-2. bbmap v35.85 (bbduk.sh) -- quality filtering - remove phiX and low quality sequences 
-   “ref= bbmap/35.85/resources/phix174_ill.ref.fa.gz k=27 hdist=1 qtrim=rl trimq=17 cardinality=t mingc=0.05 maxgc=0.95 -Xmx30g”. 
-3. bbmap v35.85 -- checked remaining reads for mammalian contaminants - humans, dogs, mouse, cat 
-    - REF DATABASE: https://portal.nersc.gov/dna/microbial/assembly/bushnell/)
-4. bbmap v35.85 -- interleaved forward and reverse reads using the reformat.sh script 
-5. bfc v181 -- filtered reads with “-l -s 10g -k21” to correct or remove unique kmers
-6. In general, I did not need to run this part of their pipeline since they did this before sending 
-   the files to NCBI (at least, I think that they did based on their supplementary files)
-
-#### ASSEMBLY 
-1. metaSPADES v3.15.4
-   - “-k 21,33,55,77,99,127”. 
-   - quality controlled reads submitted to NCBI under PRJNA1077797 
-   - GVMAGS also provided GenBank accession numbers PV483752-PV483756, PV637767-PV637835.
-
-#### BINNING CONTIGS 
-1. bbmap v35.85, samtools v1.15.1, MetaBAT v2.15
-2. GVClass v0.9.4 -- identify giant virus bins 
-3. GVClass and CheckV v0.9.0 -- used to check GVMAG completeness and quality 
-4. pyrodigal-gv v 3.5.1 -- gene prediction 
-5. geNomad v1.7.4 -- gene annotation (bitscore of 50 or higher)
-
-#### GVMAG comparisons 
-1. Based on their average nucleotide identity 
-2. ANIclustermap v1.1.0 (https://github.com/moshi4/ANIclustermap)
-   - used ncldv_markersearch -c to get concatenated giant virus phylogenomic trees 
-   - this identifies, extracts, concatenates, and aligsn the default seven giant virus marker genes (didn't Aylward have more?)
-   - downloaded giant virus reference genomes (Aylward paper, accessed Sept 2024)
-3. trimAI v1.4.22 to trim concatenated giant virus genomes "-automated1"
-
-#### Phylogenetic tree 
-1. Alignment file from trimAI was put into IQTree - “-m MFP -bb 1000 -nt AUTO -wbt”.  
-2. RAxML v8.2.12 -- used to calculate tree certainty scores with “-f i -m GTRCAT” 
-
-#### GVMAG prevalence 
-1. Mapped GVMAGs to reads from environmental samples 
-2. Coverm v0.6.1 --min-read-percent-identity 90 --min-read-aligned-percent 75  --min-covered-fraction 0 --minimap2-parameters "-I 500M" (https://github.com/wwood/CoverM?tab=readme-ov-file#coverm).
-3. Coverm relative abundance calculations and K. brevis cell counts from EH25 were graphed in R using ggplot2.
-
-
-
-They also re-propagated the viral OTU's picked up in their initial incubation 
-experiment by giving the lysate to new cultures at a 15% v/v. They collected the lysate from this,
-passaged it one more time and then extracted DNA from filters. They developed PCR assays to pick up GVMAG 
-vOTU1 through 6. So essentially they develoepd primers using the MAGs that they had previously 
-assembled. PCR products were sequenced via GridION and aligned to vOTU1-6 genomes. 
 
 ----------------------------------------------------------------------------------------
 
