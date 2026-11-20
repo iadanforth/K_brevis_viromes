@@ -7522,3 +7522,282 @@ In `output/`, as requested:
     203 kb, yet it has no giant-virus marker genes (10j), no GVMAGs V2 relative (09f), and
     no match to the published set (15d). Three independent signals say it is not what
     CheckV's completeness implies. vOTU13 and vOTU19 need similar scrutiny.
+
+----------------------------------------------------------------------------------------
+
+# Commands
+
+Every command needed to reproduce this project from nothing, in order. Written
+2026-11-20 (prompt 52 in `PROMPT_LOG.md`) and checked against the scripts as they stand on
+that date: every script named here exists, every flag was verified against the script's own
+argument parser, and every `#SBATCH` default quoted below was read from the file.
+
+This section is the **copy-and-paste list**. The reasoning behind each choice -
+why a tool, why a threshold, what the output means - is in the numbered step sections
+above, and the shorter narrative version is under "Rebuilding everything from scratch".
+
+**Read these five things first.**
+
+1. **Run everything from `~/K_brevis_viromes` on dev.** The step 01-03 wrappers call their
+   worker script by a relative path (`bash ./scripts/02_fastp.sh`) and `sbatch` starts a
+   job in the directory it was submitted from. Submitting from elsewhere fails.
+2. **Wait for each step to finish before starting the next.** Nothing here polls or blocks.
+   Check with `squeue` (see "Monitoring" at the end).
+3. **The `-p` partitions below are what worked on the dates in the step sections, not
+   permanent advice.** Before each submission run
+   `~/hpc/best_cluster.sh -c CORES -m MEM_GB -H HOURS` and override `-p` and `-t`. Only
+   `05_metaspades*.slurm` and `06_merge_assemblies.slurm` carry a partition (`-p serial`)
+   in the file; everything else takes it from the command line.
+4. **Several commands deliberately override the script's own `#SBATCH` values**, because
+   the originals were over-requested and later measured. Those are flagged inline. Do not
+   "tidy" them away.
+5. **Disk**: this produces about **5.3 TB** in scratch. `raw/` 2.0 TB, `trim/` 1.6 TB,
+   `clean/` 1.1 TB, `contigs_no_v/` 322 GB, `gvmags/` 115 GB, `contigs/` 90 GB,
+   `reference/` 79 GB. Scratch is never backed up and is purged after 90 days without
+   access.
+
+## 0. Directories, repository, environments, metadata
+
+```bash
+# --- the two directories, and the code -------------------------------------------------
+mkdir -p ~/scr10/data/kbrevis
+cd ~
+git clone https://github.com/iadanforth/K_brevis_viromes.git
+cd ~/K_brevis_viromes
+
+# creates the remaining scratch and repo folders (each script also makes its own, so this
+# is belt-and-braces rather than strictly required)
+bash scripts/00_directory_setup.sh
+
+# --- the sample table step 01 reads ----------------------------------------------------
+cp metadata/SraRunTable.csv ~/scr10/data/kbrevis/
+
+# --- conda environments ----------------------------------------------------------------
+# Builds the seven environments steps 01-06 need (sra-toolkit, datasets, seqtk,
+# host-screen, metaspades, seqkit, fastp) and then verifies every tool resolves.
+# Steps 07 and 14 build their own environments later; do not duplicate them here.
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/00_create_envs.slurm )
+```
+
+**If you are not `iadanforth`**, also run these two substitutions before anything else. 23
+scripts contain the literal path and 17 contain the e-mail; 44 of the path occurrences are
+`#SBATCH` log directives, which cannot use `~` or `$HOME` and so must be absolute:
+
+```bash
+grep -rl '/sciclone/home/iadanforth' scripts/ \
+  | xargs sed -i 's|/sciclone/home/iadanforth|/sciclone/home/YOUR_USERNAME|g'
+grep -rl 'iadanforth@wm.edu' scripts/ \
+  | xargs sed -i 's|iadanforth@wm.edu|YOUR_ADDRESS@wm.edu|g'
+```
+
+## 1-6. Reads, references, cleaning, assembly, merging
+
+```bash
+cd ~/K_brevis_viromes
+
+# --- 01. download 20 SRA runs -> raw/  (~2.0 TB) ---------------------------------------
+( module purge; module load slurm/bora; sbatch scripts/01_download_files.slurm )
+
+# --- 02. adapter/quality trimming -> trim/  (~1.6 TB) ----------------------------------
+# fastp 1.3.7 from fastp-env; the wrapper activates it.
+( module purge; module load slurm/bora; sbatch scripts/02_fastp.slurm )
+
+# --- 03 + 03b. host and contaminant genomes -> reference/  (~79 GB) --------------------
+# SKIPPABLE ON A RE-RUN - see the note below.
+( module purge; module load slurm/bora; sbatch scripts/03_download_refs.slurm )
+( module purge; module load slurm/bora; sbatch scripts/03b_download_phix.slurm )
+
+# --- 04. bowtie2 host removal -> clean/  (~1.1 TB) -------------------------------------
+# Also builds the 42 GB bowtie2 index into reference/, but only if it is not already there.
+( module purge; module load slurm/bora; sbatch -p hima -C hi --exclude=hi04,hi05,hi07 \
+    scripts/04_clean_refs.slurm )
+
+# --- 05a. metaviralSPAdes -> contigs/  (90 GB; 20 separate jobs) -----------------------
+# The submitter skips any sample whose contigs already exist, so it is safe to re-run.
+( module purge; module load slurm/kuro; bash scripts/05_metaspades.sh )
+
+# --- 05b. metaSPAdes -> contigs_no_v/  (322 GB; 20 jobs) -------------------------------
+( module purge; module load slurm/kuro; bash scripts/05_metaspades_nov.sh )
+
+# --- 06. merge the two assemblies per sample -> contigs_merged/  (6.6 GB; 20 jobs) -----
+( module purge; module load slurm/kuro; bash scripts/06_merge_assemblies.sh )
+```
+
+**To skip step 03 on a re-run**, keep `~/scr10/data/kbrevis/reference/` when you clear
+scratch and simply do not submit `03_download_refs.slurm` or `03b_download_phix.slurm`.
+This is safe and saves both the ~79 GB download and several hours of `bowtie2-build`:
+step 04 needs six FASTAs (`dog_ref_genome.fna`, `cat_ref_genome.fna`,
+`mouse_ref_genome.fna`, `human_ref_genome.fna`, `phix174.fna`, `kbrevis_ref.fna`) and exits
+with an error naming any that are missing, and it rebuilds the index only when
+`bowtie2-inspect` cannot find one. Check before relying on it:
+
+```bash
+ls -la ~/scr10/data/kbrevis/reference/*.fna
+ls ~/scr10/data/kbrevis/reference/host_index.*.bt2l | wc -l    # expect 6
+```
+
+## 7. One-time setup for the GVMAG pipeline
+
+```bash
+# Builds 6 more conda environments, installs GVClass + pixi, and downloads the CheckV v1.5,
+# geNomad and GVMAGs V2 databases into ~/data10/databases (about 5 GB of environments and
+# several GB of databases).
+#
+# GVMAGS_V2_FULL=1 IS REQUIRED. Without it the 1.18 GB GVMAGs V2 genome/protein bundle is
+# not downloaded and STEP 10 FAILS much later with a confusing error.
+( module purge; module load slurm/astral; sbatch -p batch -c 4 --exclude=as01 --mem=16G \
+    -t 6:00:00 --export=ALL,GVMAGS_V2_FULL=1 scripts/07_gvmag_setup.slurm )
+```
+
+## 8-11. Binning, GVMAGs, vOTUs, alignment, tree
+
+```bash
+# --- 08. map, bin, classify -> gvmags/  (115 GB; array, <=10 concurrent) ---------------
+# Keep --mem=96G: several samples peaked at the full 96 GB.
+( module purge; module load slurm/kuro; bash scripts/08_gvmags.sh -p serial )
+
+# --- 09. cluster GVMAGs into vOTUs -> votus/  (16 MB; ~1 minute) -----------------------
+# --with-refs also compares each vOTU to the 8,508 GVMAGs V2 reference genomes.
+# 16c/64G is far more than needed (measured: 14.3 GB, 1 m 07 s); -c 8 --mem=24G -t 30:00 suffices.
+( module purge; module load slurm/kuro; sbatch -p serial -c 16 --mem=64G -t 4:00:00 \
+    scripts/09_gvmag_votus.slurm --with-refs )
+
+# --- 10. marker genes + concatenated alignment -> phylogeny/  (629 MB; ~1 h 10 m) ------
+# OVERRIDE THE MEMORY: the script asks for 128 GB, the measured peak is 3.6 GB.
+( module purge; module load slurm/kuro; sbatch -p serial -c 32 --mem=16G -t 4:00:00 \
+    scripts/10_gvmag_phylogeny.slurm )
+
+# --- 11. optional diagnostics, which is how the step 11 resources below were chosen ----
+( module purge; module load slurm/kuro; sbatch -p serial scripts/11_pre_tree_check.slurm )
+( module purge; module load slurm/kuro; sbatch -p serial scripts/11_pre_tree_check2.slurm )
+
+# --- 11. maximum-likelihood tree -> tree/  (180 MB; ~1 d 12 h) -------------------------
+# The three flags are deliberate deviations, justified by measurement in sections 11h-11i:
+#   --mset LG,WAG,JTT  unrestricted ModelFinder would spend days before building a tree
+#   --cmax 4           same reason
+#   --safe             IQ-TREE itself asked for it (numerical underflow at 14.5% identity)
+# The script's #SBATCH asks for 3 days, which EXCEEDS kuro's 48 h limit, so -t is overridden.
+# IF IT HITS THE WALLTIME, RESUBMIT THE IDENTICAL COMMAND - IQ-TREE resumes from its checkpoint.
+( module purge; module load slurm/kuro; sbatch -p serial -c 64 --mem=96G -t 48:00:00 \
+    scripts/11_gvmag_tree.slurm --mset LG,WAG,JTT --cmax 4 --safe )
+```
+
+## 12-13. Collect results, and build the iTOL files
+
+```bash
+# --- 12. copy results out of scratch into output/  (~4.4 GB) ---------------------------
+# Excludes the regenerable bulk: binning/ (108 GB), gvclass_in/ (a duplicate of bins/),
+# and the tree's .ufboot/.ckp.gz/.mldist (116 GB combined).
+( module purge; module load slurm/kuro; sbatch -p serial scripts/copy_results.slurm )
+
+# --- 13. iTOL annotations and vOTU tree placement (pure Python, runs on dev) -----------
+python3 -I scripts/make_itol_annotations.py \
+    --tree     output/tree/kbrevis_gvmags.treefile \
+    --manifest ~/scr10/data/kbrevis/phylogeny/reference_manifest.tsv \
+    --votus    output/votus/gvmags_votus.tsv \
+    --nearest  output/votus/votu_nearest_reference.tsv \
+    --out-dir  output/tree
+
+python3 -I scripts/votu_tree_context.py \
+    --tree     output/tree/kbrevis_gvmags.treefile \
+    --manifest ~/scr10/data/kbrevis/phylogeny/reference_manifest.tsv \
+    --out      output/tree/votu_tree_context.tsv
+```
+
+`output/Kbrevis_virome_tree.png` has **no command**: it is exported by hand from iTOL after
+uploading `output/tree/kbrevis_gvmags.treefile` and dragging on the `itol_*.txt` files
+(see `output/tree/README.md`). A re-run will not recreate it.
+
+## 14. vOTU abundance in the environment through time
+
+```bash
+# --- environments: CoverM 0.7.0 and R 4.4 + ggplot2 ------------------------------------
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/14_abundance_setup.slurm )
+
+# --- the mapping reference: 19 vOTU representatives, renamed vOTU01.fna ... ------------
+# MUST run before the array; the array checks for its output and exits if it is missing.
+bash scripts/14_votu_reference.sh
+
+# --- optional but recommended: validates the CoverM command on 200,000 reads in ~3 s ---
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/14_abundance_smoketest.slurm )
+
+# --- map the 11 environmental samples -> abundance/per_sample  (array of 11, 3-6 min each)
+( module purge; module load slurm/bora; sbatch -p hima -C hi --exclude=hi04,hi05,hi07 \
+    scripts/14_votu_abundance.slurm )
+
+# --- merge to a tidy table, applying the >=75% genome-breadth presence rule ------------
+python3 -I scripts/merge_votu_abundance.py \
+    --coverm-dir ~/scr10/data/kbrevis/abundance/per_sample \
+    --manifest   ~/scr10/data/kbrevis/abundance/votu_reference_manifest.tsv \
+    --sra-table  metadata/SraRunTable.csv \
+    --out-long   output/abundance/votu_abundance_long.tsv \
+    --out-matrix output/abundance/votu_abundance_matrix.tsv
+
+# --- the figures -----------------------------------------------------------------------
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate r-plot-env
+Rscript scripts/plot_votu_abundance.R \
+    output/abundance/votu_abundance_long.tsv \
+    output/abundance
+conda deactivate
+```
+
+`plot_votu_abundance.R` takes an optional third argument, the metric to plot:
+`rpkm_detected` (default), `rpkm`, `mean_coverage`, `relative_abundance_pct` or `tpm`.
+
+## 15. ANI against the GVMAGs published by the original study
+
+```bash
+# --- download the 74 GenBank contigs and regroup them into their 10 parent GVMAGs ------
+bash scripts/15_fetch_booker_gvmags.sh
+
+# --- fastANI both directions + the three summary CSVs in output/  (~10 s) --------------
+( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/15_booker_ani.slurm )
+```
+
+This writes `output/booker_gvmag_ani_summary.csv`, `..._by_votu.csv` and
+`..._all_pairs.csv` directly, so there is no separate collection step.
+
+## Monitoring and checking
+
+```bash
+# queued/running jobs - ONE CLUSTER AT A TIME; squeue only sees the module you loaded
+( module purge; module load slurm/kuro;   squeue -u $USER )
+( module purge; module load slurm/bora;   squeue -u $USER )
+( module purge; module load slurm/astral; squeue -u $USER )
+
+# a finished job: state, runtime, peak memory, exit code
+( module purge; module load slurm/kuro; sacct -j JOBID -o jobid,state,elapsed,maxrss,exitcode )
+
+# always read the .err before resubmitting anything that failed
+ls -lat logs/ | head
+tail -40 logs/<step>_<jobid>.err
+
+# disk
+quota -s                                  # home, 50 GB limit
+df -h ~/scr10 ~/data10
+du -sh ~/scr10/data/kbrevis/*/
+```
+
+Checkpoints worth confirming as you go:
+
+```bash
+ls ~/scr10/data/kbrevis/raw/*.fastq         | wc -l   # 40  after step 01
+ls ~/scr10/data/kbrevis/clean/*_CLEAN.fastq | wc -l   # 40  after step 04
+ls ~/scr10/data/kbrevis/gvmags/*/.done      | wc -l   # 20  after step 08
+ls ~/scr10/data/kbrevis/votus/gvmags/*.fna  | wc -l   # 26  after step 09
+
+# step 06 writes TWO FASTAs per sample - the merged set that step 08 consumes, and a
+# _shared_contigs.fasta of the contigs both assemblers found - so glob the specific one:
+ls ~/scr10/data/kbrevis/contigs_merged/*_merged_contigs.fasta | wc -l   # 20  after step 06
+grep -c '^>' ~/scr10/data/kbrevis/phylogeny/kbrevis_gvmags.trimmed.aln   # 1564 after step 10
+ls ~/scr10/data/kbrevis/abundance/per_sample/*_coverm.tsv | wc -l        # 11   after step 14
+```
+
+## Total runtime
+
+Roughly **4-6 days of wall-clock time** end to end, dominated by queue waits rather than
+compute. The long poles are step 01 (~2 TB of downloads), steps 05a/05b (20 assembly jobs
+each, up to 2 days apiece) and step 11 (1 d 12 h). Steps 09, 12, 14 and 15 together take
+under an hour.

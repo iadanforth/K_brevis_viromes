@@ -1323,3 +1323,32 @@ The old binary is left in place; nothing references it.
 **Files:** `envs/fastp-env.yml` (new), `scripts/02_fastp.slurm`, `scripts/02_fastp.sh`,
 `scripts/00_create_envs.slurm`, `README.md`, `PROMPT_LOG.md`. Outside the repo: created
 the `fastp-env` conda environment.
+
+---
+
+### 52. 2026-11-20 09:40 (US Eastern) — Claude Code (Opus 5)
+
+> Ok, my (maybe) final task for you is to please add to the bottom of the README a section called "Commands". In this section, I want you to write out every single command that would need to be run in order to reproduce this entire pipeline. Starting from the creation of the directory ~/K_brevis_viromes and ~/scr10/data/kbrevis.
+
+**Done:** Added a `# Commands` section as the last top-level heading of `README.md` (~275
+lines), covering every command from `mkdir -p ~/scr10/data/kbrevis` and `git clone` through
+step 15, in nine subsections: directories/repo/environments/metadata, steps 1-6, step 7,
+steps 8-11, steps 12-13, step 14, step 15, monitoring, and total runtime. **Verified rather
+than written from memory:** read every script's `#SBATCH` defaults directly from the files
+so the documented overrides are correct, checked the argument handling of the four
+array-submitting wrappers, confirmed all 29 scripts named in the section exist, and
+confirmed the markdown structure (344 code fences, balanced; `# Commands` is the final
+top-level heading). Then **executed all seven "checkpoint" verification commands against
+the real completed data** - six matched the numbers I had written, and one did not:
+`contigs_merged/*.fasta` returned 40, not 20, because step 06 writes two FASTAs per sample
+(`_merged_contigs.fasta`, which step 08 reads, and `_shared_contigs.fasta`). Corrected the
+glob to `*_merged_contigs.fasta`, re-tested, and added a note explaining the two files.
+Also verified the skip-step-03 checks report 6 reference FASTAs and 6 bowtie2 index files.
+Flagged inline the five things that bite: run from the repo root (the 01-03 wrappers use
+relative paths), `--export=ALL,GVMAGS_V2_FULL=1` on step 07 or step 10 fails much later,
+the deliberate memory overrides for steps 10 and 11 (the scripts ask for 128 GB; measured
+peaks are 3.6 GB and 42.5 GB), step 11's 3-day `#SBATCH` exceeding kuro's 48 h limit with
+resubmission resuming from the checkpoint, and the ~5.3 TB of scratch this produces. Noted
+that `output/Kbrevis_virome_tree.png` has no command because it is a hand-exported iTOL
+image, and included the two `sed` substitutions another user needs.
+**Files:** `README.md` (new `# Commands` section), `PROMPT_LOG.md`.
