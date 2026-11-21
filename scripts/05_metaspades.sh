@@ -19,6 +19,7 @@ SLURM_SCRIPT="$SCRIPT_DIR/05_metaspades.slurm"
 
 mkdir -p "$OUT_DIR" "$REPO_DIR/logs"
 
+SUBMITTED=()
 shopt -s nullglob
 R1_FILES=(
     "$READ_DIR"/*_1_*.fastq
@@ -53,7 +54,18 @@ for R1 in "${R1_FILES[@]}"; do
     fi
 
     echo "[$NAME] submitting MetaSPAdes job"
-    sbatch \
+    # "$@" passes through anything given on the command line - a partition, a walltime, or
+    # the --dependency that run_pipeline.sh uses to chain stages together. Without it this
+    # loop could not take part in a dependency chain.
+    JID=$(sbatch --parsable \
         --job-name="metaspades_${NAME}" \
-        "$SLURM_SCRIPT" "$NAME" "$R1" "$R2"
+        "$@" \
+        "$SLURM_SCRIPT" "$NAME" "$R1" "$R2")
+    echo "[$NAME] job $JID"
+    SUBMITTED+=("$JID")
 done
+
+# One line listing every job ID, for run_pipeline.sh to collect.
+if ((${#SUBMITTED[@]})); then
+    echo "SUBMITTED_JOB_IDS=$(IFS=:; echo "${SUBMITTED[*]}")"
+fi

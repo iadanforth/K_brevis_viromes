@@ -23,6 +23,9 @@ SLURM_SCRIPT="$SCRIPT_DIR/06_merge_assemblies.slurm"
 
 mkdir -p "$OUT_DIR" "$REPO_DIR/logs"
 
+# Collected so run_pipeline.sh can chain the next stage after all of these.
+SUBMITTED=()
+
 shopt -s nullglob
 for MV in "$MV_DIR"/*_contigs.fasta; do
     FILE_NAME="${MV##*/}"
@@ -45,9 +48,15 @@ for MV in "$MV_DIR"/*_contigs.fasta; do
 
     if ((MV_ONLY)); then
         echo "[$NAME] submitting metaviralSPAdes-only job (no metaSPAdes assembly)"
-        sbatch --job-name="merge_${NAME}" --export=ALL,MV_ONLY=1 "$SLURM_SCRIPT" "$NAME"
+        JID=$(sbatch --parsable --job-name="merge_${NAME}" --export=ALL,MV_ONLY=1 "$@" "$SLURM_SCRIPT" "$NAME")
+        echo "[$NAME] job $JID"; SUBMITTED+=("$JID")
     else
         echo "[$NAME] submitting merge job"
-        sbatch --job-name="merge_${NAME}" "$SLURM_SCRIPT" "$NAME"
+        JID=$(sbatch --parsable --job-name="merge_${NAME}" "$@" "$SLURM_SCRIPT" "$NAME")
+        echo "[$NAME] job $JID"; SUBMITTED+=("$JID")
     fi
 done
+
+if ((${#SUBMITTED[@]})); then
+    echo "SUBMITTED_JOB_IDS=$(IFS=:; echo "${SUBMITTED[*]}")"
+fi

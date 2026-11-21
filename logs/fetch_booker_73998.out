@@ -1,0 +1,13 @@
+[booker] downloaded 74 contigs
+  GVMAG_022B_bin.8                     5 contigs     436894 bp -> GVMAG_022B_bin.8.fna
+  vOTU1_GVMAG_022C_bin.20              3 contigs    1249865 bp -> vOTU1_GVMAG_022C_bin.20.fna
+  vOTU2_CE2_022B_bin31                 2 contigs     623527 bp -> vOTU2_CE2_022B_bin31.fna
+  vOTU2_CE2_022C_bin.14                2 contigs     623463 bp -> vOTU2_CE2_022C_bin.14.fna
+  vOTU3_CE2_022B_bin19                 4 contigs     418504 bp -> vOTU3_CE2_022B_bin19.fna
+  vOTU3_GVMAG_022C_bin.21              5 contigs     419385 bp -> vOTU3_GVMAG_022C_bin.21.fna
+  vOTU4_GVMAG_022C_bin.27              5 contigs     451954 bp -> vOTU4_GVMAG_022C_bin.27.fna
+  vOTU5_CE2_022C_bin.2                 4 contigs     438504 bp -> vOTU5_CE2_022C_bin.2.fna
+  vOTU6_CE2_022B_bin14r               38 contigs     687815 bp -> vOTU6_CE2_022B_bin14r.fna
+  vOTU6_CE2_022C_bin16                 6 contigs     457346 bp -> vOTU6_CE2_022C_bin16.fna
+
+wrote 10 published GVMAGs to /sciclone/home/iadanforth/scr10/data/kbrevis/booker_gvmags/genomes

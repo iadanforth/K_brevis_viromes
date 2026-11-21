@@ -1352,3 +1352,46 @@ resubmission resuming from the checkpoint, and the ~5.3 TB of scratch this produ
 that `output/Kbrevis_virome_tree.png` has no command because it is a hand-exported iTOL
 image, and included the two `sed` substitutions another user needs.
 **Files:** `README.md` (new `# Commands` section), `PROMPT_LOG.md`.
+
+---
+
+### 53. 2026-11-21 09:50 (US Eastern) — Claude Code (Opus 5)
+
+> Ok so I feel good about everything that has been generated. It seems as though the pipeline is complete. Could you please create script that recreates this entire pipeline. A new user should be able to clone by GitHub repository and recreate the entire project themselves. This applies to all scripts generated here. Everything should be reproducible on a computer that is not mine
+
+**Done:** Built a three-part driver. **`run_pipeline.sh`** queues all 17 stages in one
+command, submitting each with `--dependency=afterok:<previous job IDs>` so Slurm releases
+a stage only when the one before it succeeded, then exits rather than polling on the
+front-end for days (which would trip the watchdog and die at logout). Supports `--list`,
+`--dry-run`, `--from/--to/--only`, `--status` across all five clusters, and `--check`.
+Stages that submit many jobs (05a, 05b, 06, 08) report every job ID and the next stage
+depends on all of them; the non-Slurm steps (iTOL annotations, CoverM merge, R plotting,
+the GenBank fetch) are wrapped in small `sbatch --wrap` jobs so they join the same chain
+and log to `logs/`. **`pipeline.conf`** holds every site- and user-specific value - paths,
+mail address, per-stage cluster and sbatch arguments, analysis parameters - including the
+two resource overrides that are easy to lose (step 10's 16 GB vs its 128 GB `#SBATCH`,
+step 11's 48 h vs its 3-day request). **`scripts/setup_new_user.sh`** rewrites the 44
+absolute `#SBATCH` log paths and 18 `--mail-user` lines that cannot be read from a config
+at run time, verifies every script still parses afterwards, and is idempotent. Also
+patched `05_metaspades.sh`, `05_metaspades_nov.sh` and `06_merge_assemblies.sh` to accept
+pass-through sbatch flags and report `SUBMITTED_JOB_IDS`, without which they could not
+take part in a dependency chain. **Tested throughout, including the live path:** fixed two
+bugs in my own setup script (a `grep | head` SIGPIPE fatal under `pipefail`, and a
+"nothing to change" test that checked for the strings' presence instead of whether the
+values differ); tested the rewrite in a throwaway clone posing as another user (23 files
+and 18 mail lines rewritten, 0 old references left, all scripts still parsing); ran
+`--dry-run all`, `--only`, `--from/--to`, `--list` and `--check`; and **actually submitted
+stage 15**, where the wrapped `fetch_booker` job and the dependent `15_booker_ani` job
+both completed and the regenerated CSV was byte-identical to the committed copy.
+`--check` caught a wrong assumption of mine: 05b produces **18** metaSPAdes assemblies,
+not 20, because SRR28004142/43 were cancelled for time and are carried by step 06's
+`MV_ONLY_SAMPLES`; the threshold and its comment now say so. Stated plainly in the README
+what this does not do: it is a complete one-command reproduction **on a SciClone account**,
+but it cannot make the pipeline cluster-independent - 14 scripts assume the per-cluster
+`slurm/<name>` modules, 24 assume `module load miniforge3`, and 29 assume `~/scr10`.
+`pipeline.conf` reduces porting to editing one file plus the module lines rather than 44
+scripts, and the science itself is portable because every version and threshold is pinned.
+**Files:** `run_pipeline.sh`, `pipeline.conf`, `scripts/setup_new_user.sh` (all new),
+`scripts/05_metaspades.sh`, `scripts/05_metaspades_nov.sh`, `scripts/06_merge_assemblies.sh`
+(pass-through + job IDs), `README.md` (new section "Reproducing this project with one
+command"), `PROMPT_LOG.md`.

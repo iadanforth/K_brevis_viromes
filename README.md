@@ -7525,6 +7525,120 @@ In `output/`, as requested:
 
 ----------------------------------------------------------------------------------------
 
+# Reproducing this project with one command
+
+Added 2026-11-21 (prompt 53 in `PROMPT_LOG.md`). Files: `run_pipeline.sh`,
+`pipeline.conf`, `scripts/setup_new_user.sh`.
+
+The `# Commands` section below lists every command individually, which is what you want
+when something has gone wrong or you are running one stage by hand. This section is the
+other thing: **three commands that queue the entire analysis.**
+
+```bash
+git clone https://github.com/iadanforth/K_brevis_viromes.git
+cd K_brevis_viromes
+nano pipeline.conf                      # set PROJECT_ROOT, SCRATCH, MAIL_USER
+bash scripts/setup_new_user.sh          # adapt the paths baked into #SBATCH directives
+bash run_pipeline.sh --dry-run all      # read what it would do
+bash run_pipeline.sh all                # queue all 17 stages
+```
+
+## How it works
+
+Each stage is submitted with `--dependency=afterok:<the previous stage's job IDs>`, so the
+whole pipeline is queued in seconds and Slurm releases each stage only when the one before
+it has **succeeded**. `run_pipeline.sh` then exits. It deliberately does not sit on the
+front-end waiting: a process that polls for five days would trip the watchdog
+(AGENTS.md section 1) and die at logout regardless.
+
+Stages that submit many jobs - 05a, 05b, 06 (20 jobs each) and 08 (an array) - report
+every job ID they created, and the next stage depends on **all** of them. Stages that are
+not Slurm jobs at all, such as the iTOL annotations and the R plotting, are wrapped in a
+small `sbatch --wrap` job so they take their place in the same chain and their logs land
+in `logs/` like everything else.
+
+| command | what it does |
+|---|---|
+| `bash run_pipeline.sh --list` | the 17 stages, which cluster each uses, what each produces |
+| `bash run_pipeline.sh --dry-run all` | prints every `sbatch` it would run, submits nothing |
+| `bash run_pipeline.sh all` | queues the whole pipeline |
+| `bash run_pipeline.sh --from 08 --to 11` | queues part of it |
+| `bash run_pipeline.sh --only 14` | queues one stage |
+| `bash run_pipeline.sh --status` | what is queued or running, across all five clusters |
+| `bash run_pipeline.sh --check` | which stages have produced their outputs |
+
+## When a stage fails
+
+Everything after it stays `PENDING` with reason `DependencyNeverSatisfied`, and Slurm may
+cancel it. **That is the point** - it stops a failed assembly from being quietly binned and
+phylogenised. Read the failed stage's `.err` in `logs/`, fix the cause, then resume:
+
+```bash
+bash run_pipeline.sh --from 08_gvmags
+```
+
+Resuming is cheap because the stages skip finished work: 05a/05b/06 skip samples whose
+contigs exist, 08 skips samples with a `.done` marker, 14 skips samples with a CoverM
+table, and 00 and 07 skip conda environments that already exist.
+
+## What `pipeline.conf` controls
+
+Everything site- and user-specific, in one file: `PROJECT_ROOT`, `SCRATCH`, `ARCHIVE`,
+`NODE_TMP`, `MAIL_USER`, the conda module name, the cluster and `sbatch` arguments for
+each of the 17 stages, and the analysis parameters that the scripts take on the command
+line (`IQTREE_MSET`, `ABUNDANCE_MIN_BREADTH`, and so on). Set
+`SKIP_REFERENCE_DOWNLOAD=1` to skip the ~79 GB step 03 when `reference/` is already
+populated.
+
+The stage table in `pipeline.conf` also carries the two deliberate resource overrides that
+are easy to lose: step 10 is given `--mem=16G` rather than the 128 GB in its `#SBATCH`
+(measured peak 3.6 GB), and step 11 is given `-t 48:00:00` because its own 3-day request
+exceeds kuro's limit.
+
+## What `scripts/setup_new_user.sh` is for
+
+Two things cannot be read from a config file at run time. Slurm parses `#SBATCH`
+directives before any shell runs, so `--output=`, `--error=` and `--mail-user=` cannot
+expand `~`, `$HOME` or a variable - and AGENTS.md requires every job's logs to land in
+`<project>/logs/`, which forces 44 absolute paths into the scripts. This script rewrites
+those and the 18 `--mail-user` lines to match `pipeline.conf`, verifies every script still
+parses afterwards, and is idempotent. `--dry-run` shows the edits first.
+
+## Tested
+
+- `--list`, `--check`, `--status` and `--dry-run all` all run clean.
+- `--check` was run against the finished project and correctly reports all 17 stages
+  present. It caught one of my own wrong assumptions in the process: `05b_assembly`
+  produces **18** metaSPAdes assemblies, not 20, because SRR28004142 and SRR28004143 were
+  cancelled for time and are carried by step 06's `MV_ONLY_SAMPLES` mechanism instead
+  (README 05b-fix-c). The threshold and the comment now say so.
+- `scripts/setup_new_user.sh` was tested in a throwaway clone posing as another user: it
+  rewrote 23 files and 18 mail lines, left **0** references to the old values, and every
+  script still parsed.
+- **The live path was tested, not just the dry run.** `bash run_pipeline.sh --only 15`
+  submitted the wrapped `fetch_booker` job and the dependent `15_booker_ani` job; both
+  completed, and `booker_gvmag_ani_summary.csv` came back **byte-identical** to the
+  committed copy.
+
+## What this does and does not give you
+
+It gives a **complete, one-command reproduction on a SciClone account**. Another user
+clones, edits three values, runs two commands, and the entire analysis is queued.
+
+It does **not** make the pipeline cluster-independent, and no driver script could. The job
+plumbing assumes Slurm with SciClone's per-cluster `slurm/<name>` modules (14 scripts),
+`module load miniforge3` (24 scripts), and the `~/scr10` and `~/data10` filesystems
+(29 and 6 scripts). `pipeline.conf` centralises the paths and partitions so that porting
+means editing one file plus the `module load` lines, rather than hunting through 44
+scripts - but on a non-SciClone cluster that editing is still real work.
+
+**The science is portable even where the plumbing is not.** Every tool, version,
+parameter and threshold is pinned in `envs/*.yml` and documented in the step sections
+above, so the analysis can be rebuilt on any system by someone willing to rewrite the
+submission layer.
+
+----------------------------------------------------------------------------------------
+
 # Commands
 
 Every command needed to reproduce this project from nothing, in order. Written
