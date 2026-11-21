@@ -1428,3 +1428,60 @@ different data.
 **Files:** `scripts/plot_pipeline_figure.py` (new), `output/pipeline_overview.pdf`,
 `output/pipeline_overview.png` (new), `README.md` (generation command and the caveat about
 hard-coded counts), `PROMPT_LOG.md`.
+
+---
+
+### 55. 2026-11-21 16:00 (US Eastern) — Claude Code (Opus 5)
+
+> I find it strange that none of the 12 incubation vOTUs was recovered in the environment. I think that Booker et al. 2026 was able to recover some of these. I think that this is because I did not run metaspades.py for some of these incubation samples. Could this be the case? If so, could you please adjust this pipeline so that metaspades.py is run on all samples instead of 18/20 of them? [...] My assignment is due on 12/4
+
+**Done:** Tested the hypothesis before acting on it, and it does not hold - but the
+underlying concern about those two samples does. SRR28004142 and SRR28004143 are badly
+under-assembled (364 and 828 contigs, 12 and 11 bins, against 41-95 bins for every sample
+that got both assemblers), so fixing them is worthwhile. They cannot however explain the
+non-detection: **neither sample contributed a single GVMAG**, so none of the 12 incubation
+vOTUs contains sequence from them; lowering the breadth threshold from 75% to 10% adds
+**zero** detections; and a real detection recruits 34,000-173,000 reads where the
+incubation vOTUs recruit a **median of 1**. Decisively, the environmental-derived vOTUs are
+also undetected in environmental samples other than their own source (0 of 70 pairs), so
+the pattern is a detection limit, not an incubation-vs-environment effect. Made the
+requested change anyway: `MV_ONLY_SAMPLES` in `06_merge_assemblies.sh` is now **empty by
+default**, so all 20 samples get a real merge once the assemblies exist. Discovered the
+cancelled SPAdes runs are intact and resumable (`params.txt` present, through K21/K33 into
+K55), and that the script already supports `RESTART_FROM`, so resumed both rather than
+restarting ~30 h of work. Also found the original `--mem=360G` was guesswork - real peaks
+were 171 GB and 310 GB - and right-sizing let both onto kuro's faster 64-core nodes
+instead of waiting for bora. Submitted as jobs **122119** and **122120**.
+**Files:** `scripts/06_merge_assemblies.sh` (MV_ONLY_SAMPLES default now empty).
+
+---
+
+### 56. 2026-11-21 16:30 (US Eastern) — Claude Code (Opus 5)
+
+> https://academic.oup.com/ismecommun/article/6/1/ycag051/8512080 here is the paper
+
+**Done:** Read the paper and ran down the disagreement. Their Methods give one sentence on
+the environmental abundance analysis - *"The relative abundance and coverage of
+environmental metagenomic reads recruited to each GVMAG was calculated using coverm"* -
+with **no identity cutoff, no breadth cutoff and no version**, and they count values they
+call background (~0.1 and <0.1 relative abundance) as presence. They report their vOTU1,
+2, 5 and 6 at the coastal EH25 site, which by the step 15 correspondence are our vOTU02,
+08, 12 and 03. Their environmental set (nine EH25 metagenomes, Dec 2020-Aug 2021) matches
+our nine Gulf monthly samples, so the comparison is like with like. Wrote
+`scripts/14b_abundance_relaxed.slurm` to repeat step 14 on those nine samples with
+**CoverM's defaults** (no identity filter), writing to a separate directory so the main
+result is untouched. Result: removing the filter recruits **100-500x more reads** (e.g.
+vOTU12 from 8 to 4,651), which would indeed produce a relative-abundance number that looks
+like a detection - **but those reads pile 43-447 deep onto 0.5-4% of each genome**, against
+breadth 0.999-1.000 for the seven genomes we know are present. It is conserved-gene
+cross-recruitment from a different virus, the same artifact as vOTU13 in 14d. Recorded the
+conclusion with two caveats against over-claiming: this shows the published method *would*
+produce an apparent detection from data in which the genome is absent, not that the paper
+is wrong (their settings are unstated and their *K. brevis* correlation is separate
+evidence); and the relaxed run does not reproduce their specific pattern either, since
+vOTU07 - which they do not report - recruits more reads than three of the four they do, so
+the sample sets should be confirmed against Fei et al. and Supplemental Data 1. Noted for
+the write-up that the defensible claim is methodological: applying the MIUViG breadth
+criterion overturns an apparent detection.
+**Files:** `scripts/14b_abundance_relaxed.slurm` (new), `README.md` (new section 14h),
+`PROMPT_LOG.md`.

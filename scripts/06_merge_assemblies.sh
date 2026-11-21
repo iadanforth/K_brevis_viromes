@@ -12,7 +12,17 @@
 # merge. Override for a one-off run with, e.g., MV_ONLY_SAMPLES="" bash 06_merge_assemblies.sh
 set -euo pipefail
 
-MV_ONLY_SAMPLES="${MV_ONLY_SAMPLES-SRR28004142 SRR28004143}"
+# Samples with no metaSPAdes assembly, merged from metaviralSPAdes contigs alone.
+#
+# EMPTY BY DEFAULT since 2026-11-21. SRR28004142 and SRR28004143 were on this list because
+# their metaSPAdes jobs were cancelled for time on 2026-11-13, which left them with 364 and
+# 828 contigs and only 12 and 11 bins, against 41-95 bins for every sample that got both
+# assemblers. Those two assemblies are being completed, after which all 20 samples get a
+# real merge and this list should stay empty.
+#
+# If a sample genuinely has no metaSPAdes assembly, put it back:
+#   MV_ONLY_SAMPLES="SRRxxxxxxx" bash scripts/06_merge_assemblies.sh
+MV_ONLY_SAMPLES="${MV_ONLY_SAMPLES-}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"

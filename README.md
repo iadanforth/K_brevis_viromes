@@ -7249,6 +7249,99 @@ Y" but are weak evidence for absence elsewhere. **Deeper sequencing, or pooling 
 samples, is the way to test persistence.** The figures should not be read as showing viral
 turnover between months.
 
+#### 14h. Why we do not see the incubation vOTUs in the environment, and Booker et al. do (2026-11-21)
+
+Written by Claude Code on 2026-11-21 (prompt 56 in `PROMPT_LOG.md`). File:
+`scripts/14b_abundance_relaxed.slurm`.
+
+Section 14d reports that **none of the 12 incubation-derived vOTUs is detectable in any
+environmental sample.** Booker et al. 2026 report the opposite for four of them: their
+vOTU1, vOTU2, vOTU5 and vOTU6 are described as present at the coastal EH25 site and
+correlated with *K. brevis* cell counts. By the step 15 correspondence those are **our
+vOTU02, vOTU08, vOTU12 and vOTU03**. The disagreement is real and had to be run down.
+
+**The first hypothesis was wrong.** The obvious suspect was the two incubation samples
+whose metaSPAdes assemblies were cancelled (SRR28004142, SRR28004143; section 05b-fix-c).
+It cannot be the cause:
+
+- **Neither sample contributed a single GVMAG.** All 26 came from other samples, so none of
+  the 12 incubation vOTUs contains any sequence from those two. Better assemblies there can
+  *add* vOTUs; they cannot change whether the existing 12 are detected.
+- **It is not a threshold effect.** Lowering the breadth rule from 75% to 10% yields **zero**
+  extra detections.
+- **The scale is wrong by orders of magnitude.** A real detection in our data recruits
+  **34,000-173,000 reads**; the incubation vOTUs across the nine Gulf samples recruit a
+  **median of 1 read**, maximum 406.
+
+**What the paper actually specifies.** Their Methods give one sentence: *"The relative
+abundance and coverage of environmental metagenomic reads recruited to each GVMAG was
+calculated using coverm."* No identity cutoff, no breadth cutoff, no version, no settings.
+Presence is judged on relative abundance, and they count values they themselves call
+background (*"~0.1-0.8 ... and <0.1"*) as presence. **CoverM applies no read-identity
+filter by default.** Ours uses `--min-read-percent-identity 95`, the MIUViG species
+boundary and the same cut-off that defined the vOTUs in step 09.
+
+**The test.** `14b_abundance_relaxed.slurm` repeats step 14 on the same nine EH25 monthly
+samples with CoverM's defaults, writing to `abundance/per_sample_relaxed/` so the main
+result is untouched.
+
+Removing the identity filter recruits **100-500x more reads**:
+
+| our vOTU | their vOTU | they report it? | reads at ≥95% | reads, no filter | best breadth |
+|---|---|---|---|---|---|
+| vOTU02 | vOTU1 | yes | 32 | 5,718 | 0.008 |
+| vOTU08 | vOTU2 | yes | 615 | 8,643 | 0.021 |
+| vOTU12 | vOTU5 | yes | 8 | 4,651 | 0.005 |
+| vOTU03 | vOTU6 | yes | 467 | 5,957 | 0.039 |
+| vOTU17 | vOTU3 | no | 121 | 1,848 | 0.016 |
+| vOTU07 | vOTU4 | no | 32 | 6,618 | 0.006 |
+
+**So a relative-abundance number computed this way would look like a detection** - thousands
+of reads, a non-zero percentage, something to plot against cell counts.
+
+**But look at where those reads land.** Summed over the nine samples:
+
+| vOTU | genome | bases covered | breadth | reads | depth on the covered part |
+|---|---|---|---|---|---|
+| vOTU02 | 1,226,811 | 9,387 | 0.008 | 5,718 | **91x** |
+| vOTU08 | 857,067 | 17,894 | 0.021 | 8,643 | **72x** |
+| vOTU12 | 343,608 | 1,562 | 0.005 | 4,651 | **447x** |
+| vOTU03 | 530,439 | 20,933 | 0.039 | 5,957 | **43x** |
+| vOTU07 | 495,517 | 3,169 | 0.006 | 6,618 | **313x** |
+
+Thousands of reads stacked 43-447 deep on **0.5-4% of each genome**. For comparison, the
+seven genomes we know are present - the positive controls, assembled from the very sample
+they were mapped back to - have breadth **0.999-1.000**. A virus that is actually there is
+covered end to end.
+
+**This is reads from a different, related virus latching onto a conserved gene.** It is the
+same artifact as vOTU13 in section 14d, which reaches 32x mean coverage over 0.9% of its
+genome. Depth alone cannot distinguish "this genome is present" from "something shares one
+conserved gene with it" - **only breadth can**, which is exactly why the MIUViG standard
+gates on breadth and why step 14 does too.
+
+**Conclusion, stated carefully.** The most likely explanation for the disagreement is that
+the published analysis computed relative abundance from read recruitment **without a
+genome-breadth requirement**, so conserved-gene cross-recruitment was counted as presence.
+Our stricter criterion says these four vOTUs are **not** present in the environmental
+samples at any meaningful abundance.
+
+Two honest caveats against over-claiming:
+
+1. **We cannot show the paper is wrong**, only that its stated method would produce an
+   apparent detection from data in which the genome is demonstrably absent. Their Methods
+   omit the settings, so they may have applied filters not described; and their correlation
+   with *K. brevis* cell counts is a separate line of evidence this test does not address.
+2. **The relaxed run does not reproduce their pattern either.** vOTU07 - which they do *not*
+   report - recruits more reads (6,618) than three of the four they do. So read recruitment
+   alone does not pick out their four, and something else differs as well. Their
+   environmental accessions are in Fei et al. and Supplemental Data 1, which we have not
+   checked; confirming the sample sets are identical is the obvious next step.
+
+**For a write-up**, the defensible claim is the methodological one: applying the MIUViG
+breadth criterion overturns an apparent detection, and the figures above show precisely
+why. That is a stronger and more interesting result than simply reproducing the paper.
+
 #### 14f. Outputs
 
 In `output/abundance/`:

@@ -1,0 +1,9 @@
+[2026-11-21T21:18:16Z INFO  bird_tool_utils::clap_utils] CoverM version 0.7.0
+[2026-11-21T21:18:16Z INFO  coverm] Writing output to file: /sciclone/home/iadanforth/scr10/data/kbrevis/abundance/per_sample_relaxed/SRR28004150_coverm.tsv.part
+[2026-11-21T21:18:16Z INFO  coverm] Using min-covered-fraction 0%
+[2026-11-21T21:18:16Z INFO  bird_tool_utils::external_command_checker] Found minimap2 version 2.31-r1302 
+[2026-11-21T21:18:16Z INFO  bird_tool_utils::external_command_checker] Found samtools version 1.21 
+[2026-11-21T21:18:16Z INFO  coverm] Profiling 19 genomes
+[2026-11-21T21:18:16Z INFO  coverm] Generating concatenated reference FASTA file of 19 genomes ..
+[2026-11-21T21:18:16Z INFO  coverm] Not pre-generating minimap2 index
+[2026-11-21T21:21:31Z INFO  coverm::genome] In sample 'SRR28004150_1_CLEAN.fastq', found 38357 reads mapped out of 68982720 total (0.06%)

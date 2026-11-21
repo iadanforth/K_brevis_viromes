@@ -1,0 +1,123 @@
+[SRR28004142] resuming from check-point k55 with 32 threads, -m 198G
+
+======= SPAdes pipeline continued. Log can be found here: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/spades.log
+
+Restored from Command line: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/metaspades.py	--only-assembler	-1	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq	-2	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq	-o	/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142	-t	32	-m	340
+
+Command line: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/metaspades.py	--only-assembler	-1	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq	-2	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq	-o	/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142	-t	32	-m	340	-t	32	-m	198
+Restart-from=k55
+with updated parameters: -t	32	-m	198
+
+System information:
+  SPAdes version: 4.3.0
+  Python version: 3.15.2
+  OS: Linux-5.14.0-687.15.1.el9_8.x86_64-x86_64-with-glibc2.34
+
+Output dir: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142
+Mode: ONLY assembling (without read error correction)
+Debug mode is turned OFF
+
+Dataset parameters:
+  Metagenomic mode
+  Reads:
+    Library number: 1, library type: paired-end
+      orientation: fr
+      left reads: ['/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq']
+      right reads: ['/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq']
+      interlaced reads: not specified
+      single reads: not specified
+      merged reads: not specified
+Assembly parameters:
+  k: [21, 33, 55]
+  Repeat resolution is enabled
+  Mismatch careful mode is turned OFF
+  MismatchCorrector will be SKIPPED
+  Coverage cutoff is turned OFF
+  Assembly graph output will use GFA v1.2 format
+Other parameters:
+  Dir for temp files: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/tmp
+  Threads: 32
+  Memory limit (in Gb): 198
+
+/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq: max reads length: 122
+/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq: max reads length: 122
+
+Reads length: 122
+
+
+===== Before start started. 
+
+
+===== Assembling started. 
+
+===== Skipping K21 (already processed)
+===== Skipping K33 (already processed)
+
+===== K55 started. 
+
+
+== Running: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/spades-core /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/config.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/mda_mode.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/meta_mode.info
+
+  0:00:00.000     1M / 21M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/config.info"
+  0:00:00.027     1M / 21M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/mda_mode.info"
+  0:00:00.036     1M / 21M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/meta_mode.info"
+  0:00:00.047     1M / 21M   INFO    General                 (memory_limit.cpp          :  55)   Memory limit set to 198 Gb
+  0:00:00.071     1M / 21M   INFO    General                 (main.cpp                  : 102)   Starting SPAdes, built from N/A, git revision N/A
+  0:00:00.076     1M / 21M   INFO    General                 (main.cpp                  : 103)   Maximum k-mer length: 128
+  0:00:00.086     1M / 21M   INFO    General                 (main.cpp                  : 104)   Assembling dataset ("/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/dataset.info") with K=55
+  0:00:00.096     1M / 21M   INFO    General                 (main.cpp                  : 105)   Maximum # of threads to use (adjusted due to OMP capabilities): 32
+  0:00:00.107     1M / 21M   INFO    General                 (pipeline.cpp              : 221)   SPAdes started
+  0:00:00.117     1M / 21M   INFO    General                 (pipeline.cpp              : 234)   Starting from stage: read_conversion
+  0:00:00.127     1M / 21M   INFO    General                 (pipeline.cpp              : 245)   Two-step repeat resolution enabled
+  0:00:00.157     1M / 21M   INFO   GraphCore                (graph_core.hpp            : 582)   Graph created, vertex min_id: 3, edge min_id: 3
+  0:00:00.163     1M / 21M   INFO   GraphCore                (graph_core.hpp            : 583)   Vertex size: 48, edge size: 40
+  0:00:00.186     1M / 21M   INFO    General                 (edge_index.hpp            : 132)   Size of edge index entries: 12/8
+  0:00:00.196     1M / 21M   INFO    General                 (pipeline.cpp              : 256)   Will need read mapping, kmer mapper will be attached
+  0:00:00.204     1M / 21M   INFO   StageManager             (stage.cpp                 : 210)   STAGE == Binary Read Conversion (id: read_conversion)
+  0:00:00.245     1M / 21M   INFO    General                 (read_converter.cpp        :  78)   Converting reads to binary format for library #0 (takes a while)
+  0:00:00.250     1M / 21M   INFO    General                 (read_converter.cpp        :  99)   Converting paired reads
+  0:00:01.701    81M / 106M  INFO    General                 (binary_converter.cpp      : 127)   16384 reads processed
+  0:00:01.711    81M / 110M  INFO    General                 (binary_converter.cpp      : 127)   32768 reads processed
+  0:00:01.727    81M / 118M  INFO    General                 (binary_converter.cpp      : 127)   65536 reads processed
+  0:00:01.822    81M / 154M  INFO    General                 (binary_converter.cpp      : 127)   131072 reads processed
+  0:00:02.032    56M / 202M  INFO    General                 (binary_converter.cpp      : 127)   262144 reads processed
+  0:00:02.390     0M / 268M  INFO    General                 (binary_converter.cpp      : 127)   524288 reads processed
+  0:00:03.082     0M / 359M  INFO    General                 (binary_converter.cpp      : 127)   1048576 reads processed
+  0:00:04.532     0M / 477M  INFO    General                 (binary_converter.cpp      : 127)   2097152 reads processed
+  0:00:07.444     0M / 566M  INFO    General                 (binary_converter.cpp      : 127)   4194304 reads processed
+  0:00:13.521     0M / 675M  INFO    General                 (binary_converter.cpp      : 127)   8388608 reads processed
+  0:00:26.211     0M / 719M  INFO    General                 (binary_converter.cpp      : 127)   16777216 reads processed
+  0:00:56.320     0M / 862M  INFO    General                 (binary_converter.cpp      : 127)   33554432 reads processed
+  0:01:51.953     0M / 927M  INFO    General                 (binary_converter.cpp      : 127)   67108864 reads processed
+  0:04:39.347     0M / 1053M INFO    General                 (binary_converter.cpp      : 127)   134217728 reads processed
+  0:08:28.720     0M / 1237M INFO    General                 (binary_converter.cpp      : 127)   268435456 reads processed
+  0:15:16.913     0M / 1573M INFO    General                 (binary_converter.cpp      : 143)   499373113 reads written
+  0:15:16.926     0M / 1573M INFO    General                 (read_converter.cpp        : 113)   Converting single reads
+  0:15:17.039     0M / 1573M INFO    General                 (binary_converter.cpp      : 143)   0 reads written
+  0:15:17.040     0M / 1573M INFO    General                 (read_converter.cpp        : 119)   Converting merged reads
+  0:15:17.041     0M / 1573M INFO    General                 (binary_converter.cpp      : 143)   0 reads written
+  0:15:17.304     1M / 1573M INFO   StageManager             (stage.cpp                 : 210)   STAGE == de Bruijn graph construction (id: construction)
+  0:15:17.345     1M / 1573M INFO    General                 (construction.cpp          : 115)   Contigs from previous K will be used: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K33/simplified_contigs
+  0:15:23.192     1M / 1573M INFO    General                 (construction.cpp          : 150)   Max read length 122
+  0:15:23.197     1M / 1573M INFO    General                 (construction.cpp          : 156)   Average read length 121.961
+  0:15:23.199     1M / 1573M INFO    General                 (stage.cpp                 : 120)   PROCEDURE == k+1-mer counting (id: construction:kpomer_counting)
+  0:15:23.210     1M / 1573M INFO    General                 (kmer_index_builder.hpp    : 308)   Splitting kmer instances into 320 files using 32 threads. This might take a while.
+  0:15:23.591     1M / 1573M INFO    General                 (file_limit.hpp            :  43)   Open file limit set to 131072
+  0:15:23.591     1M / 1573M INFO    General                 (kmer_splitter.hpp         :  96)   Memory available for splitting buffers: 2.06249 Gb
+  0:15:23.591     1M / 1573M INFO    General                 (kmer_splitter.hpp         : 104)   Using cell size of 104857
+  0:15:34.468    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 21725182 reads
+  0:15:50.702    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 43437435 reads
+  0:16:05.826    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 65145013 reads
+  0:16:22.571    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 86863806 reads
+  0:16:31.488    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 108550911 reads
+  0:16:42.284    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 130279748 reads
+  0:17:01.308    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 152062194 reads
+  0:17:14.448    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 173832402 reads
+  0:17:37.173    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 195576837 reads
+  0:17:55.561    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 217338190 reads
+  0:18:05.638    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 239038327 reads
+  0:18:15.965    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 260756758 reads
+  0:18:32.038    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 282497356 reads
+  0:18:43.800    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 304257346 reads
+  0:21:28.890    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 543081298 reads
+  0:28:57.441    19G / 19G   INFO    General                 (kmer_splitters.hpp        : 128)   Processed 1086019697 reads
