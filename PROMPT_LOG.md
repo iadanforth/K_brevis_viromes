@@ -1395,3 +1395,36 @@ scripts, and the science itself is portable because every version and threshold 
 `scripts/05_metaspades.sh`, `scripts/05_metaspades_nov.sh`, `scripts/06_merge_assemblies.sh`
 (pass-through + job IDs), `README.md` (new section "Reproducing this project with one
 command"), `PROMPT_LOG.md`.
+
+---
+
+### 54. 2026-11-21 15:40 (US Eastern) — Claude Code (Opus 5)
+
+> Thank you! Last thing - could you make a figure depicting the pipeline followed?
+
+**Done:** Wrote `scripts/plot_pipeline_figure.py`, which draws the whole pipeline on one
+page and writes `output/pipeline_overview.{pdf,png}`. Made it a committed script rather
+than a one-off image so it matches how every other figure in this project is produced.
+Left column: steps 01-11 as a vertical flow, each with its tool and version, the key
+parameters, and the data volume, colour-coded by phase (read processing, assembly,
+binning/vOTUs, phylogeny). Right column: the three findings - abundance through time, the
+match to the published study, and novelty - plus a highlighted strip carrying the three
+caveats that should never be separated from those numbers (14.5% alignment identity,
+non-detection meaning <1.4x coverage rather than absence, and vOTU05's three
+contradictions). **Verified every number against the data files before drawing**, which
+caught two of my own wrong column indices: the abundance detections and the ANI
+same-species count both came back 0 from `awk` because the CSV has embedded commas and the
+`present` column is 18 not 17; parsed properly with Python the real figures are 7
+detections, 12 of 26 GVMAGs the same species, and all 6 published vOTUs recovered.
+**Inspected the rendered PNG after each of three drafts** rather than assuming matplotlib
+had laid it out: the first had the footer overlapping step 11 and caveat text spilling
+past its border; the second still collided and, more importantly, its three curved arrows
+implied each finding came from a different pipeline step when all three derive from the
+vOTUs and the tree, so I replaced them with plain column headers; the third needed only
+spacing. Used the same Okabe-Ito palette as the abundance figures so the project's figures
+read as one set. Noted in the README that the counts are written into the script, so the
+figure is a diagram of this run and would need updating if the pipeline were re-run on
+different data.
+**Files:** `scripts/plot_pipeline_figure.py` (new), `output/pipeline_overview.pdf`,
+`output/pipeline_overview.png` (new), `README.md` (generation command and the caveat about
+hard-coded counts), `PROMPT_LOG.md`.

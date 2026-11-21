@@ -7818,6 +7818,23 @@ python3 -I scripts/votu_tree_context.py \
     --out      output/tree/votu_tree_context.tsv
 ```
 
+```bash
+# --- the pipeline overview figure (matplotlib lives in aniclustermap-env) --------------
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate aniclustermap-env
+python3 -I scripts/plot_pipeline_figure.py --out-dir output
+conda deactivate
+```
+
+This writes `output/pipeline_overview.{pdf,png}`: the whole pipeline on one page, with the
+tool and version at each step and the measured result of this run - 20 samples, 848 bins,
+26 GVMAGs, 19 vOTUs, a 1,564-taxon tree - alongside the three findings and the caveats
+that belong next to them. The numbers are written into `scripts/plot_pipeline_figure.py`
+rather than read from the tables, so **if the pipeline is re-run on different data the
+figure will need its STEPS and RESULTS lists updated**; it is a diagram of this run, not a
+live dashboard.
+
 `output/Kbrevis_virome_tree.png` has **no command**: it is exported by hand from iTOL after
 uploading `output/tree/kbrevis_gvmags.treefile` and dragging on the `itol_*.txt` files
 (see `output/tree/README.md`). A re-run will not recreate it.
