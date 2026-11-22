@@ -79,7 +79,7 @@ p <- ggplot() +
   # not collide and no repel package is needed.
   geom_text(data = lab, aes(collection_date, value, label = votu, colour = grp),
             size = 3.2, fontface = "bold", vjust = -1.1, show.legend = FALSE) +
-  scale_colour_manual(values = pal, name = "vOTU detected somewhere", na.value = "grey85") +
+  scale_colour_manual(values = pal, name = "vOTU", na.value = "grey85") +
   scale_fill_manual(values = pal, guide = "none") +
   scale_shape_manual(values = c(`Gulf of Mexico (monthly)` = 21,
                                 `coastal Florida (separate study)` = 24),
@@ -88,16 +88,16 @@ p <- ggplot() +
                expand = expansion(mult = c(0.05, 0.05))) +
   scale_y_continuous(expand = expansion(mult = c(0.02, 0.12))) +
   labs(
-    title = "Giant-virus vOTU abundance in the environmental samples",
+    title = "Abundance of the 7 vOTUs recovered from environmental samples",
     subtitle = paste0(
       "Environmental reads mapped to the 19 vOTU representative genomes (CoverM, >=95% read identity).\n",
       "A FILLED point is a detection: >=75% of the genome covered. A HOLLOW point means reads recruited\n",
-      "but the genome is not present. Grey lines are the 12 vOTUs never detected in any sample.\n",
+      "but the genome is not present, so those are true zeros rather than missing data.\n",
       "The dotted line separates the monthly Gulf of Mexico series (Dec 2020 - Aug 2021) from two samples\n",
       "of a separate coastal Florida study (Sep 2021, Mar 2022)."),
     x = NULL, y = ylab,
     caption = paste0(
-      "Each detected vOTU appears in exactly one sample: the giant virus recovered from a given month is not\n",
+      "Each vOTU is detected in exactly one sample: the giant virus recovered from a given month is not\n",
       "detectable in any other month. Data: votu_abundance_environmental.csv")
   ) +
   theme_minimal(base_size = 11) +

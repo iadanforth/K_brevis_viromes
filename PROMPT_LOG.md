@@ -1510,3 +1510,41 @@ right for the other 18 samples and wrong for these two, and that a peak from an 
 run must not be used to right-size a rerun.
 **Files:** `scripts/05_metaspades_nov.slurm` (memory guidance), `README.md` (new section
 05b-fix-d), `PROMPT_LOG.md`.
+
+---
+
+### 58. 2026-11-22 18:30 (US Eastern) — Claude Code (Opus 5)
+
+> I also still want to investigate and visualize K brevis cell counts as a function of vOTUs. I think that for this, we only want to look at the vOTUs found in the environmental samples. Could you please update everything in the abundance directory to reflect this change?
+
+**Done:** Restricted `output/abundance/` to the **7 vOTUs found in the environmental
+samples**, having first checked that both readings of the phrase pick out the same seven -
+those assembled *from* an environmental sample are exactly those ever *detected* in one
+(vOTU01, 04, 05, 10, 14, 15, 16) - so no clarification was needed. Added
+`--only-source-set` to `merge_votu_abundance.py` and regenerated the CSV (77 rows, down
+from 209) and the time-series figure, updating its title, subtitle and legend, which still
+referred to the 12 vOTUs that are no longer in the file. Wrote
+`scripts/plot_votu_vs_cells.R`, which joins the abundance CSV to a cell-count CSV, fits a
+linear model per vOTU and writes `votu_vs_karenia_cells.{pdf,png}` plus
+`votu_vs_karenia_lm.csv` with slope, intercept, R², p and n. **Did not produce cell-count
+numbers**: they are not in the paper - Fig. 4A's caption gives no values, units or ranges,
+the Results contain no EH25 concentrations, and the only numeric counts are lab-culture and
+New Pass figures, neither of which is EH25. Supplemental Data 14 is the likely source but
+sits in a ~26 MB zip that could not be fetched, and the user's copy is on their Mac rather
+than the cluster. Rather than estimate values off a figure - which would be invented data
+feeding a p-value, and indistinguishable from real data once in a CSV - shipped
+`karenia_cell_counts.csv` as a template with the 11 samples and dates pre-filled, the
+`karenia_cells_per_L` column blank and a `source` column for provenance, and made the R
+script stop with an explanation when fewer than three counts are present. **Tested both
+paths:** the empty case prints the instruction, and the working case was exercised with
+synthetic counts in a scratch directory, which caught a real bug - both CSVs carry a
+`survey` column so the join produced `survey.x`/`survey.y` and the plot died with
+`object 'survey' not found`. The synthetic data never entered the repository. Recorded
+caveats for when the counts arrive: nine monthly points give a per-vOTU regression very
+little power, each vOTU is non-zero in exactly one month so a fit hinges on a single
+point, and the two coastal Florida samples are a different study and should likely be
+excluded from the fit.
+**Files:** `scripts/plot_votu_vs_cells.R` (new), `scripts/merge_votu_abundance.py`
+(`--only-source-set`), `scripts/plot_votu_abundance.R` (text for the restricted set),
+`output/abundance/` (CSV restricted to 7 vOTUs, figure rebuilt, new
+`karenia_cell_counts.csv` template), `README.md` (new section 14i), `PROMPT_LOG.md`.

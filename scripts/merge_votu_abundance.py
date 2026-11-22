@@ -81,6 +81,11 @@ def main():
     p.add_argument("--out-long", required=True)
     p.add_argument("--out-matrix", required=True)
     p.add_argument("--out-csv", help="tidy CSV holding exactly what the figure needs")
+    p.add_argument("--only-source-set", choices=["environmental", "incubation"],
+                   help="restrict --out-csv to vOTUs discovered in this sample set. "
+                        "'environmental' gives the 7 vOTUs that were assembled from an "
+                        "environmental sample, which are also exactly the 7 ever detected "
+                        "in one.")
     p.add_argument("--min-covered-fraction", type=float, default=0.75,
                    help="breadth required to call a vOTU present (default 0.75 = MIUViG)")
     a = p.parse_args()
@@ -204,10 +209,15 @@ def main():
         csv_cols = ["votu", "sample", "collection_date", "survey", "votu_source_set",
                     "relative_abundance_pct", "rpkm", "mean_coverage",
                     "covered_fraction", "detected"]
+        keep = [r for r in rows
+                if not a.only_source_set or r["votu_source_set"] == a.only_source_set]
+        if a.only_source_set:
+            n_v = len({r["votu"] for r in keep})
+            print(f"--only-source-set {a.only_source_set}: {n_v} vOTUs, {len(keep)} rows")
         with open(a.out_csv, "w", newline="") as fo:
             w = csv.DictWriter(fo, fieldnames=csv_cols)
             w.writeheader()
-            for r in rows:
+            for r in keep:
                 w.writerow({
                     "votu": r["votu"],
                     "sample": r["sample"],

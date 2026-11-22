@@ -88,3 +88,5 @@ Reads length: 122
   0:00:13.635     0M / 672M  INFO    General                 (binary_converter.cpp      : 127)   8388608 reads processed
   0:00:26.702     0M / 764M  INFO    General                 (binary_converter.cpp      : 127)   16777216 reads processed
   0:00:54.242     0M / 795M  INFO    General                 (binary_converter.cpp      : 127)   33554432 reads processed
+  0:02:35.617     0M / 882M  INFO    General                 (binary_converter.cpp      : 127)   67108864 reads processed
+  0:04:16.007     0M / 1078M INFO    General                 (binary_converter.cpp      : 127)   134217728 reads processed

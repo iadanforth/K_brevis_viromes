@@ -7392,6 +7392,66 @@ Two honest caveats against over-claiming:
 breadth criterion overturns an apparent detection, and the figures above show precisely
 why. That is a stronger and more interesting result than simply reproducing the paper.
 
+#### 14i. Restricting to the environmental vOTUs, and the cell-count analysis (2026-11-22)
+
+Written by Claude Code on 2026-11-22 (prompt 58 in `PROMPT_LOG.md`). Files:
+`scripts/plot_votu_vs_cells.R`, and `--only-source-set` in `merge_votu_abundance.py`.
+
+`output/abundance/` now covers only the **7 vOTUs found in the environmental samples**.
+Both readings of that phrase pick out the same seven - the vOTUs assembled *from* an
+environmental sample (vOTU01, 04, 05, 10, 14, 15, 16) are exactly the seven ever *detected*
+in one - so there was no ambiguity to resolve. `merge_votu_abundance.py --only-source-set
+environmental` applies the filter, giving 77 rows instead of 209.
+
+| file | what it is |
+|---|---|
+| `votu_abundance_environmental.csv` | the data: one row per vOTU per environmental sample |
+| `votu_abundance_timeseries.{pdf,png}` | abundance against time, rebuilt from that CSV alone |
+| `karenia_cell_counts.csv` | **a template with the cell-count column left blank** - see below |
+
+**The *K. brevis* cell counts are not in the paper.** Booker et al. plot them in Fig. 4A,
+but the caption gives no numbers, no units and no axis ranges; the Results contain no EH25
+concentrations; and nothing states where the counts came from. The only numeric counts in
+the paper are from lab cultures (17,063-33,141 cells/ml) and one New Pass bloom sample
+(1,330,000 cells/l) - **neither is station EH25**. Supplemental Data 14 is the only
+supplementary file cited beside the EH25 analysis and is the most likely home for them,
+but it is inside a ~26 MB zip that could not be retrieved.
+
+**No values were estimated from the figure.** Reading points off a published plot is a
+legitimate technique when done with the image in hand and a digitiser; inventing numbers
+that then get a slope, an R² and a p-value is not, and those numbers would be
+indistinguishable from real ones once written into a CSV. `karenia_cell_counts.csv` is
+therefore shipped with the 11 samples and dates pre-filled and `karenia_cells_per_L`
+**empty**, plus a `source` column to record provenance. Fill it from Supplemental Data 14
+or the FWC/FWRI HAB Monitoring Database, which publishes counts for Florida coastal
+stations and is properly citable.
+
+`scripts/plot_votu_vs_cells.R` is written and tested, and produces
+`votu_vs_karenia_cells.{pdf,png}` plus `votu_vs_karenia_lm.csv` (slope, intercept, R²,
+p-value and n per vOTU) as soon as the counts are present:
+
+```bash
+module load miniforge3; eval "$(conda shell.bash hook)"; conda activate r-plot-env
+Rscript scripts/plot_votu_vs_cells.R \
+    output/abundance/votu_abundance_environmental.csv \
+    output/abundance/karenia_cell_counts.csv \
+    output/abundance
+```
+
+With the template still blank it stops with an explanation rather than failing obscurely
+or fitting nothing. Both paths were tested: the empty case prints the instruction above,
+and the working case was exercised with synthetic counts **in a scratch directory**, which
+confirmed the figure and the per-vOTU model table are produced and caught a real bug - both
+CSVs carry a `survey` column, so the join silently produced `survey.x`/`survey.y` and the
+plot failed with `object 'survey' not found`. The synthetic data was deleted and never
+entered the repository.
+
+Caveats for when the counts arrive: with nine monthly points a per-vOTU regression has
+very little power, and each vOTU is non-zero in exactly one month, so a fit is largely
+driven by that single point. A correlation found this way is suggestive at best, and the
+two coastal Florida samples are a different study and should probably be excluded from the
+fit rather than pooled.
+
 #### 14f. Outputs
 
 In `output/abundance/`:
