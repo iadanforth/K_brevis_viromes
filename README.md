@@ -1653,6 +1653,56 @@ becomes ~35–45 hours there.
   that previously succeeded. It saves the K=21 and K=33 work (~6.7 hours of gz time), not
   all 13.6 hours.
 
+### 05b-fix-d. Resuming those two assemblies, and an OOM caused by over-trimming the memory request (2026-11-21/22)
+
+Written by Claude Code on 2026-11-22 (prompt 57 in `PROMPT_LOG.md`).
+
+The two cancelled assemblies were resumed so that all 20 samples get a real merge
+(`MV_ONLY_SAMPLES` is now empty by default in `06_merge_assemblies.sh`). Both SPAdes run
+directories had survived with `params.txt` intact and had reached K55, so
+`RESTART_FROM=k55` picks up from the last check-point rather than repeating ~30 h of K21
+and K33.
+
+**The first attempt (jobs 122119, 122120) was killed by the memory limit after 7-8 h**, and
+the mistake was mine. I sized the requests from the "peak so far" recorded in each
+cancelled run's `spades.log` - 171 GB for SRR28004142 and 310 GB for SRR28004143 - and
+asked for 220 GB and 360 GB. But those runs had been **cancelled part-way through K55 with
+memory still climbing**, so their high-water marks were floors, not requirements:
+
+```
+SRR28004142:  Memory limit set to 198 Gb  ->  mimalloc: unable to allocate 15674114048 bytes
+SRR28004143:  Memory limit set to 324 Gb  ->  mimalloc: unable to allocate 67108864 bytes
+```
+
+The original `--mem=360G` had worked only because those runs sat on 1 TB nodes where the
+limit was never the binding constraint. **A peak from an incomplete run tells you a lower
+bound and nothing more** - the general lesson for `seff`-style right-sizing, which is
+sound only for jobs that ran to completion.
+
+Resubmitted with real headroom:
+
+```bash
+# SRR28004143 exceeded a 324 GB SPAdes limit outright, so it needs a 1 TB-class node
+( module purge; module load slurm/bora; \
+  RESTART_FROM=k55 sbatch --export=ALL,RESTART_FROM \
+    -p hima -C hi --exclude=hi04,hi05,hi07 -c 32 --mem=900G -t 72:00:00 \
+    scripts/05_metaspades_nov.slurm SRR28004143 \
+      ~/scr10/data/kbrevis/clean/SRR28004143_{1,2}_CLEAN.fastq )   # job 695880, hi03, -m 810G
+
+# SRR28004142 needs >214 GB; 333 GB is the limit its earlier gz run reached without OOM
+( module purge; module load slurm/kuro; \
+  RESTART_FROM=k55 sbatch --export=ALL,RESTART_FROM \
+    -p serial -c 32 --mem=370G -t 48:00:00 \
+    scripts/05_metaspades_nov.slurm SRR28004142 \
+      ~/scr10/data/kbrevis/clean/SRR28004142_{1,2}_CLEAN.fastq )   # job 122136, ku58, -m 333G
+```
+
+A warning about this trap is now in the `#SBATCH --mem` block of
+`05_metaspades_nov.slurm`, since the default of 360 GB is fine for the other 18 samples
+and badly wrong for these two.
+
+----------------------------------------------------------------------------------------
+
 ### 05b-fix-c. Both remaining metaSPAdes jobs cancelled for time (2026-11-13)
 
 **Decision.** On 2026-11-13 the user chose to **cancel both outstanding metaSPAdes jobs

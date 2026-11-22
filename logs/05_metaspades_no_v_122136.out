@@ -1,0 +1,90 @@
+[SRR28004142] resuming from check-point k55 with 32 threads, -m 333G
+
+======= SPAdes pipeline continued. Log can be found here: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/spades.log
+
+Restored from Command line: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/metaspades.py	--only-assembler	-1	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq	-2	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq	-o	/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142	-t	32	-m	340	-t	32	-m	198
+
+Command line: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/metaspades.py	--only-assembler	-1	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq	-2	/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq	-o	/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142	-t	32	-m	340	-t	32	-m	198	-t	32	-m	333
+Restart-from=k55
+with updated parameters: -t	32	-m	333
+
+System information:
+  SPAdes version: 4.3.0
+  Python version: 3.15.2
+  OS: Linux-5.14.0-687.15.1.el9_8.x86_64-x86_64-with-glibc2.34
+
+Output dir: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142
+Mode: ONLY assembling (without read error correction)
+Debug mode is turned OFF
+
+Dataset parameters:
+  Metagenomic mode
+  Reads:
+    Library number: 1, library type: paired-end
+      orientation: fr
+      left reads: ['/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq']
+      right reads: ['/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq']
+      interlaced reads: not specified
+      single reads: not specified
+      merged reads: not specified
+Assembly parameters:
+  k: [21, 33, 55]
+  Repeat resolution is enabled
+  Mismatch careful mode is turned OFF
+  MismatchCorrector will be SKIPPED
+  Coverage cutoff is turned OFF
+  Assembly graph output will use GFA v1.2 format
+Other parameters:
+  Dir for temp files: /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/tmp
+  Threads: 32
+  Memory limit (in Gb): 333
+
+/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_1_CLEAN.fastq: max reads length: 122
+/sciclone/home/iadanforth/scr10/data/kbrevis/clean/SRR28004142_2_CLEAN.fastq: max reads length: 122
+
+Reads length: 122
+
+
+===== Before start started. 
+
+
+===== Assembling started. 
+
+===== Skipping K21 (already processed)
+===== Skipping K33 (already processed)
+
+===== K55 started. 
+
+
+== Running: /sciclone/home/iadanforth/.conda/envs/metaspades-env/bin/spades-core /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/config.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/mda_mode.info /sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/meta_mode.info
+
+  0:00:00.000     1M / 21M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/config.info"
+  0:00:00.001     1M / 21M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/mda_mode.info"
+  0:00:00.001     1M / 21M   INFO    General                 (main.cpp                  :  94)   Loaded config from "/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/K55/configs/meta_mode.info"
+  0:00:00.001     1M / 21M   INFO    General                 (memory_limit.cpp          :  55)   Memory limit set to 333 Gb
+  0:00:00.017     1M / 21M   INFO    General                 (main.cpp                  : 102)   Starting SPAdes, built from N/A, git revision N/A
+  0:00:00.017     1M / 21M   INFO    General                 (main.cpp                  : 103)   Maximum k-mer length: 128
+  0:00:00.017     1M / 21M   INFO    General                 (main.cpp                  : 104)   Assembling dataset ("/sciclone/home/iadanforth/scr10/data/kbrevis/contigs_no_v/SRR28004142/dataset.info") with K=55
+  0:00:00.017     1M / 21M   INFO    General                 (main.cpp                  : 105)   Maximum # of threads to use (adjusted due to OMP capabilities): 32
+  0:00:00.017     1M / 21M   INFO    General                 (pipeline.cpp              : 221)   SPAdes started
+  0:00:00.017     1M / 21M   INFO    General                 (pipeline.cpp              : 234)   Starting from stage: read_conversion
+  0:00:00.017     1M / 21M   INFO    General                 (pipeline.cpp              : 245)   Two-step repeat resolution enabled
+  0:00:00.037     1M / 21M   INFO   GraphCore                (graph_core.hpp            : 582)   Graph created, vertex min_id: 3, edge min_id: 3
+  0:00:00.037     1M / 21M   INFO   GraphCore                (graph_core.hpp            : 583)   Vertex size: 48, edge size: 40
+  0:00:00.048     1M / 21M   INFO    General                 (edge_index.hpp            : 132)   Size of edge index entries: 12/8
+  0:00:00.052     1M / 21M   INFO    General                 (pipeline.cpp              : 256)   Will need read mapping, kmer mapper will be attached
+  0:00:00.064     1M / 21M   INFO   StageManager             (stage.cpp                 : 210)   STAGE == Binary Read Conversion (id: read_conversion)
+  0:00:00.081     1M / 21M   INFO    General                 (read_converter.cpp        :  78)   Converting reads to binary format for library #0 (takes a while)
+  0:00:00.086     1M / 21M   INFO    General                 (read_converter.cpp        :  99)   Converting paired reads
+  0:00:00.309    81M / 113M  INFO    General                 (binary_converter.cpp      : 127)   16384 reads processed
+  0:00:00.314    81M / 115M  INFO    General                 (binary_converter.cpp      : 127)   32768 reads processed
+  0:00:00.326    81M / 125M  INFO    General                 (binary_converter.cpp      : 127)   65536 reads processed
+  0:00:00.398    81M / 158M  INFO    General                 (binary_converter.cpp      : 127)   131072 reads processed
+  0:00:00.707    56M / 186M  INFO    General                 (binary_converter.cpp      : 127)   262144 reads processed
+  0:00:02.432     0M / 259M  INFO    General                 (binary_converter.cpp      : 127)   524288 reads processed
+  0:00:03.528     0M / 338M  INFO    General                 (binary_converter.cpp      : 127)   1048576 reads processed
+  0:00:05.022     0M / 484M  INFO    General                 (binary_converter.cpp      : 127)   2097152 reads processed
+  0:00:07.932     0M / 626M  INFO    General                 (binary_converter.cpp      : 127)   4194304 reads processed
+  0:00:13.635     0M / 672M  INFO    General                 (binary_converter.cpp      : 127)   8388608 reads processed
+  0:00:26.702     0M / 764M  INFO    General                 (binary_converter.cpp      : 127)   16777216 reads processed
+  0:00:54.242     0M / 795M  INFO    General                 (binary_converter.cpp      : 127)   33554432 reads processed

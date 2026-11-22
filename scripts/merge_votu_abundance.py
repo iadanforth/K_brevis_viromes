@@ -80,6 +80,7 @@ def main():
     p.add_argument("--sra-table", required=True, help="metadata/SraRunTable.csv")
     p.add_argument("--out-long", required=True)
     p.add_argument("--out-matrix", required=True)
+    p.add_argument("--out-csv", help="tidy CSV holding exactly what the figure needs")
     p.add_argument("--min-covered-fraction", type=float, default=0.75,
                    help="breadth required to call a vOTU present (default 0.75 = MIUViG)")
     a = p.parse_args()
@@ -195,6 +196,34 @@ def main():
         for v in votus:
             src = origin[v]["source_set"]
             out.write(f"{v}\t{src}\t" + "\t".join(lookup.get((v, s), "0") for _, s in samples) + "\n")
+
+    # A self-contained CSV for the figure: one row per vOTU per environmental sample,
+    # carrying only the columns plot_votu_abundance.R reads. Kept separate from the long
+    # TSV so the figure can be regenerated from one small file with no other inputs.
+    if a.out_csv:
+        csv_cols = ["votu", "sample", "collection_date", "survey", "votu_source_set",
+                    "relative_abundance_pct", "rpkm", "mean_coverage",
+                    "covered_fraction", "detected"]
+        with open(a.out_csv, "w", newline="") as fo:
+            w = csv.DictWriter(fo, fieldnames=csv_cols)
+            w.writeheader()
+            for r in rows:
+                w.writerow({
+                    "votu": r["votu"],
+                    "sample": r["sample"],
+                    "collection_date": r["collection_date"],
+                    # The nine Gulf samples are a monthly series; the two coastal Florida
+                    # samples come from a separate study and must not be joined to it.
+                    "survey": ("Gulf of Mexico (monthly)" if "Gulf" in r["isolation_source"]
+                               else "coastal Florida (separate study)"),
+                    "votu_source_set": r["votu_source_set"],
+                    "relative_abundance_pct": r["relative_abundance_pct"],
+                    "rpkm": r["rpkm"],
+                    "mean_coverage": r["mean_coverage"],
+                    "covered_fraction": r["covered_fraction"],
+                    "detected": "TRUE" if r["present"] == "TRUE" else "FALSE",
+                })
+        print(f"wrote {a.out_csv}")
 
     n_present = sum(1 for r in rows if r["present"] == "TRUE")
     print(f"{len(rows)} rows ({len(votus)} vOTUs x {len(samples)} samples)")

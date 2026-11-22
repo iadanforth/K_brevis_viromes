@@ -1485,3 +1485,28 @@ the write-up that the defensible claim is methodological: applying the MIUViG br
 criterion overturns an apparent detection.
 **Files:** `scripts/14b_abundance_relaxed.slurm` (new), `README.md` (new section 14h),
 `PROMPT_LOG.md`.
+
+---
+
+### 57. 2026-11-22 18:20 (US Eastern) — Claude Code (Opus 5)
+
+> It looks like one of the recently submitted jobs failed. Could you please fix this and resubmit the job?
+
+**Done:** Both resumed metaSPAdes jobs had failed, not one - 122119 and 122120, each exit
+code 68 after 7-8 h. The cause was **out of memory**, and the fault was mine: I had sized
+the requests from the "peak so far" in each cancelled run's `spades.log` (171 GB and
+310 GB) and asked for 220 GB and 360 GB, but those runs were killed part-way through K55
+with memory still climbing, so those marks were lower bounds rather than requirements.
+`mimalloc` failed to allocate at limits of 198 GB and 324 GB respectively. The original
+360 GB request had only ever worked because those runs sat on 1 TB nodes where the limit
+never bound. Resubmitted with real headroom: **SRR28004143 to bora `hima`, which a 900 GB
+request forces onto hi03, the 1 TB node (job 695880, SPAdes -m 810G)** - it had exceeded a
+324 GB limit outright so it needs a big node - and **SRR28004142 to kuro `serial` with
+--mem=370G (job 122136, -m 333G)**, 333 GB being the limit its earlier gulf `gz` run
+reached without OOM. Both confirmed RUNNING on hi03 and ku58 with the intended limits, and
+both are resuming from the K55 check-point rather than restarting. Added a warning to the
+`#SBATCH --mem` block of `05_metaspades_nov.slurm` explaining that the 360 GB default is
+right for the other 18 samples and wrong for these two, and that a peak from an incomplete
+run must not be used to right-size a rerun.
+**Files:** `scripts/05_metaspades_nov.slurm` (memory guidance), `README.md` (new section
+05b-fix-d), `PROMPT_LOG.md`.

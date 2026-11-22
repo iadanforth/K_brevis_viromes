@@ -5,6 +5,16 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --time=2-00:00:00
 #SBATCH --mem=360G
+# NOTE ON MEMORY, learned the hard way on 2026-11-21 (jobs 122119/122120, both OOM-killed
+# after 7-8 h). SRR28004142 and SRR28004143 are the two largest read sets (252 and 236 GB
+# of cleaned reads) and need far more than this default: 143 exceeded a 324 GB SPAdes
+# limit outright. Give them a 1 TB-class node (bora hima hi03, or gulf gz) with
+# --mem=900G.
+#
+# THE TRAP: do not size these from the "peak so far" in a cancelled run's spades.log.
+# Those runs were killed part-way through K55 with memory still climbing, so their 171 GB
+# and 310 GB high-water marks were floors, not requirements. Trimming the request to just
+# above them is what caused the OOM.
 #SBATCH --mail-type=FAIL,BEGIN,END
 #SBATCH --mail-user=iadanforth@wm.edu
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_no_v_%j.out
