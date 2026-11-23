@@ -9,6 +9,21 @@
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/14b_abundance_relaxed_%A_%a.out
 #SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/14b_abundance_relaxed_%A_%a.err
 
+# SUPERSEDED 2026-11-23 (prompt 60). Kept for provenance only - do not run it.
+#
+# This script existed to answer one question: how much of the gap between our result and
+# Booker et al. 2026 was caused by our 95% read-identity filter, which their Methods do
+# not specify? It re-ran step 14 with CoverM's defaults on the nine Gulf samples against
+# the 19 vOTU representatives, writing to abundance/per_sample_relaxed/.
+#
+# Step 14 now does that comparison itself. scripts/14_gvmag_abundance.slurm runs BOTH
+# filter settings on ALL 11 environmental samples against ALL 26 individual GVMAGs, and
+# merge_gvmag_abundance.py writes them side by side. That is a strict superset of what
+# this script produced, so there is nothing left for it to do.
+#
+# Results from the original run are in README section 14h.
+
+
 # Sensitivity test: does our 95% read-identity filter explain why we do not see the
 # incubation vOTUs in the environment, when Booker et al. 2026 report four of them there?
 #

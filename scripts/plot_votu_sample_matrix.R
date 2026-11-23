@@ -23,8 +23,22 @@ dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 d <- read_csv(in_csv, show_col_types = FALSE)
 
-lev <- c("not assessed", "mapped, not detected", "ASSEMBLED", "ASSEMBLED+DETECTED")
-d <- d %>% mutate(status_label = factor(status_label, levels = lev))
+# "DETECTED" (found by read mapping in a sample it was NOT assembled from) must be in
+# this list even when no cell currently has it. Leaving it out makes factor() turn any
+# such cell into NA, which ggplot draws as grey - indistinguishable from "not assessed".
+# Since 2026-11-23 step 14 maps against each individual GVMAG, which makes a cross-sample
+# detection genuinely possible, so a silent NA here would hide the most interesting result
+# the table can produce.
+lev <- c("not assessed", "mapped, not detected", "DETECTED", "ASSEMBLED",
+         "ASSEMBLED+DETECTED")
+# Keep the raw string so the guard below can NAME an unknown value; once factor() has
+# turned it into NA the original is gone.
+d <- d %>% mutate(raw_status = status_label,
+                  status_label = factor(status_label, levels = lev))
+bad <- unique(d$raw_status[is.na(d$status_label)])
+if (length(bad))
+  stop("unexpected status_label value(s): ", paste(bad, collapse = ", "),
+       " - add them to `lev` and `pal` rather than letting them render as blank tiles")
 
 # samples left to right: the 9 incubation samples, then the 11 environmental by date
 ord <- d %>% distinct(sample, sample_set, collection_date) %>%
@@ -33,8 +47,11 @@ d <- d %>% mutate(sample = factor(sample, levels = ord$sample),
                   votu = factor(votu, levels = rev(sort(unique(votu)))))
 split_at <- sum(ord$sample_set == "incubation") + 0.5
 
+# Okabe-Ito. DETECTED gets vermillion, deliberately the one warm colour on the plot, so
+# a cross-sample detection cannot be mistaken for anything else.
 pal <- c("not assessed"         = "#DCDCDC",
          "mapped, not detected" = "#F7F7F7",
+         "DETECTED"             = "#D55E00",
          "ASSEMBLED"            = "#56B4E9",
          "ASSEMBLED+DETECTED"   = "#0072B2")
 
@@ -48,14 +65,16 @@ p <- ggplot(d, aes(sample, votu, fill = status_label)) +
            y = nlevels(d$votu) + 0.9,
            label = "ENVIRONMENTAL  (read-mapped)", size = 3.1,
            fontface = "bold", colour = "grey35") +
-  scale_fill_manual(values = pal, name = NULL, drop = FALSE) +
+  scale_fill_manual(values = pal, name = NULL, drop = TRUE) +
   coord_cartesian(ylim = c(0.5, nlevels(d$votu) + 1.4), clip = "off") +
   labs(
     title = "Which vOTUs appeared in which samples",
     subtitle = paste0(
       "ASSEMBLED = a GVMAG was binned from that sample and clustered into this vOTU (known for all 20 samples).\n",
       "DETECTED  = that sample's reads covered >=75% of the vOTU genome (known for the 11 environmental samples only).\n",
-      "The 9 incubation samples were never read-mapped, so grey means NOT ASSESSED - it does not mean absent."),
+      "The 9 incubation samples were never read-mapped, so grey means NOT ASSESSED - it does not mean absent.\n",
+      "Since 2026-11-23 the mapping targets each individual GVMAG, which makes a vOTU detectable in a sample it was\n",
+      "not assembled from. No vOTU is: every detection here sits on its own source sample, so DETECTED-only is empty."),
     x = NULL, y = NULL,
     caption = "Data: votu_sample_table.csv  ·  wide form: votu_sample_matrix.csv"
   ) +

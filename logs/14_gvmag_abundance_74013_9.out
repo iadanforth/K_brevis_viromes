@@ -1,0 +1,8 @@
+[abund] sample SRR28004145 (task 9), 26 GVMAG genomes, 8 threads
+[abund] reads: 12G + 12G
+coverm 0.7.0
+[abund] === SRR28004145 / paper filter: coverm  ===
+[abund] wrote /sciclone/home/iadanforth/scr10/data/kbrevis/abundance/per_gvmag/paper/SRR28004145_coverm.tsv (28 lines) in 170s
+[abund] === SRR28004145 / strict filter: coverm --min-read-percent-identity 95 --min-read-aligned-percent 75 ===
+[abund] wrote /sciclone/home/iadanforth/scr10/data/kbrevis/abundance/per_gvmag/strict/SRR28004145_coverm.tsv (28 lines) in 161s
+[abund] done SRR28004145

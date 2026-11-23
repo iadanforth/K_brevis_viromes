@@ -1,0 +1,22 @@
+[2026-11-23T14:23:38Z INFO  bird_tool_utils::clap_utils] CoverM version 0.7.0
+[2026-11-23T14:23:38Z INFO  coverm] Writing output to file: /sciclone/home/iadanforth/scr10/data/kbrevis/abundance/per_gvmag/paper/SRR28004147_coverm.tsv.part
+[2026-11-23T14:23:38Z INFO  coverm] Using min-covered-fraction 0%
+[2026-11-23T14:23:38Z INFO  bird_tool_utils::external_command_checker] Found minimap2 version 2.31-r1302 
+[2026-11-23T14:23:38Z INFO  bird_tool_utils::external_command_checker] Found samtools version 1.21 
+[2026-11-23T14:23:38Z INFO  coverm] Profiling 26 genomes
+[2026-11-23T14:23:38Z INFO  coverm] Generating concatenated reference FASTA file of 26 genomes ..
+[2026-11-23T14:23:38Z INFO  coverm] Not pre-generating minimap2 index
+[2026-11-23T14:25:23Z INFO  coverm::genome] In sample 'SRR28004147_1_CLEAN.fastq', found 21400 reads mapped out of 60606166 total (0.04%)
+[2026-11-23T14:25:23Z INFO  bird_tool_utils::clap_utils] CoverM version 0.7.0
+[2026-11-23T14:25:23Z INFO  coverm] Writing output to file: /sciclone/home/iadanforth/scr10/data/kbrevis/abundance/per_gvmag/strict/SRR28004147_coverm.tsv.part
+[2026-11-23T14:25:23Z INFO  coverm] Using min-covered-fraction 0%
+[2026-11-23T14:25:23Z INFO  coverm] Using min-read-percent-identity 95%
+[2026-11-23T14:25:23Z INFO  coverm] Using min-read-aligned-percent 75%
+[2026-11-23T14:25:23Z INFO  bird_tool_utils::external_command_checker] Found minimap2 version 2.31-r1302 
+[2026-11-23T14:25:23Z INFO  bird_tool_utils::external_command_checker] Found samtools version 1.21 
+[2026-11-23T14:25:23Z INFO  coverm] Profiling 26 genomes
+[2026-11-23T14:25:23Z INFO  coverm] Generating concatenated reference FASTA file of 26 genomes ..
+[2026-11-23T14:25:23Z INFO  coverm] Not pre-generating minimap2 index
+[2026-11-23T14:25:23Z INFO  coverm] Using min-read-percent-identity 95%
+[2026-11-23T14:25:23Z INFO  coverm] Using min-read-aligned-percent 75%
+[2026-11-23T14:26:49Z INFO  coverm::genome] In sample 'SRR28004147_1_CLEAN.fastq', found 7363 reads mapped out of 60606166 total (0.01%)

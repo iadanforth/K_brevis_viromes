@@ -7301,6 +7301,12 @@ turnover between months.
 
 #### 14h. Why we do not see the incubation vOTUs in the environment, and Booker et al. do (2026-11-21)
 
+> **Superseded in part by Step 17 (2026-11-23).** This section tested CoverM's defaults on
+> 9 samples against the 19 vOTU representatives. Step 14 was then rebuilt to map against
+> each of the 26 individual GVMAGs, as the paper's Methods describe, running both filter
+> settings on all 11 environmental samples. The conclusion below is unchanged and the
+> evidence is stronger; read section 17d for the current numbers.
+
 Written by Claude Code on 2026-11-21 (prompt 56 in `PROMPT_LOG.md`). File:
 `scripts/14b_abundance_relaxed.slurm`.
 
@@ -7912,6 +7918,186 @@ parameter and threshold is pinned in `envs/*.yml` and documented in the step sec
 above, so the analysis can be rebuilt on any system by someone willing to rewrite the
 submission layer.
 
+
+### Step 17. Re-doing step 14 the way the paper did it: map to each GVMAG, not to one representative per vOTU
+
+Written by Claude Code on 2026-11-23, prompt 60 in `PROMPT_LOG.md`.
+
+#### 17a. Why step 14 was rebuilt
+
+Section 14h established that none of the 12 incubation-derived vOTUs was detectable in any
+environmental sample, and that this disagreed with Booker et al. 2026. One possible source
+of the disagreement had not been tested: **what we were mapping to.** Their Methods say
+
+> "The relative abundance and coverage of environmental metagenomic reads recruited to
+> **each GVMAG** was calculated using coverm."
+
+*Each GVMAG* - not each vOTU. The original step 14 mapped against 19 vOTU
+**representatives**: step 09 had clustered the 26 GVMAGs into 19 vOTUs at ≥95% ANI, and
+only one genome per cluster was carried forward. The other 7 were discarded from the
+mapping reference. That is a reasonable design - it stops two near-identical genomes
+stealing reads from each other - but it is a different experiment from the published one.
+
+Some vocabulary, because the two words are easy to run together:
+
+| term | what it is |
+|---|---|
+| **GVMAG** | *giant-virus metagenome-assembled genome*. One genome, binned out of one sample's assembly. We have 26. |
+| **vOTU** | *viral operational taxonomic unit*. A cluster of GVMAGs sharing ≥95% ANI over ≥85% of the shorter genome - roughly "one viral species". Our 26 GVMAGs form 19 vOTUs: 13 singletons, 6 clusters of 2-3. |
+
+So the old reference had 19 entries and the new one has 26. The 7 extra are the non-
+representative members of those 6 multi-member clusters.
+
+#### 17b. What the new step 14 does
+
+**`scripts/14_gvmag_reference.sh`** writes one FASTA per GVMAG into
+`~/scr10/data/kbrevis/abundance/gvmag_ref/`, named exactly as the GVMAG is named in
+`output/votus/gvmags_votus.tsv` (CoverM takes each genome's name from its filename), plus
+`gvmag_reference_manifest.tsv` joining each name back to its vOTU, source sample and
+source set. It runs on dev: 26 file copies, 14 MB.
+
+By default it writes **all 26** GVMAGs, not only the 19 from the incubation experiments.
+The incubation GVMAGs are the ones the question is about - are the viruses that bloomed in
+the incubations present in the environment? - but the 7 environmental GVMAGs are kept as
+**internal positive controls**. Each was assembled from an environmental sample, so each
+*must* be recoverable by mapping that sample's own reads back onto it. Without them, a
+result of "the incubation genomes recruit almost nothing" would be indistinguishable from
+"the mapping command is broken". `GVMAG_SET=incubation bash scripts/14_gvmag_reference.sh`
+builds the 19-genome reference instead.
+
+**`scripts/14_gvmag_abundance.slurm`** is an 11-task array, one task per environmental
+sample, and each task runs CoverM **twice**:
+
+| arm | settings | why |
+|---|---|---|
+| `paper` | CoverM defaults - no read-identity filter, no aligned-length filter | The paper specifies no cutoffs, no version and no settings, so "what they did" can only mean the defaults. This is the primary result. |
+| `strict` | `--min-read-percent-identity 95 --min-read-aligned-percent 75` | 95% ANI is the MIUViG species boundary and the same cutoff that defined the vOTUs in step 09, so a read must plausibly come from *this* virus rather than a relative. 75% aligned rejects reads that match only through a short conserved patch. |
+
+Both arms pass `--min-covered-fraction 0`. CoverM's default for that flag is 10, which
+silently rewrites a genome's abundance to zero when breadth falls below 10% - that would
+bake a presence/absence threshold into the raw numbers. The threshold is applied later, in
+`merge_gvmag_abundance.py`, so it stays explicit and can be changed without re-mapping
+~100 GB of reads.
+
+Running both arms is the point of the rebuild. The difference between the columns *is* a
+measurement: recruitment that disappears once reads must match at 95% identity was never
+that genome's to begin with.
+
+Note the scale on those flags. CoverM 0.7.0 wants a **percentage**, not a fraction.
+Passing `0.95` is accepted silently and means 0.95% identity - no filtering at all - with
+no error to warn you. This was caught by a smoke test before the first run and is recorded
+in the script's header.
+
+#### 17c. Reading the output, and one trap that was found the hard way
+
+`scripts/merge_gvmag_abundance.py` reads both arms and writes four files to
+`output/abundance/`:
+
+| file | contents |
+|---|---|
+| `gvmag_abundance_long.tsv` | one row per GVMAG per sample per filter arm, all CoverM metrics |
+| `gvmag_abundance.csv` | the same, trimmed to what the figures read |
+| `votu_rollup.tsv` | per vOTU per sample, members recombined |
+| `gvmag_abundance_matrix.tsv` | genome × sample relative abundance, one block per arm |
+
+The **presence rule** is `covered_fraction ≥ 0.75` - at least 75% of the genome covered by
+at least one read (MIUViG, Roux et al. 2019). Breadth, not depth, is the gate. A genome can
+show high average coverage while only a few percent of it is covered at all, which is what
+happens when a handful of conserved genes attract reads from a relative. Breadth saturates
+as `1 − e^−coverage`, so 75% breadth needs only about 1.4× coverage: it is a weak demand on
+depth and a strong demand on evenness, which is exactly the right shape of test.
+
+The **rollup** exists because of a cost of following the paper's design. Mapping to 26
+individual GVMAGs means the 6 multi-member vOTUs split their recruited reads between
+members that are ≥95% identical, so each member alone understates the cluster. The rollup
+reports, per vOTU per sample, `read_count_sum` (the split undone), `best_covered_fraction`
+(breadth of the best-covered member - breadths are *not* summed, since overlapping members
+would double-count), and the representative's own values for a like-for-like comparison
+with the old per-representative analysis.
+
+**The trap.** Each array task writes its `paper` table before its `strict` table, so
+part-way through the run the `paper` directory is ahead. Merging at that moment produces a
+table that looks complete and is quietly wrong: `max breadth across samples` silently drops
+the samples that have not landed yet. This happened during job 74013 - a mid-run merge
+showed vOTU01 at breadth 1.000 under `paper` and 0.060 under `strict`, which looks like a
+dramatic finding and was nothing but `SRR28004148` still being `.part` in the strict
+directory, so that genome's own source sample was missing from its strict maximum.
+`merge_gvmag_abundance.py` now refuses to run unless both arms cover the identical sample
+set, and names the difference.
+
+
+#### 17d. The result: mapping per GVMAG does not change the answer
+
+Job 74013 on astral, 11 array tasks, 3-7 min each, finished cleanly. Summary over the
+11 environmental samples, with the maximum across samples for each genome:
+
+| | `paper` arm | `strict` arm |
+|---|---|---|
+| detections (breadth ≥75%) | **7** | **7** |
+| of those, incubation GVMAGs | **0** | **0** |
+| minimum breadth among the 7 | 0.9998 | 0.9991 |
+| incubation GVMAGs: median reads per genome-sample pair | 347 | 1 |
+| incubation GVMAGs: best breadth achieved by any of the 19 | 0.196 | 0.097 |
+| total reads recruited by all 19 incubation GVMAGs, all samples | 424,857 | 5,914 |
+
+**The positive controls pass.** All 7 environmental GVMAGs reach ≥99.9% breadth under
+*both* filter settings. The mapping command works, and it works at 95% identity. That is
+what makes the incubation result interpretable rather than merely negative.
+
+**No incubation GVMAG comes close.** The best any of the 19 manages is 19.6% breadth, and
+that is in the unfiltered arm. Lifting the identity filter multiplies their recruited reads
+by 72× in total, and moves nothing above 20% breadth. The 7 detections are the same 7 as
+before the rebuild, so **mapping to each GVMAG rather than to one representative per vOTU
+does not change the conclusion of section 14d.**
+
+**The clearest single illustration** is `SRR28004137__SRR28004137_bin_11` (our vOTU13,
+from an incubation) in sample `SRR34748664`, in the unfiltered arm:
+
+| reads recruited | genome breadth | mean depth | relative abundance |
+|---|---|---|---|
+| 264,155 | **0.012** | 76.6× | **0.358 %** |
+
+A quarter of a million reads, piled 77 deep onto **1.2% of the genome**, with the other
+98.8% untouched. The relative abundance that comes out, 0.36%, sits squarely inside the
+range Booker et al. describe as presence (*"~0.1-0.8"*). Under the 95% identity filter the
+same genome-sample pair keeps almost nothing.
+
+This is the whole argument in one row. Relative abundance cannot distinguish a virus that
+is present from a conserved gene family that is present in something else; only breadth
+can, and breadth is unambiguous here. It does **not** prove Booker et al. wrong - we cannot
+see their settings, their read set differs, and a different cutoff is a defensible choice,
+not an error. What it does show is that the quantity their Methods describe can reach
+reportable values without the genome being there, so the disagreement between our
+section 14d and their Fig. 4 is explained by the measurement, not by a difference in the
+underlying data.
+
+**The vOTU-by-sample matrix is unchanged too.** `output/votu_sample_matrix.png`, rebuilt
+from the per-GVMAG mapping: 19 ASSEMBLED, 7 ASSEMBLED+DETECTED, 202 tested absences, 152
+not assessed, and **0 DETECTED-only**. Per-GVMAG mapping makes it possible for a vOTU to
+turn up in a sample it was not assembled from - that is the cell the old per-representative
+design could not really test - and no vOTU does.
+
+#### 17e. What this does not settle
+
+- **The 9 incubation samples are still not read-mapped.** The grey half of the matrix is
+  unchanged. Mapping them against the same 26 GVMAGs is the same array with a different
+  sample list, about 30 minutes, and would turn the matrix into a true presence/absence
+  table.
+- **Two assemblies are still missing.** `SRR28004142` and `SRR28004143` (section 05b-fix-c)
+  have never produced contigs. Neither contributed a GVMAG, so they cannot change whether
+  the existing 19 incubation GVMAGs are detected - but they could add new ones. 695880 is
+  running on hi03; 700722 is queued behind it.
+- **The cell-count regression is still blocked on data**, not on code.
+  `scripts/plot_votu_vs_cells.R` now reads `votu_rollup.tsv` and fits all 19 vOTUs, but
+  `output/abundance/karenia_cell_counts.csv` is an empty template and the script exits
+  with a message saying so. The counts are not in the paper's text; they need
+  Supplemental Data 14 or the FWC/FWRI HAB Monitoring Database.
+- **Read-splitting within multi-member vOTUs is real but not load-bearing here.** The 6
+  vOTUs with 2-3 members do divide their reads, which is why `votu_rollup.tsv` exists.
+  Recombining them changes no detection call: the summed read counts for incubation vOTUs
+  remain three orders of magnitude below the detected ones.
+
+
 ----------------------------------------------------------------------------------------
 
 # Commands
@@ -8102,55 +8288,90 @@ python3 -I scripts/plot_pipeline_figure.py --out-dir output
 conda deactivate
 ```
 
-This writes `output/pipeline_overview.{pdf,png}`: the whole pipeline on one page, with the
-tool and version at each step and the measured result of this run - 20 samples, 848 bins,
-26 GVMAGs, 19 vOTUs, a 1,564-taxon tree - alongside the three findings and the caveats
-that belong next to them. The numbers are written into `scripts/plot_pipeline_figure.py`
-rather than read from the tables, so **if the pipeline is re-run on different data the
-figure will need its STEPS and RESULTS lists updated**; it is a diagram of this run, not a
-live dashboard.
+This writes `output/pipeline_overview.{pdf,png}`: a single vertical flowchart, one box per
+step connected by arrows. Each box holds **what was done** and **the program that did it**;
+the text beside it says **briefly how**. Box colour groups the phases (read preparation,
+assembly, genome recovery, phylogeny, quantification) in the same Okabe-Ito palette as the
+rest of the figures.
+
+Redrawn on 2026-11-23 (prompt 61 in `PROMPT_LOG.md`). The previous version was a wider
+three-column diagram that also carried the run's measured counts and summarised the three
+findings; the user asked for a plain method flowchart with no heading and no results, in
+the style of a published methods figure. The counts and findings were not lost - they live
+in the step sections above and in `output/abundance/`, `output/votus/` and `output/tree/`.
+
+The step list is written into `scripts/plot_pipeline_figure.py` as the `STEPS` constant, so
+**a re-run on different data needs `STEPS` edited**; it is a diagram of the method, not a
+live dashboard. Because it no longer carries counts, it only goes stale when a step's tool
+or approach changes, not when the numbers do.
 
 `output/Kbrevis_virome_tree.png` has **no command**: it is exported by hand from iTOL after
 uploading `output/tree/kbrevis_gvmags.treefile` and dragging on the `itol_*.txt` files
 (see `output/tree/README.md`). A re-run will not recreate it.
 
-## 14. vOTU abundance in the environment through time
+## 14. GVMAG abundance in the environmental samples
+
+Rewritten 2026-11-23 (prompt 60). Step 14 used to map against 19 vOTU **representatives**;
+it now maps against all 26 **individual GVMAGs**, twice per sample, following Booker et
+al. 2026's Methods. Section 17 explains why.
 
 ```bash
 # --- environments: CoverM 0.7.0 and R 4.4 + ggplot2 ------------------------------------
 ( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/14_abundance_setup.slurm )
 
-# --- the mapping reference: 19 vOTU representatives, renamed vOTU01.fna ... ------------
+# --- the mapping reference: all 26 GVMAGs, one FASTA each ------------------------------
 # MUST run before the array; the array checks for its output and exits if it is missing.
-bash scripts/14_votu_reference.sh
+# GVMAG_SET=incubation restricts it to the 19 incubation GVMAGs (drops the 7 controls).
+bash scripts/14_gvmag_reference.sh
 
-# --- optional but recommended: validates the CoverM command on 200,000 reads in ~3 s ---
-( module purge; module load slurm/astral; sbatch -p batch --exclude=as01 scripts/14_abundance_smoketest.slurm )
+# --- map the 11 environmental samples -> abundance/per_gvmag/{paper,strict} ------------
+# Array of 11; each task runs CoverM twice (CoverM defaults, then >=95% read identity).
+( module purge; module load slurm/astral; \
+    sbatch -p batch --exclude=as01 scripts/14_gvmag_abundance.slurm )
 
-# --- map the 11 environmental samples -> abundance/per_sample  (array of 11, 3-6 min each)
-( module purge; module load slurm/bora; sbatch -p hima -C hi --exclude=hi04,hi05,hi07 \
-    scripts/14_votu_abundance.slurm )
-
-# --- merge to a tidy table, applying the >=75% genome-breadth presence rule ------------
-python3 -I scripts/merge_votu_abundance.py \
-    --coverm-dir ~/scr10/data/kbrevis/abundance/per_sample \
-    --manifest   ~/scr10/data/kbrevis/abundance/votu_reference_manifest.tsv \
+# --- merge both filter settings into tidy tables, applying the >=75% breadth rule ------
+python3 -I scripts/merge_gvmag_abundance.py \
+    --coverm-dir ~/scr10/data/kbrevis/abundance/per_gvmag \
+    --manifest   ~/scr10/data/kbrevis/abundance/gvmag_reference_manifest.tsv \
     --sra-table  metadata/SraRunTable.csv \
-    --out-long   output/abundance/votu_abundance_long.tsv \
-    --out-matrix output/abundance/votu_abundance_matrix.tsv
+    --out-dir    output/abundance
+
+# --- which vOTU appeared in which sample (assembly + read mapping) ---------------------
+python3 -I scripts/votu_sample_table.py \
+    --votus      output/votus/gvmags_votus.tsv \
+    --coverm-dir ~/scr10/data/kbrevis/abundance/per_gvmag/strict \
+    --sra-table  metadata/SraRunTable.csv \
+    --incubation SRR28004137,SRR28004138,SRR28004139,SRR28004140,SRR28004141,SRR28004142,SRR28004143,SRR28004144,SRR28004154 \
+    --out-long   output/votu_sample_table.csv \
+    --out-matrix output/votu_sample_matrix.csv
 
 # --- the figures -----------------------------------------------------------------------
 module load miniforge3
 eval "$(conda shell.bash hook)"
 conda activate r-plot-env
-Rscript scripts/plot_votu_abundance.R \
-    output/abundance/votu_abundance_long.tsv \
-    output/abundance
+Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
+Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output
+# Needs karenia_cell_counts.csv filled in first; it exits cleanly with a message if not.
+Rscript scripts/plot_votu_vs_cells.R \
+    output/abundance/votu_rollup.tsv \
+    output/abundance/karenia_cell_counts.csv \
+    output/abundance strict
 conda deactivate
 ```
 
-`plot_votu_abundance.R` takes an optional third argument, the metric to plot:
-`rpkm_detected` (default), `rpkm`, `mean_coverage`, `relative_abundance_pct` or `tpm`.
+Outputs in `output/abundance/`:
+
+| file | what it holds |
+|---|---|
+| `gvmag_abundance_long.tsv` | one row per GVMAG per sample per filter setting, every CoverM metric |
+| `gvmag_abundance.csv` | the same, trimmed to the columns the figures read |
+| `votu_rollup.tsv` | per vOTU per sample: members summed, best member's breadth |
+| `gvmag_abundance_matrix.tsv` | genome x sample relative abundance, one block per filter |
+| `gvmag_abundance_timeseries.{pdf,png}` | abundance and breadth through time, both filters |
+
+`plot_votu_vs_cells.R` takes the filter setting as its 4th argument (`strict` or `paper`)
+and the metric as its 5th (`relative_abundance_pct_sum` by default).
+
 
 ## 15. ANI against the GVMAGs published by the original study
 

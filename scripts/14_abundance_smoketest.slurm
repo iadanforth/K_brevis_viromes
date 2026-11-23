@@ -8,7 +8,7 @@
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/14_abundance_smoketest_%j.out
 #SBATCH --error=/sciclone/home/iadanforth/K_brevis_viromes/logs/14_abundance_smoketest_%j.err
 
-# Validate the exact CoverM command in 14_votu_abundance.slurm on 200,000 reads before
+# Validate the exact CoverM command in 14_gvmag_abundance.slurm on 200,000 reads before
 # committing an 11-task array to ~200 GB of them. Three bugs in that command were already
 # found by reading `coverm genome --full-help`, and all three would have been silent or
 # late-failing:

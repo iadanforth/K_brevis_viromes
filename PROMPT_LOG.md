@@ -1582,3 +1582,80 @@ and recorded in the script that both of these samples need a 1 TB-class node.
 `output/votu_sample_table.csv`, `output/votu_sample_matrix.csv`,
 `output/votu_sample_matrix.{pdf,png}` (new), `scripts/05_metaspades_nov.slurm` (memory
 note), `README.md` (new Step 16), `PROMPT_LOG.md`.
+
+---
+
+### 60. 2026-11-23 09:05 (US Eastern) — Claude Code (Opus 5)
+
+> Ok I think that I misunderstood the paper when I first read it. Could you actually use CoverM to map the reads from all environmental samples to the GVMAGs from all incubation experiments? I believe that this is actually what the authors of the paper did. This would replace the previous coverM step and anything downstream of that.
+
+**Done:** Confirmed the user's reading is right: Booker et al. 2026's Methods say "reads
+recruited to **each GVMAG**", while the old step 14 mapped to 19 vOTU *representatives*,
+discarding 7 genomes. Rebuilt step 14 to map every environmental sample against all 26
+individual GVMAGs. Kept the 7 environmental GVMAGs in the reference alongside the 19
+incubation ones as internal positive controls (without them, "incubation genomes recruit
+nothing" is indistinguishable from a broken mapping command); `GVMAG_SET=incubation` builds
+the 19-only reference. Each sample is mapped twice - CoverM defaults (`paper`, the closest
+reading of their unspecified settings) and >=95% read identity / >=75% aligned (`strict`,
+MIUViG) - so the difference between them is itself measured. Smoke-tested the exact command
+on 20,000 read pairs on dev before submitting. Job **74013**, astral `-p batch
+--exclude=as01`, 11-task array at %4, 8 cores / 24 GB / 3 h each, 3-7 min per task, all
+finished cleanly.
+
+**Result: the conclusion does not change.** All 7 environmental GVMAGs reach >=99.9%
+breadth under both filters (controls pass); 0 of 19 incubation GVMAGs is detected under
+either, best breadth 0.196. Lifting the identity filter multiplies incubation read
+recruitment 72x (424,857 vs 5,914 reads) and moves nothing above 20% breadth. Sharpest
+illustration: vOTU13's GVMAG in SRR34748664 recruits 264,155 reads at 76.6x depth but
+**1.2% breadth**, giving relative abundance 0.358% - inside the range the paper calls
+presence, from a genome that is 98.8% uncovered.
+
+Two bugs caught before they could mislead: (1) a mid-run merge of partial results showed
+vOTU01 collapsing from breadth 1.000 to 0.060 between arms, which looked like a finding and
+was only `SRR28004148` still being `.part` in the strict directory - `merge_gvmag_abundance.py`
+now refuses to merge unless both arms cover the identical sample set; (2)
+`plot_votu_sample_matrix.R` had no `DETECTED` factor level, so a vOTU detected in a sample
+it was not assembled from - newly possible under per-GVMAG mapping, and the most
+interesting cell the table can produce - would have rendered as a blank grey tile; added
+the level, a colour and a guard that errors rather than drawing a silent NA. Also renamed
+the output column `filter` to `filter_set` after it shadowed dplyr's verb in R.
+
+Removed the 3 superseded per-vOTU outputs from `output/abundance/` and archived the
+superseded scratch directories to `~/scr10/data/kbrevis/abundance/superseded_per_votu/`.
+Marked `14b_abundance_relaxed.slurm` superseded (step 14 now does its comparison as a
+strict superset). Not done: the 9 incubation samples are still not read-mapped, and the
+cell-count regression still exits cleanly for want of `karenia_cell_counts.csv`.
+
+**Files:** `scripts/14_gvmag_reference.sh`, `scripts/14_gvmag_abundance.slurm`,
+`scripts/merge_gvmag_abundance.py`, `scripts/plot_gvmag_abundance.R` (all four renamed
+from their `votu` equivalents via `git mv` and rewritten), `scripts/votu_sample_table.py`,
+`scripts/plot_votu_sample_matrix.R`, `scripts/plot_votu_vs_cells.R`,
+`scripts/14b_abundance_relaxed.slurm`, `scripts/14_abundance_smoketest.slurm`,
+`run_pipeline.sh`, `pipeline.conf` (new `INCUBATION_SAMPLES`), `README.md` (new Step 17,
+rewritten Commands section 14, pointer in 14h), `PROMPT_LOG.md`; new outputs
+`output/abundance/{gvmag_abundance_long.tsv,gvmag_abundance.csv,votu_rollup.tsv,gvmag_abundance_matrix.tsv,gvmag_abundance_timeseries.{pdf,png}}`,
+rebuilt `output/votu_sample_{table,matrix}.csv` and `output/votu_sample_matrix.{pdf,png}`;
+deleted `output/abundance/votu_abundance_environmental.csv` and
+`output/abundance/votu_abundance_timeseries.{pdf,png}`. Outside the repo:
+`~/scr10/data/kbrevis/abundance/{gvmag_ref/,gvmag_reference_manifest.tsv,per_gvmag/}`.
+
+---
+
+### 61. 2026-11-23 09:18 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please also edit the pipeline_overview.png to look a bit more like this? I don't need the results summarized or addition of any heading. Just boxes with what was done, the program that was used and briefly how it was done. Then boxes and arrows connecting each step. Please keep the color scheme that you were using
+>
+> [pasted: reference image of a published methods flowchart - single column of grey rounded boxes with right-hand annotations, 8 steps, 1 image]
+
+**Done:** Rewrote `scripts/plot_pipeline_figure.py` as a single vertical flowchart in the
+style of the reference image: 12 rounded boxes top to bottom joined by arrows, each holding
+what was done and the program that did it, with a brief description of how to its right. No
+title and no results, as asked. Kept the Okabe-Ito palette, now used to group the phases
+(read preparation, assembly, genome recovery, phylogeny, quantification) rather than to
+distinguish steps from findings. Added step 14 in its rebuilt per-GVMAG form and step 15.
+Inspected the render twice: the first pass had the step number colliding with the two
+longest box titles and ~2 inches of dead space at the right, so the numbers moved to a left
+gutter outside the boxes and the figure width dropped from 10.4 to 9.45 inches.
+
+**Files:** `scripts/plot_pipeline_figure.py`, `output/pipeline_overview.{png,pdf}`,
+`README.md` (Commands section for the figure), `PROMPT_LOG.md`.

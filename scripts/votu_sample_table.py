@@ -7,9 +7,16 @@ data, so both are reported and kept distinct:
   ASSEMBLED  the vOTU was recovered from that sample - a GVMAG was binned out of that
              sample's assembly and clustered into this vOTU. This is available for all
              20 samples.
-  DETECTED   that sample's reads were mapped back to the vOTU representative and covered
-             >=75% of the genome (MIUViG). This is available for the 11 ENVIRONMENTAL
-             samples only, because they are the only ones step 14 mapped.
+  DETECTED   that sample's reads were mapped back and covered >=75% of the genome
+             (MIUViG). This is available for the 11 ENVIRONMENTAL samples only, because
+             they are the only ones step 14 mapped.
+
+             Since 2026-11-23 (prompt 60) step 14 maps against each individual GVMAG
+             rather than one representative per vOTU, following Booker et al. 2026. A
+             vOTU therefore counts as detected when ANY of its member GVMAGs clears the
+             breadth rule - the same "best member" convention as votu_rollup.tsv. Breadths
+             are not added together: members of a vOTU are >=95% identical, so their
+             covered regions overlap and summing would double-count.
   mapped     reads were mapped and the vOTU was not detected: a true absence.
   -          not assessed - the 9 incubation samples were never read-mapped, so a blank
              here means "unknown", NOT "absent". That asymmetry is the main thing this
@@ -30,7 +37,8 @@ STATUS = {"assembled+detected": "ASSEMBLED+DETECTED", "assembled": "ASSEMBLED",
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--votus", required=True, help="gvmags_votus.tsv from step 09")
-    p.add_argument("--coverm-dir", required=True, help="abundance/per_sample")
+    p.add_argument("--coverm-dir", required=True,
+                   help="abundance/per_gvmag/strict (or .../paper)")
     p.add_argument("--sra-table", required=True)
     p.add_argument("--incubation", required=True,
                    help="comma-separated incubation sample accessions")
@@ -52,10 +60,12 @@ def main():
     # which sample each vOTU was assembled from (a vOTU can come from several)
     assembled = {}
     votus = set()
+    votu_of = {}          # GVMAG name -> its vOTU, for reading the CoverM tables
     with open(a.votus) as fh:
         for row in csv.DictReader(fh, delimiter="\t"):
             votus.add(row["votu"])
             assembled.setdefault(row["votu"], set()).add(row["sample"])
+            votu_of[row["gvmag"]] = row["votu"]
 
     # read-mapping detections, from the CoverM tables
     detected, mapped_samples = {}, set()
@@ -73,14 +83,15 @@ def main():
                     break
         for r in body:
             g = r[0].strip()
-            if not g.startswith("vOTU"):
-                continue
+            v = votu_of.get(g)
+            if v is None:
+                continue      # CoverM's "unmapped" row, or a genome not in step 09
             try:
                 cb, ln = float(r[idx["cb"]]), float(r[idx["ln"]])
             except Exception:
                 continue
             if ln and cb / ln >= a.min_breadth:
-                detected.setdefault(g, set()).add(samp)
+                detected.setdefault(v, set()).add(samp)
 
     votus = sorted(votus)
     long_rows = []

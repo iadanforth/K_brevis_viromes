@@ -225,21 +225,29 @@ python3 -I scripts/votu_tree_context.py \
       14_abundance)
         local a b c d
         a=$(submit_script "14_abundance" "$dep" scripts/14_abundance_setup.slurm)
-        b=$(submit_wrap   "14_abundance" "$a" votu_reference "bash scripts/14_votu_reference.sh")
-        c=$(submit_script "14_abundance" "$b" scripts/14_votu_abundance.slurm)
+        b=$(submit_wrap   "14_abundance" "$a" gvmag_reference "bash scripts/14_gvmag_reference.sh")
+        c=$(submit_script "14_abundance" "$b" scripts/14_gvmag_abundance.slurm)
         d=$(submit_wrap   "14_abundance" "$c" abundance_merge_plot "
 mkdir -p output/abundance
-python3 -I scripts/merge_votu_abundance.py \
-  --coverm-dir '$SCRATCH/abundance/per_sample' \
-  --manifest '$SCRATCH/abundance/votu_reference_manifest.tsv' \
+python3 -I scripts/merge_gvmag_abundance.py \
+  --coverm-dir '$SCRATCH/abundance/per_gvmag' \
+  --manifest '$SCRATCH/abundance/gvmag_reference_manifest.tsv' \
   --sra-table metadata/SraRunTable.csv \
   --min-covered-fraction $ABUNDANCE_MIN_BREADTH \
-  --out-long output/abundance/votu_abundance_long.tsv \
-  --out-matrix output/abundance/votu_abundance_matrix.tsv
+  --out-dir output/abundance
+python3 -I scripts/votu_sample_table.py \
+  --votus output/votus/gvmags_votus.tsv \
+  --coverm-dir '$SCRATCH/abundance/per_gvmag/strict' \
+  --sra-table metadata/SraRunTable.csv \
+  --incubation '$INCUBATION_SAMPLES' \
+  --min-breadth $ABUNDANCE_MIN_BREADTH \
+  --out-long output/votu_sample_table.csv \
+  --out-matrix output/votu_sample_matrix.csv
 module load $CONDA_MODULE
 eval \"\\\$(conda shell.bash hook)\"
 conda activate r-plot-env
-Rscript scripts/plot_votu_abundance.R output/abundance/votu_abundance_long.tsv output/abundance")
+Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
+Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output")
         echo "$d" ;;
       15_ani)
         local a b
