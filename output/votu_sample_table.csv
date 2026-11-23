@@ -1,0 +1,381 @@
+votu,sample,collection_date,sample_set,read_mapped,status,status_label
+vOTU01,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU01,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU01,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU01,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU01,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU01,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU01,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU01,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU01,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU01,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004148,2021-05,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU01,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU01,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU02,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU02,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU02,SRR28004137,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU02,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU02,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU02,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU02,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU02,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU02,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU02,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU03,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU03,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU03,SRR28004137,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU03,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU03,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU03,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU03,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU03,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU03,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU03,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU04,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU04,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU04,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU04,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU04,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU04,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU04,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU04,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU04,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU04,SRR34748664,2021-09-29,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU04,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU05,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU05,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU05,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU05,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU05,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU05,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU05,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU05,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU05,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004151,2021-02,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU05,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU05,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU06,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU06,SRR28004144,2021-05,incubation,no,assembled,ASSEMBLED
+vOTU06,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU06,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU06,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU06,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU06,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU06,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU06,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU06,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU07,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU07,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU07,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU07,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU07,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU07,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU07,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU07,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU07,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU07,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU08,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU08,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU08,SRR28004137,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU08,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU08,SRR28004139,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU08,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU08,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU08,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU08,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU08,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU09,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU09,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU09,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU09,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU09,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU09,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU09,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU09,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU09,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU09,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU10,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU10,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU10,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU10,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU10,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU10,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU10,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU10,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU10,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004148,2021-05,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU10,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU10,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU11,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU11,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU11,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU11,SRR28004138,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU11,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU11,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU11,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU11,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU11,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU11,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU12,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU12,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU12,SRR28004137,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU12,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU12,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU12,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU12,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU12,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU12,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU12,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU13,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU13,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU13,SRR28004137,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU13,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU13,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU13,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU13,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU13,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU13,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU13,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU14,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU14,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU14,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU14,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU14,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU14,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU14,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU14,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU14,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004151,2021-02,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU14,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU14,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU15,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU15,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU15,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU15,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU15,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU15,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU15,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU15,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU15,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004152,2021-01,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU15,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU15,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU16,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU16,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU16,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU16,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU16,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU16,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU16,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU16,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU16,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004148,2021-05,environmental,yes,assembled+detected,ASSEMBLED+DETECTED
+vOTU16,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU16,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU17,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU17,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU17,SRR28004137,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU17,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU17,SRR28004139,2021-08,incubation,no,none,not assessed
+vOTU17,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU17,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU17,SRR28004154,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU17,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU17,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU18,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU18,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU18,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU18,SRR28004138,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU18,SRR28004139,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU18,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU18,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU18,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU18,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU18,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004142,2021-05,incubation,no,none,not assessed
+vOTU19,SRR28004143,2021-05,incubation,no,none,not assessed
+vOTU19,SRR28004144,2021-05,incubation,no,none,not assessed
+vOTU19,SRR28004137,2021-08,incubation,no,none,not assessed
+vOTU19,SRR28004138,2021-08,incubation,no,none,not assessed
+vOTU19,SRR28004139,2021-08,incubation,no,assembled,ASSEMBLED
+vOTU19,SRR28004140,2021-08,incubation,no,none,not assessed
+vOTU19,SRR28004141,2021-08,incubation,no,none,not assessed
+vOTU19,SRR28004154,2021-08,incubation,no,none,not assessed
+vOTU19,SRR28004153,2020-12,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004152,2021-01,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004151,2021-02,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004150,2021-03,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004149,2021-04,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004148,2021-05,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004147,2021-06,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004146,2021-07,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR28004145,2021-08,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR34748664,2021-09-29,environmental,yes,mapped,"mapped, not detected"
+vOTU19,SRR34748663,2022-03-08,environmental,yes,mapped,"mapped, not detected"

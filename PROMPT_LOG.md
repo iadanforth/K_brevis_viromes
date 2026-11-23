@@ -1548,3 +1548,37 @@ excluded from the fit.
 (`--only-source-set`), `scripts/plot_votu_abundance.R` (text for the restricted set),
 `output/abundance/` (CSV restricted to 7 vOTUs, figure rebuilt, new
 `karenia_cell_counts.csv` template), `README.md` (new section 14i), `PROMPT_LOG.md`.
+
+---
+
+### 59. 2026-11-23 09:40 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please create a table that shows which vOTUs appeared in which samples? Could you please also make this into a figure?
+
+**Done:** Built a 19 vOTU x 20 sample presence table as both CSV and figure
+(`scripts/votu_sample_table.py`, `scripts/plot_votu_sample_matrix.R`). The design problem
+is that "appeared" means two different things covering different samples: **ASSEMBLED** (a
+GVMAG was binned from that sample and clustered into this vOTU) is known for all 20
+samples, while **DETECTED** (reads covered >=75% of the genome) is known only for the 11
+environmental samples, because step 14 mapped those alone. Treating the 9 unmapped
+incubation samples as absences would assert **152 absences that were never tested**, so
+they are a distinct category - *not assessed* - with its own grey in the figure and its own
+label in the CSV, and the figure's subtitle says so explicitly. Outputs: a long table (one
+row per vOTU per sample with `status`, `sample_set`, `read_mapped`), a wide matrix
+(`A`/`D`/`A+D`/`.`/blank), and the figure. Cell counts: 19 assembled, 7 assembled and
+detected, 202 tested absences, 152 not assessed. The figure shows the step 14/15 result in
+one picture: two blocks with no overlap, 12 incubation-derived vOTUs on the left from 5 of
+9 samples, and on the right 7 vOTUs each assembled from and detected in exactly one sample.
+Flagged the gap the figure makes obvious - the incubation half is entirely grey, and
+mapping those 9 samples against the same 19 vOTUs (the same array with a different sample
+list, ~30 min) would turn this into a true presence/absence matrix.
+**Separately:** job 122136 (SRR28004142) failed again, OOM at MaxRSS 387968732K, the whole
+370 GB. My second memory estimate was wrong for the same reason as the first - the earlier
+gulf run had not reached its peak before being cancelled either. Rather than guess a third
+time or risk a preemptible node, queued it behind SRR28004143 with
+`--dependency=afterany:695880` so it inherits hi03 and its full 1 TB (job 700722, -m 810G),
+and recorded in the script that both of these samples need a 1 TB-class node.
+**Files:** `scripts/votu_sample_table.py`, `scripts/plot_votu_sample_matrix.R` (new),
+`output/votu_sample_table.csv`, `output/votu_sample_matrix.csv`,
+`output/votu_sample_matrix.{pdf,png}` (new), `scripts/05_metaspades_nov.slurm` (memory
+note), `README.md` (new Step 16), `PROMPT_LOG.md`.

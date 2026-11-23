@@ -15,6 +15,11 @@
 # Those runs were killed part-way through K55 with memory still climbing, so their 171 GB
 # and 310 GB high-water marks were floors, not requirements. Trimming the request to just
 # above them is what caused the OOM.
+#
+# Confirmed twice over: a second attempt gave SRR28004142 370 GB and it OOMed again at
+# MaxRSS 387968732K, i.e. the whole allocation. BOTH of these samples need a 1 TB-class
+# node (bora hima hi03, or gulf gz) - do not try to fit them on kuro serial (376 GB) or
+# gulf highmem (503 GB).
 #SBATCH --mail-type=FAIL,BEGIN,END
 #SBATCH --mail-user=iadanforth@wm.edu
 #SBATCH --output=/sciclone/home/iadanforth/K_brevis_viromes/logs/05_metaspades_no_v_%j.out

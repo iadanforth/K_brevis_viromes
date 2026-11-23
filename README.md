@@ -7728,6 +7728,78 @@ In `output/`, as requested:
 
 ----------------------------------------------------------------------------------------
 
+# Step 16. Which vOTUs appeared in which samples (2026-11-23)
+
+Written by Claude Code on 2026-11-23 (prompt 59 in `PROMPT_LOG.md`). Files:
+`scripts/votu_sample_table.py`, `scripts/plot_votu_sample_matrix.R`.
+
+A vOTU-by-sample presence table, 19 vOTUs x 20 samples, as a CSV and a figure.
+
+#### 16a. "Appeared" means two different things, and the table keeps them apart
+
+This is the whole difficulty of the table. There are two kinds of evidence, and they
+cover different samples:
+
+| | what it means | available for |
+|---|---|---|
+| **ASSEMBLED** | a GVMAG was binned out of that sample's assembly and clustered into this vOTU | **all 20 samples** |
+| **DETECTED** | that sample's reads were mapped back and covered >=75% of the vOTU genome | **the 11 environmental samples only** |
+
+Step 14 mapped the environmental samples only, so **the 9 incubation samples have no
+mapping evidence at all**. Colouring those cells the same as a tested absence would assert
+152 absences that were never tested. They are therefore a separate category - *not
+assessed* - with its own grey in the figure and its own label in the CSV. This is the one
+thing the figure has to get right, and it is why it is not a plain presence/absence
+heatmap.
+
+#### 16b. Output
+
+```bash
+python3 -I scripts/votu_sample_table.py \
+    --votus output/votus/gvmags_votus.tsv \
+    --coverm-dir ~/scr10/data/kbrevis/abundance/per_sample \
+    --sra-table metadata/SraRunTable.csv \
+    --incubation SRR28004137,SRR28004138,SRR28004139,SRR28004140,SRR28004141,SRR28004142,SRR28004143,SRR28004144,SRR28004154 \
+    --out-long output/votu_sample_table.csv \
+    --out-matrix output/votu_sample_matrix.csv
+
+module load miniforge3; eval "$(conda shell.bash hook)"; conda activate r-plot-env
+Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output
+```
+
+| file | what it is |
+|---|---|
+| `output/votu_sample_table.csv` | long form, one row per vOTU per sample, with `status`, `status_label`, `sample_set` and `read_mapped` |
+| `output/votu_sample_matrix.csv` | wide form, vOTUs down, samples across, with `A`, `D`, `A+D`, `.` and blank |
+| `output/votu_sample_matrix.{pdf,png}` | the figure |
+
+Cell counts: **19 assembled**, **7 assembled and detected**, 202 mapped-but-absent, and
+**152 not assessed**.
+
+#### 16c. What it shows
+
+The figure splits cleanly into two blocks with no overlap between them, which is the
+result of steps 14 and 15 in one picture:
+
+- **Left (incubation):** 12 vOTUs assembled from 5 of the 9 incubation samples. SRR28004154
+  and SRR28004137 carry most of them. Nothing is detected here because nothing was mapped.
+- **Right (environmental):** 7 vOTUs, each assembled from **and** detected in exactly one
+  sample - vOTU15 in January, vOTU05 and vOTU14 in February, vOTU01/vOTU10/vOTU16 in May,
+  vOTU04 in the September coastal-Florida sample. Every other environmental cell is a
+  tested absence.
+
+So no vOTU crosses the divide, and within the environmental block no vOTU is found in more
+than one sample. Both facts are visible at a glance, and both are the detection limit
+described in section 14e rather than a biological turnover signal.
+
+**The obvious gap this figure makes plain:** the incubation half is grey. Mapping the 9
+incubation samples against the same 19 vOTUs would fill it in and turn this into a real
+presence/absence matrix - it is the same `14_votu_abundance.slurm` with a different sample
+list, roughly 30 minutes of compute, and it would let the incubation and environmental
+halves be compared directly rather than only by assembly origin.
+
+----------------------------------------------------------------------------------------
+
 # Reproducing this project with one command
 
 Added 2026-11-21 (prompt 53 in `PROMPT_LOG.md`). Files: `run_pipeline.sh`,
