@@ -1827,3 +1827,42 @@ predict.
 (replaced), `output/Kbrevis_virome_tree.pdf` (new), `README.md` (new Step 20, Commands
 block, and the three places that described the figure as a manual iTOL export - including
 gap 7 of the reproducibility audit, now closed), `PROMPT_LOG.md`.
+
+---
+
+### 67. 2026-11-24 11:20 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please add a column to incubation_votu_abundance.csv containing the taxonomic classification for each vOTU? Like "unclassified" or "Algavirales" or "Imetervirales"? I'd like to facet wrap my plot using this
+
+**Done:** Added **two** columns to `output/abundance/incubation_votu_abundance.csv`,
+`order` and `family`, both parsed from GVClass's `gvclass_taxonomy_majority` lineage in
+`output/votus/all_gvmag_summaries.tsv` by a new `pull_rank()` helper in
+`scripts/plot_incubation_votu_timeseries.R`. A rank GVClass could not assign is present but
+empty in that string, so it is written as `"unclassified"` rather than NA - it means
+GVClass looked and could not say. Order is unanimous within every vOTU so it is taken
+directly, and the script now **errors out** if that ever stops being true instead of
+silently picking a member; family is not unanimous (a less complete member often falls back
+to blank) so it is taken from the vOTU's step 09 representative.
+
+Flagged that faceting on `order` is lopsided - 11 of the 12 incubation vOTUs are
+Imitervirales and only vOTU19 is Pandoravirales - which is why `family` was added alongside
+it (IM_01 x4, IM_16 x2, IM_14, PV_05, unclassified x4).
+
+**Correction to an earlier claim.** README section 10j stated, and prompt 66's answer
+repeated, that vOTU05's GVClass lineage "stopped at `c_Megaviricetes` - no order". Checking
+`all_gvmag_summaries.tsv` while building this column showed that is **wrong**: vOTU05 is
+`...;o_Imitervirales;f_;g_;s_`, and the no-order lineage quoted in 10j is **vOTU15's**.
+GVClass does assign vOTU05 an order; what is true is that it rests on 2 marker votes, 1
+unique GVOG8, 11.4% order completeness and the largest `avgdist` of all 26 GVMAGs. The
+caution about not reporting vOTU05 as a giant-virus genome still stands, but on weaker
+grounds than written. Corrected both places in the README with a dated note rather than
+silently editing, and told the user directly.
+
+Also added README section 20c, recording that GVClass order and tree placement are
+different tests and disagree for vOTU04, vOTU15 and vOTU19 - vOTU19 being the instructive
+one, classifiable by GVClass yet unplaceable in the tree because the two use different gene
+sets. Reordered the new subsections so they read 18a/18b/18c and 20a/20b/20c.
+
+**Files:** `scripts/plot_incubation_votu_timeseries.R`,
+`output/abundance/incubation_votu_abundance.csv`, `README.md` (new 18c and 20c, corrections
+in 10j and 20a, subsection reorder), `PROMPT_LOG.md`.

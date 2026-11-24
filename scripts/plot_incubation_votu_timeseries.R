@@ -46,6 +46,19 @@
 # has eight, so colour is paired with line type: the first eight vOTUs are solid, the last
 # four dashed. Both are mapped to `votu`, which merges them into one legend.
 #
+# TAXONOMY
+# --------
+# Each row carries the vOTU's GVClass assignment, parsed out of
+# `gvclass_taxonomy_majority` in output/votus/all_gvmag_summaries.tsv:
+#   order   e.g. Imitervirales, Pandoravirales, or "unclassified" when GVClass left the
+#           rank blank (`o_;`). Every vOTU's member GVMAGs agree on order, and the script
+#           stops if that ever stops being true rather than silently picking one.
+#   family  e.g. IM_01, PV_05. Members do NOT always agree here - a less complete member
+#           often drops to blank - so family is taken from the vOTU's REPRESENTATIVE, the
+#           genome step 09 picked to stand for the cluster.
+# These are GVClass's own classification of the genome, which is a different question from
+# where the genome lands in the step 11 tree; the two can disagree (README 20c).
+#
 # Usage:
 #   Rscript scripts/plot_incubation_votu_timeseries.R <votu_rollup.tsv> <out-dir> [filter]
 #   filter: paper (default, lenient - CoverM defaults) | strict (>=95% read identity)
@@ -72,6 +85,47 @@ INK <- "#1A1A1A"; MUTED <- "#4A4A4A"
 # at the source.
 MISLABELLED <- c("SRR34748664", "SRR34748663")
 
+SUMMARIES <- "output/votus/all_gvmag_summaries.tsv"
+MEMBERSHIP <- "output/votus/gvmags_votus.tsv"
+
+# Pull one rank out of a GVClass lineage string such as
+# "d_NCLDV;p_Nucleocytoviricota;c_Megaviricetes;o_Imitervirales;f_IM_01;g_;s_singleton".
+# A rank GVClass could not assign is present but empty ("f_"), which is why an empty value
+# is mapped to "unclassified" rather than NA - it means "GVClass looked and could not say",
+# not "missing data".
+pull_rank <- function(tax, rk) {
+  vapply(strsplit(tax, ";", fixed = TRUE), function(parts) {
+    hit <- parts[startsWith(parts, paste0(rk, "_"))]
+    val <- if (length(hit)) sub(paste0("^", rk, "_"), "", hit[1]) else ""
+    if (nzchar(val)) val else "unclassified"
+  }, character(1))
+}
+
+taxonomy_table <- function() {
+  summ <- read_tsv(SUMMARIES, show_col_types = FALSE) %>%
+    mutate(order = pull_rank(gvclass_taxonomy_majority, "o"),
+           family = pull_rank(gvclass_taxonomy_majority, "f"))
+  memb <- read_tsv(MEMBERSHIP, show_col_types = FALSE) %>%
+    select(votu, gvmag, is_representative)
+  joined <- memb %>% left_join(summ %>% select(gvmag, order, family), by = "gvmag")
+  if (any(is.na(joined$order)))
+    stop("GVMAGs in ", MEMBERSHIP, " with no row in ", SUMMARIES, ": ",
+         paste(joined$gvmag[is.na(joined$order)], collapse = ", "))
+
+  # Order must be unanimous within a vOTU. Fail loudly if not, instead of quietly
+  # reporting whichever member happened to sort first.
+  disagree <- joined %>% group_by(votu) %>%
+    summarise(n = n_distinct(order), .groups = "drop") %>% filter(n > 1)
+  if (nrow(disagree))
+    stop("members disagree on order for: ", paste(disagree$votu, collapse = ", "),
+         " - decide how to resolve it rather than letting this pick one")
+
+  joined %>% group_by(votu) %>%
+    summarise(order = first(order),
+              family = family[is_representative == "yes"][1],
+              .groups = "drop")
+}
+
 d <- read_tsv(in_tsv, show_col_types = FALSE) %>%
   filter(filter_set == filt, votu_source_set == "incubation") %>%
   mutate(collection_date = as.Date(collection_date),
@@ -80,7 +134,8 @@ d <- read_tsv(in_tsv, show_col_types = FALSE) %>%
          survey = "Gulf of Mexico",
          sra_isolation_source = ifelse(sample %in% MISLABELLED,
                                        "coastal Florida (SRA label, incorrect)",
-                                       "Gulf of Mexico"))
+                                       "Gulf of Mexico")) %>%
+  left_join(taxonomy_table(), by = "votu")
 
 if (nrow(d) == 0)
   stop("no incubation rows with filter_set == '", filt, "' in ", in_tsv)
@@ -89,8 +144,8 @@ if (nrow(d) == 0)
 # from this one small file with no other input.
 out_csv <- file.path(out_dir, "incubation_votu_abundance.csv")
 d %>%
-  select(votu, sample, collection_date, survey, sra_isolation_source, abundance_pct,
-         reads = read_count_sum, breadth = best_covered_fraction,
+  select(votu, order, family, sample, collection_date, survey, sra_isolation_source,
+         abundance_pct, reads = read_count_sum, breadth = best_covered_fraction,
          n_gvmags_in_votu = n_members, detected) %>%
   arrange(votu, collection_date) %>%
   write_csv(out_csv)
@@ -159,3 +214,5 @@ cat(sprintf("%d incubation vOTUs x %d environmental samples, filter = %s\n",
             n_distinct(d$votu), n_distinct(d$sample), filt))
 cat(sprintf("abundance range: %.3g%% to %.3g%%\n",
             min(d$abundance_pct), max(d$abundance_pct)))
+cat("\nvOTUs per order (the column to facet on):\n")
+print(as.data.frame(d %>% distinct(votu, order) %>% count(order, name = "n_votus")))

@@ -5690,9 +5690,20 @@ seven core *Nucleocytoviricota* markers - no VLTF3, no A32 packaging ATPase, no 
 topoisomerase II, no TFIIB, no DNA polymerase B, no RNA polymerase alpha, no SNF2 helicase.
 A genuinely complete giant virus genome should carry most of these. The likelier
 explanations are that it is a mis-binned contig set, or something real but so divergent that
-the GVOG HMMs do not detect it. Its GVClass lineage stopped at
-`d_NCLDV;p_Nucleocytoviricota;c_Megaviricetes;o_;f_;g_;s_` - no order - which is consistent
-with very few marker hits. **It should not be reported as a giant virus genome without
+the GVOG HMMs do not detect it.
+
+> **Correction, 2026-11-24 (prompt 67).** This paragraph originally continued: *"Its
+> GVClass lineage stopped at `d_NCLDV;p_Nucleocytoviricota;c_Megaviricetes;o_;f_;g_;s_` -
+> no order - which is consistent with very few marker hits."* **That is wrong, and the
+> lineage quoted is vOTU15's, not vOTU05's.** Checked against
+> `output/votus/all_gvmag_summaries.tsv`: vOTU05 is
+> `d_NCLDV;p_Nucleocytoviricota;c_Megaviricetes;o_Imitervirales;f_;g_;s_` - GVClass **does**
+> assign it an order. What is true is that the assignment rests on very little: 2 marker
+> votes, 1 unique GVOG8, `order_completeness` 11.4%, and `avgdist` 3.15, the largest of any
+> of our 26 GVMAGs. So the caution below still stands, but on weaker grounds than first
+> written: the evidence is thin, not absent.
+
+**It should not be reported as a giant virus genome without
 further evidence.** vOTU19 is the CheckV "Not-determined" genome, so its weakness is less
 surprising.
 
@@ -8201,6 +8212,36 @@ Nothing in the analysis depended on that figure. The numbers it displayed are in
 `incubation_votu_timeseries.{pdf,png}` from step 18.
 
 
+#### 18c. Taxonomy columns in `incubation_votu_abundance.csv` (2026-11-24)
+
+Prompt 67 in `PROMPT_LOG.md`. The CSV now carries two extra columns, so the figure can be
+facetted by taxonomy:
+
+| column | source | values among the 12 incubation vOTUs |
+|---|---|---|
+| `order` | `o_` from `gvclass_taxonomy_majority` | Imitervirales (11), Pandoravirales (1) |
+| `family` | `f_` from the same string, taken from the vOTU's **representative** | IM_01 (4), IM_16 (2), IM_14 (1), PV_05 (1), unclassified (4) |
+
+Both come from GVClass's assignment in `output/votus/all_gvmag_summaries.tsv`, parsed out of
+the lineage string by `pull_rank()` in `scripts/plot_incubation_votu_timeseries.R`.
+
+A rank GVClass could not assign is present but **empty** in that string (`f_;`), so an empty
+value is written as `"unclassified"` rather than `NA` - it means "GVClass looked and could
+not say", which is a finding, not missing data.
+
+Why the two ranks are derived differently:
+
+- **Order is unanimous** within every vOTU - all members of a cluster agree - so it is taken
+  directly, and the script **stops with an error** if that ever stops being true rather than
+  quietly reporting whichever member sorted first.
+- **Family is not unanimous.** A less complete member often falls back to blank while the
+  representative resolves to a family, so family is taken from the representative, the
+  genome step 09 chose to stand for the cluster.
+
+**Faceting on `order` is lopsided**: 11 of the 12 vOTUs are Imitervirales and only vOTU19 is
+Pandoravirales, so one panel holds eleven lines and the other holds one. `family` splits
+them more evenly and is probably the more informative facet.
+
 ### Step 19. A one-row-per-vOTU origin table (2026-11-24)
 
 Written by Claude Code on 2026-11-24, prompt 65 in `PROMPT_LOG.md`. File:
@@ -8265,9 +8306,11 @@ one: CheckV called it 100% complete at 203 kb, it has no relative in GVMAGs V2, 
 carries none of VLTF3, the A32 packaging ATPase, DNA topoisomerase II, TFIIB, DNA
 polymerase B, RNA polymerase alpha or SNF2 helicase. A genuinely complete giant-virus
 genome should carry most of those. Either it is a mis-binned set of contigs, or it is real
-but too divergent for the GVOG HMMs to detect - and its GVClass lineage stopping at
-`c_Megaviricetes` with no order assigned is consistent with very few marker hits. **It
-should not be reported as a giant-virus genome without further evidence.** vOTU19 is the
+but too divergent for the GVOG HMMs to detect. GVClass does place it in Imitervirales, but
+on very little: 2 marker votes, 1 unique GVOG8, `order_completeness` 11.4% and the largest
+`avgdist` of any of our 26 GVMAGs (3.15). (An earlier version of this paragraph said
+GVClass assigned it no order at all; that was wrong - see the correction in section 10j.)
+**It should not be reported as a giant-virus genome without further evidence.** vOTU19 is the
 CheckV "Not-determined" genome, so its failure is less surprising.
 
 The figure states this in its own legend key - "K. brevis vOTU (17 of 19)" - and the script
@@ -8314,6 +8357,25 @@ misplaced.
 band that `output/tree/votu_tree_context.tsv` predicts from its sister taxa: vOTU14 in
 Pimascovirales, vOTU15 in Algavirales, vOTU04 beside Asfuvirales, the remaining twelve in
 Imitervirales, and vOTU03/vOTU09/vOTU13 adjacent to one another.
+
+#### 20c. GVClass order and tree placement are different questions, and can disagree
+
+GVClass classifies a genome by comparing its marker genes to a reference database. The step
+11 tree places it by maximum likelihood on a concatenated alignment. They answer related but
+distinct questions, and for three vOTUs they do not agree:
+
+| vOTU | GVClass order | nearest sister in the tree | note |
+|---|---|---|---|
+| vOTU04 | Imitervirales (4 votes, 2 for Asfuvirales) | Asfuvirales | the vote was already split; the tree sides with the minority |
+| vOTU15 | *unclassified* - GVClass left `o_` blank after a 3/2/1 split across Algavirales, a eukaryote and split_Imitervirales | Algavirales | the tree resolves what the vote could not |
+| vOTU19 | Pandoravirales | **not in the tree** | it carries none of the 7 phylogeny markers, but GVClass still classified it from a different gene set (2 unique GVOG8) |
+
+vOTU19 is the instructive case: **a genome can be classifiable and still be unplaceable.**
+GVClass and `ncldv_markersearch` use different gene sets, so "GVClass gave it an order" and
+"it has enough markers to go in the tree" are not the same test. That is why the CSV's
+`order` column has a value for vOTU19 even though section 20a explains it is absent from the
+figure in `output/Kbrevis_virome_tree.png`.
+
 
 
 ----------------------------------------------------------------------------------------
