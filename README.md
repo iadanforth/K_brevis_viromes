@@ -4430,7 +4430,7 @@ step rather than failing.
 | `gvmags_votus.tsv` | one row per GVMAG: its vOTU, whether it is the representative, and its ANI / aligned fraction to that representative |
 | `gvmags_representatives.txt` | path to one representative genome per vOTU, the list to use for downstream work |
 | `votu_summary.txt` | how many GVMAGs collapsed into how many vOTUs |
-| `all_gvmag_summaries.tsv` | every sample's step-10 summary rows in one table, GVMAG names prefixed with the sample |
+| `all_gvmag_summaries.tsv` | every sample's step-10 summary rows in one table, GVMAG names prefixed with the sample, plus a `sample_set` column (added 2026-11-24, see 09h) |
 | `heatmap/` | the clustered ANI heatmap |
 | `votu_nearest_reference.tsv` | with `--with-refs`: closest GVMAGs V2 relative per vOTU, with its taxonomy and ecosystem |
 
@@ -6983,7 +6983,7 @@ git push origin main
 |---|---|---|
 | `gvmags_votus.tsv` | 3.1 KB | one row per GVMAG: its vOTU, whether it represents it, ANI/AF to the representative |
 | `votu_nearest_reference.tsv` | 3.0 KB | each vOTU representative's closest GVMAGs V2 relative, with that reference's taxonomy and ecosystem |
-| `all_gvmag_summaries.tsv` | 24 KB | every sample's per-GVMAG summary combined, with `<sample>__<bin>` names |
+| `all_gvmag_summaries.tsv` | 24 KB | every sample's per-GVMAG summary combined, with `<sample>__<bin>` names and a `sample_set` column |
 | `gvmags_representatives.txt` | 1.8 KB | the 19 representative `.fna` paths, the input to step 10 |
 | `votu_summary.txt` | 125 B | the one-line vOTU count |
 
@@ -8376,6 +8376,37 @@ GVClass and `ncldv_markersearch` use different gene sets, so "GVClass gave it an
 `order` column has a value for vOTU19 even though section 20a explains it is absent from the
 figure in `output/Kbrevis_virome_tree.png`.
 
+
+
+#### 09h. A `sample_set` column in `all_gvmag_summaries.tsv` (2026-11-24)
+
+Prompt 68 in `PROMPT_LOG.md`. `output/votus/all_gvmag_summaries.tsv` now carries a
+`sample_set` column, inserted immediately after `sample`, saying whether that GVMAG came
+from an **incubation** experiment or an **environmental** sample. Of the 26 GVMAGs,
+**19 are incubation and 7 environmental**, which matches the split used everywhere else in
+the project.
+
+The whole analysis turns on that distinction - the question is whether the viruses that
+bloomed in the incubations are present in the environment - so carrying it in the table
+means each consumer no longer has to re-derive it from its own copy of the accession list.
+
+**Written by the pipeline, not patched in afterwards.** The change is in the awk loop in
+`scripts/09_gvmag_votus.slurm` that builds the combined table, so a re-run produces it. The
+committed copy was regenerated on dev by running that same loop over the nine per-sample
+`*_gvmag_summary.tsv` files still in scratch (26 rows, no compute), and checked: with the
+new column removed it is **byte-identical** to the previous committed file, so nothing but
+the added column changed.
+
+The script also now refuses to run if its hard-coded incubation list does not hold exactly
+9 accessions, which catches a typo rather than letting it silently reclassify a sample. That
+list is duplicated in `pipeline.conf` (`INCUBATION_SAMPLES`), `scripts/14_gvmag_reference.sh`
+and `scripts/votu_origin_table.py`; **they must be kept identical**, and the count check is
+the only thing currently guarding that.
+
+Both existing readers of this table - `scripts/votu_cluster.py` (`csv.DictReader`) and
+`scripts/plot_incubation_votu_timeseries.R` (`read_tsv`) - address columns by name, so
+inserting a column does not disturb them. Verified by re-running the R script: it produced
+an unchanged `incubation_votu_abundance.csv`.
 
 
 ----------------------------------------------------------------------------------------

@@ -76,13 +76,41 @@ fi
 
 # One combined table of every sample's per-GVMAG summary, with the same <sample>__<bin>
 # names, so completeness can be used to pick each vOTU's representative.
+#
+# A `sample_set` column is inserted after `sample` (added 2026-11-24, prompt 68) saying
+# whether that GVMAG came from an incubation experiment or an environmental sample. The
+# whole analysis turns on that split - the question is whether the viruses that bloomed in
+# the incubations are present in the environment - and without it every consumer of this
+# table has to re-derive it from its own copy of the accession list. Both existing readers
+# (votu_cluster.py and plot_incubation_votu_timeseries.R) use csv.DictReader / read_tsv and
+# address columns by name, so inserting a column does not disturb them.
+#
+# These 9 accessions are the CH1 (May 2021) and CH2 (Aug 2021) incubation runs; everything
+# else in the study is environmental. This list must stay identical to INCUBATION_SAMPLES
+# in pipeline.conf and to the one in scripts/14_gvmag_reference.sh; the count is checked
+# below so a typo is caught rather than silently reclassifying a sample.
+INCUBATION="SRR28004137 SRR28004138 SRR28004139 SRR28004140 SRR28004141 SRR28004142 SRR28004143 SRR28004144 SRR28004154"
+N_INC=$(wc -w <<< "$INCUBATION")
+if (( N_INC != 9 )); then
+    echo "[votus] INCUBATION holds $N_INC accessions, expected 9 - refusing to label" >&2
+    exit 1
+fi
+
 COMBINED="$OUT/all_gvmag_summaries.tsv"
 : > "$COMBINED"
 for s in "$GVMAG_ROOT"/*/*_gvmag_summary.tsv; do
     sample=$(basename "$(dirname "$s")")
-    awk -F'\t' -v s="$sample" -v first="$([[ -s $COMBINED ]] && echo 0 || echo 1)" '
-        NR==1 { if (first) print; next }
-        { $2 = s "__" $2; print }' OFS='\t' "$s" >> "$COMBINED"
+    set_name=environmental
+    for i in $INCUBATION; do [[ "$sample" == "$i" ]] && set_name=incubation; done
+    awk -F'\t' -v s="$sample" -v set="$set_name" \
+        -v first="$([[ -s $COMBINED ]] && echo 0 || echo 1)" '
+        function emit(col2, col1,    i) {
+            printf "%s\t%s", col1, col2
+            for (i = 2; i <= NF; i++) printf "\t%s", $i
+            printf "\n"
+        }
+        NR==1 { if (first) emit("sample_set", $1); next }
+        { $2 = s "__" $2; emit(set, $1) }' "$s" >> "$COMBINED"
 done
 # A sample with no GVMAG writes no *_gvmag_summary.tsv at all (step 08 exits early), so
 # the glob above simply matches fewer files - that is expected and harmless. The counts

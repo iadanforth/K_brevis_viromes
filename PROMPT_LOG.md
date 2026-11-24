@@ -1866,3 +1866,30 @@ sets. Reordered the new subsections so they read 18a/18b/18c and 20a/20b/20c.
 **Files:** `scripts/plot_incubation_votu_timeseries.R`,
 `output/abundance/incubation_votu_abundance.csv`, `README.md` (new 18c and 20c, corrections
 in 10j and 20a, subsection reorder), `PROMPT_LOG.md`.
+
+---
+
+### 68. 2026-11-24 11:50 (US Eastern) — Claude Code (Opus 5)
+
+> could you please update all_gvmag_summaries.tsv to include a column showing whether it was collected from an environmental sample or an incubation? Please then push this to GitHUb
+
+**Done:** Added a `sample_set` column to `output/votus/all_gvmag_summaries.tsv`, inserted
+right after `sample`: **19 incubation, 7 environmental** across the 26 GVMAGs. Made the
+change in the awk loop of `scripts/09_gvmag_votus.slurm` that builds the combined table, so
+a re-run of step 09 produces it rather than it being a one-off hand edit.
+
+Regenerated the committed copy by running that same loop on dev over the nine per-sample
+`*_gvmag_summary.tsv` files still in scratch (26 rows, no compute), and verified the result:
+with the new column stripped it is **byte-identical** to the previous committed file, so the
+added column is the only change. Checked both existing readers address columns by name -
+`votu_cluster.py` via `csv.DictReader` and `plot_incubation_votu_timeseries.R` via
+`read_tsv` - so inserting a column mid-table is safe, then confirmed it by re-running the R
+script and getting an unchanged `incubation_votu_abundance.csv`.
+
+Added a guard: step 09 now exits if its hard-coded incubation list does not hold exactly 9
+accessions. Flagged in the README that this list is duplicated in four places
+(`pipeline.conf`, `09_gvmag_votus.slurm`, `14_gvmag_reference.sh`, `votu_origin_table.py`)
+and that the count check is currently the only thing guarding against them drifting apart.
+
+**Files:** `scripts/09_gvmag_votus.slurm`, `output/votus/all_gvmag_summaries.tsv`,
+`README.md` (new 09h, two output-table rows), `PROMPT_LOG.md`.
