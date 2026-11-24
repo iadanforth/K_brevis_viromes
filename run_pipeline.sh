@@ -247,7 +247,8 @@ module load $CONDA_MODULE
 eval \"\\\$(conda shell.bash hook)\"
 conda activate r-plot-env
 Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
-Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output")
+Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output
+Rscript scripts/plot_incubation_votu_timeseries.R output/abundance/votu_rollup.tsv output/abundance paper")
         echo "$d" ;;
       15_ani)
         local a b

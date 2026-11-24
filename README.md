@@ -8098,6 +8098,45 @@ design could not really test - and no vOTU does.
   remain three orders of magnitude below the detected ones.
 
 
+### Step 18. The figure that corresponds to the paper's Fig. 4 (2026-11-24)
+
+Written by Claude Code on 2026-11-24, prompt 62 in `PROMPT_LOG.md`. File:
+`scripts/plot_incubation_votu_timeseries.R`. Outputs
+`output/abundance/incubation_votu_timeseries.{pdf,png}` and
+`output/abundance/incubation_votu_abundance.csv`.
+
+Step 17's figure answered a methodological question - how much does the identity filter
+change the numbers, and does breadth agree? - across all 26 GVMAGs. That is not the figure
+the analysis is for. **This one is**: collection date on the x axis, and the abundance of
+the vOTUs recovered from the incubation experiments measured in the environmental
+metagenomes, which is the comparison Booker et al. 2026 make in their Fig. 4.
+
+| choice | what it is | why |
+|---|---|---|
+| series | the **12** vOTUs assembled from an incubation sample | The 7 environmental vOTUs are excluded. The question is whether the viruses that bloomed in the incubations are out in the Gulf; an environmental vOTU recruiting its own source sample's reads answers nothing. |
+| y | relative abundance, % of the sample's reads, log scale | The quantity the paper reports. Log because the values run from 5×10⁻⁶% to 0.36%, five orders of magnitude. |
+| mapping | CoverM **defaults** - no read-identity filter, no aligned-length filter | A lenient threshold is what allows an environmental read to recruit to a genome assembled from a different experiment, and the paper specifies no cutoffs. This is step 14's `paper` arm. |
+| per vOTU | members summed via `votu_rollup.tsv` | Six vOTUs hold 2-3 near-identical GVMAGs that split the reads between them; summing recovers the cluster's true recruitment. |
+| lines | join the 9 monthly Gulf samples only | Those are the bloom time course (station EH25). The two coastal Florida samples (2021-09-29, 2022-03-08) are from a separate study and are drawn as open triangles at their real dates, unjoined, so the figure does not imply a continuous 15-month survey. |
+| colour | Okabe-Ito recycled, paired with line type | Twelve series need twelve keys and the colour-blind-safe palette has eight; the last four vOTUs are dashed. Colour and line type are both mapped to `votu`, so they merge into one legend. |
+
+**What it shows.** Every one of the 12 incubation vOTUs recruits environmental reads at
+every time point - there are no zeros - across a band from about 10⁻⁵% to 10⁻²%, rising
+roughly an order of magnitude between the February 2021 minimum and the April-August bloom
+period. vOTU13 is the outlier throughout, peaking at **0.358%** in the September 2021
+coastal Florida sample.
+
+**The caveat, stated once and carried in the figure's own caption.** Genome breadth never
+exceeds **19.6%** for any point on this plot, and is below 2% for most of them, so these
+are read-recruitment values rather than confirmed genome detections - the same reads could
+be coming from a relative's conserved genes. Section 17d works through what that means and
+why it does not amount to showing the paper is wrong. The figure is the paper's
+measurement, made faithfully; the breadth column in
+`output/abundance/incubation_votu_abundance.csv` is there so the reader can check it.
+
+To redraw it with the 95% identity filter instead, pass `strict` as the third argument.
+
+
 ----------------------------------------------------------------------------------------
 
 # Commands
@@ -8351,6 +8390,10 @@ eval "$(conda shell.bash hook)"
 conda activate r-plot-env
 Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
 Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output
+# The headline figure: incubation-derived vOTUs in the environment, through time (step 18).
+# Third argument is the filter arm: `paper` (lenient, default) or `strict`.
+Rscript scripts/plot_incubation_votu_timeseries.R \
+    output/abundance/votu_rollup.tsv output/abundance paper
 # Needs karenia_cell_counts.csv filled in first; it exits cleanly with a message if not.
 Rscript scripts/plot_votu_vs_cells.R \
     output/abundance/votu_rollup.tsv \

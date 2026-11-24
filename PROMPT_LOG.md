@@ -1659,3 +1659,39 @@ gutter outside the boxes and the figure width dropped from 10.4 to 9.45 inches.
 
 **Files:** `scripts/plot_pipeline_figure.py`, `output/pipeline_overview.{png,pdf}`,
 `README.md` (Commands section for the figure), `PROMPT_LOG.md`.
+
+---
+
+### 62. 2026-11-24 08:55 (US Eastern) — Claude Code (Opus 5)
+
+> I still don't think that what you are doing makes sense and it's not what i am looking for. I want a figure with date on the x axis and the abundance of the vOTUs recovered in the experiment in the environment (by mapping metagenomes from environment to vOTUs recovered from incubations). I recognize that different vOTUs were recovered from environmental or incubation samples but this is what the paper did. I think that they allowed a lenient identity threshold
+
+**Done:** The user was right that step 17's figure was the wrong deliverable: it was a 2x2
+methodological panel (abundance and breadth, both filter arms, all 26 GVMAGs) answering
+"how much does the identity filter matter", when what was asked for is the paper's Fig. 4
+comparison. Wrote `scripts/plot_incubation_votu_timeseries.R`: one panel, collection date
+on x, relative abundance on y (log, five orders of magnitude), one line per vOTU, the
+**12 incubation-derived vOTUs only**, from step 14's **lenient** `paper` arm (CoverM
+defaults, no read-identity filter), with members summed per vOTU from `votu_rollup.tsv`.
+Lines join the 9 monthly Gulf samples; the two coastal Florida samples are open triangles
+at their real dates, unjoined. Twelve series are keyed by Okabe-Ito colour recycled with
+line type, merged into one legend. No new mapping was needed - the data came from job
+74013, which already ran both filter arms.
+
+Every one of the 12 vOTUs recruits reads at every time point (no zeros), in a band from
+~1e-5% to ~1e-2%, rising about an order of magnitude from the Feb 2021 minimum into the
+Apr-Aug bloom. vOTU13 is the outlier, peaking at 0.358% in the Sep 2021 coastal sample.
+Verified the caption's claim before shipping it: maximum genome breadth across all 132
+points is 0.196, so the one-line caveat on the figure ("read-recruitment values, not
+confirmed genome detections") is accurate. Also wrote
+`output/abundance/incubation_votu_abundance.csv`, self-contained, carrying reads and
+breadth alongside abundance so the figure can be rebuilt and checked from one file.
+
+Did not remove step 17's `gvmag_abundance_timeseries.*`; README section 17d cites it as the
+evidence for the breadth caveat, and it is the only record of the strict-vs-lenient
+comparison. Say the word and it goes.
+
+**Files:** `scripts/plot_incubation_votu_timeseries.R` (new),
+`output/abundance/incubation_votu_timeseries.{pdf,png}` (new),
+`output/abundance/incubation_votu_abundance.csv` (new), `run_pipeline.sh`,
+`README.md` (new Step 18, Commands block), `PROMPT_LOG.md`.
