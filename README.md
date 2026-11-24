@@ -5688,6 +5688,21 @@ removing them was needed - the tool made it.
 203,021 bp (section 09f), it has no relative in GVMAGs V2, and it carries **none** of the
 seven core *Nucleocytoviricota* markers - no VLTF3, no A32 packaging ATPase, no DNA
 topoisomerase II, no TFIIB, no DNA polymerase B, no RNA polymerase alpha, no SNF2 helicase.
+
+> **Caveat on those gene names, added 2026-11-24 (prompt 69).** The seven markers are
+> identified in this run only by GVOG accession - `GVOGm0013`, `GVOGm0023`, `GVOGm0054`,
+> `GVOGm0172`, `GVOGm0461`, `GVOGm0760`, `GVOGm0890`. The familiar names used in the
+> sentence above are **not derived from anything in this project** and have never been
+> checked against it. Verified on 2026-11-24 that they cannot be: the HMM models in
+> `work/hmm/gvogs.common.hmm` carry only `NAME GVOGm####.trim`, with no `DESC`, `ACC` or
+> other free-text field, and all 8,508 GVMAGs V2 proteomes have bare headers
+> (`>Fadolivirus|NODE_1_length_...`) with no functional annotation. Resolving an accession
+> to a gene name needs the Giant Virus Database's own GVOG annotation table, which this
+> project does not hold. **Treat the names above as unconfirmed.** The count - zero of
+> seven - is solid and is what the argument rests on. Note also that the same directory
+> holds a *different*, properly named HMM set (`NCLDV.hmm`: A32, D5, SFII, mcp, mRNAc,
+> PolB, RNAPL, RNAPS, RNR, VLTF3) which the phylogeny did **not** use, so those names do
+> not map onto these seven columns either.
 A genuinely complete giant virus genome should carry most of these. The likelier
 explanations are that it is a mis-binned contig set, or something real but so divergent that
 the GVOG HMMs do not detect it.
@@ -8409,6 +8424,56 @@ inserting a column does not disturb them. Verified by re-running the R script: i
 an unchanged `incubation_votu_abundance.csv`.
 
 
+#### 10k. A per-vOTU marker-gene table (2026-11-24)
+
+Prompt 69 in `PROMPT_LOG.md`. Files: `scripts/votu_marker_table.py`,
+`output/votus/votu_marker_genes.csv`, `output/tree/marker_occupancy_raw.tsv`.
+
+Step 10 already works out which of the seven marker genes each genome carries -
+`ncldv_markersearch` writes an occupancy table as a by-product - but it landed in scratch,
+which is purged after 90 days without access, and it is keyed by the long mangled alignment
+taxon name. The raw table is now copied into `output/tree/marker_occupancy_raw.tsv` so the
+repo does not depend on scratch, and `scripts/votu_marker_table.py` turns it into a readable
+per-vOTU table:
+
+| vOTU | set | 0013 | 0023 | 0054 | 0172 | 0461 | 0760 | 0890 | n | in tree |
+|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|---|---|
+| vOTU01 | environmental | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU02 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU03 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU04 | environmental | Y | Y | Y | . | Y | Y | Y | 6 | yes |
+| **vOTU05** | environmental | . | . | . | . | . | . | . | **0** | **no** |
+| vOTU06 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU07 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU08 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU09 | incubation | Y | Y | Y | Y | Y | Y | . | 6 | yes |
+| vOTU10 | environmental | Y | Y | . | Y | Y | Y | Y | 6 | yes |
+| vOTU11 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU12 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU13 | incubation | Y | . | . | . | . | Y | . | 2 | yes |
+| vOTU14 | environmental | Y | Y | Y | Y | Y | Y | . | 6 | yes |
+| vOTU15 | environmental | Y | . | Y | Y | Y | Y | Y | 6 | yes |
+| vOTU16 | environmental | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU17 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| vOTU18 | incubation | Y | Y | Y | Y | Y | Y | Y | 7 | yes |
+| **vOTU19** | incubation | . | . | . | . | . | . | . | **0** | **no** |
+
+**11 of 19 carry all seven.** Two carry none and are therefore absent from the tree
+(section 20a). **vOTU13 is the one to look at twice**: it has only 2 of 7, so although it is
+on the tree, its position rests on two genes and should not be trusted the way a 7-marker
+placement can be. It is also the biggest read recruiter among the incubation vOTUs in the
+step 18 figure, which makes its weak placement worth knowing.
+
+Two things the table does **not** say:
+
+1. **The columns have no gene names**, only GVOG accessions. See the caveat added to
+   section 10j: the names cannot be recovered from anything in this project, and the
+   familiar list that appears elsewhere in this README is unverified.
+2. **It describes one genome per vOTU** - the step 09 representative, which is the genome
+   step 10 put into the alignment. A non-representative member of one of the 6 multi-member
+   vOTUs could carry a marker its representative lacks; that is untested.
+
+
 ----------------------------------------------------------------------------------------
 
 # Commands
@@ -8683,6 +8748,9 @@ conda deactivate
 
 # --- the plain one-row-per-vOTU origin table (step 19); no environment needed ------
 python3 -I scripts/votu_origin_table.py
+
+# --- which of the 7 marker genes each vOTU carries (section 10k) ----------------------
+python3 -I scripts/votu_marker_table.py
 ```
 
 Outputs in `output/abundance/`:

@@ -1893,3 +1893,41 @@ and that the count check is currently the only thing guarding against them drift
 
 **Files:** `scripts/09_gvmag_votus.slurm`, `output/votus/all_gvmag_summaries.tsv`,
 `README.md` (new 09h, two output-table rows), `PROMPT_LOG.md`.
+
+---
+
+### 69. 2026-11-24 12:25 (US Eastern) — Claude Code (Opus 5)
+
+> Is there not a way to generate a table that shows which of the 7 marker genes is contained by each vOTU?
+
+**Done:** Yes - step 10 already computes it, but it was only ever a by-product sitting in
+scratch under a mangled taxon name, which is why it was not obvious. Copied the raw
+occupancy table to `output/tree/marker_occupancy_raw.tsv` so the repo no longer depends on
+scratch (purged after 90 days), and wrote `scripts/votu_marker_table.py` to turn it into
+`output/votus/votu_marker_genes.csv`: one row per vOTU, one yes/no column per marker, plus
+`n_markers` and `in_tree`, with the sample set and representative GVMAG alongside.
+
+Result: **11 of 19 vOTUs carry all seven**, two carry none (vOTU05, vOTU19 - hence absent
+from the tree), and the rest carry 6 except **vOTU13, which has only 2 of 7**. Flagged
+vOTU13 in the README: it is on the tree, but its placement rests on two genes and should
+not be read like a 7-marker placement - and it happens to be the largest read recruiter
+among the incubation vOTUs in the step 18 figure.
+
+**Correction to prompt 68's answer:** I said vOTU01 was "one of 10 vOTUs with a complete
+set". It is 11, as the generated table shows.
+
+**Settled the gene-name question.** Checked exhaustively and the names are NOT recoverable
+from this project: the HMM models in `work/hmm/gvogs.common.hmm` carry only
+`NAME GVOGm####.trim` with no DESC/ACC or any free-text field, and all 8,508 GVMAGs V2
+proteomes have bare headers with no functional annotation (the earlier grep hits for
+"PolB"/"RNAPL" were coincidental matches inside protein sequences). So the familiar names
+in README 10j - VLTF3, A32, TopoII, TFIIB, PolB, RNAP-alpha, SNF2 - are unverified and were
+not derived from this run; added a dated caveat there saying so, and noting that the
+differently-named `NCLDV.hmm` set in the same directory was not the one used. The argument
+in 10j rests on the count (zero of seven), which is solid. Resolving the accessions needs
+the Giant Virus Database's GVOG annotation table, which this project does not hold - not
+fetched, offered to the user.
+
+**Files:** `scripts/votu_marker_table.py` (new), `output/votus/votu_marker_genes.csv`
+(new), `output/tree/marker_occupancy_raw.tsv` (new), `README.md` (new 10k, caveat in 10j,
+Commands block), `PROMPT_LOG.md`.
