@@ -64,10 +64,10 @@ case "$GVMAG_SET" in
     *) echo "GVMAG_SET must be 'all' or 'incubation', not '$GVMAG_SET'" >&2; exit 1 ;;
 esac
 
-# The paper's two sample sets. Incubation = the CH1 (May 2021) and CH2 (Aug 2021) bloom
-# incubation experiments; environmental = the EH25 Gulf of Mexico monthly series plus two
-# coastal Florida samples. Taken from metadata/SraRunTable.csv.
-INCUBATION="SRR28004137 SRR28004138 SRR28004139 SRR28004140 SRR28004141 SRR28004142 SRR28004143 SRR28004144 SRR28004154"
+# This script used to carry its own copy of the 9 incubation accessions and re-derive the
+# split here. It no longer does: gvmags_votus.tsv carries a `sample_set` column as of
+# 2026-11-24, written by votu_cluster.py from the single list that 09_gvmag_votus.slurm
+# checks. One fewer copy to drift out of step.
 
 [[ -s "$VOTUS" ]] || { echo "Missing $VOTUS (run step 09 first)" >&2; exit 1; }
 [[ -d "$GVMAG_DIR" ]] || { echo "Missing $GVMAG_DIR (run step 08 first)" >&2; exit 1; }
@@ -77,10 +77,12 @@ rm -f "$OUT"/*.fna
 printf 'genome\tgvmag\tvotu\tvotu_rank\tsource_sample\tsource_set\tlength_bp\tcheckv_completeness\tfasta\n' > "$MANIFEST"
 
 n=0; skipped=0
-while IFS=$'\t' read -r votu gvmag sample isrep rep length comp ani af nmem; do
+# Field order must match the header written by votu_cluster.py. `sample_set` was inserted
+# after `sample` on 2026-11-24, which is why this read has 11 variables, not 10 - a
+# positional read like this one breaks silently when a column moves, so it is listed here
+# in full rather than relying on cut/awk indices scattered through the script.
+while IFS=$'\t' read -r votu gvmag sample set_name isrep rep length comp ani af nmem; do
     [[ -n "${votu:-}" ]] || continue
-    set_name=environmental
-    for i in $INCUBATION; do [[ "$sample" == "$i" ]] && set_name=incubation; done
     if [[ "$GVMAG_SET" == "incubation" && "$set_name" != "incubation" ]]; then
         skipped=$((skipped + 1)); continue
     fi

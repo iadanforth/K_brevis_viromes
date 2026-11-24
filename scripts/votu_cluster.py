@@ -29,6 +29,7 @@ Outputs (written next to --out-prefix):
 """
 import argparse
 import csv
+import re
 import sys
 from pathlib import Path
 
@@ -37,17 +38,32 @@ def genome_length(path):
     return sum(len(line.strip()) for line in open(path) if not line.startswith(">"))
 
 
+# The 9 CH1/CH2 incubation runs. 09_gvmag_votus.slurm passes this in explicitly, so this
+# literal is a fallback; it must stay identical to INCUBATION_SAMPLES in pipeline.conf.
+DEFAULT_INCUBATION = ("SRR28004137 SRR28004138 SRR28004139 SRR28004140 SRR28004141 "
+                      "SRR28004142 SRR28004143 SRR28004144 SRR28004154")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fastani", required=True)
     p.add_argument("--gvmag-dir", required=True)
     p.add_argument("--summary")
+    p.add_argument("--incubation", default=DEFAULT_INCUBATION,
+                   help="space- or comma-separated accessions from the incubation "
+                        "experiments; every other sample is labelled environmental. "
+                        "09_gvmag_votus.slurm passes its own checked list, so the default "
+                        "here is only a fallback for standalone runs.")
     p.add_argument("--out-prefix", required=True)
     p.add_argument("--min-ani", type=float, default=95.0)
     p.add_argument("--min-af", type=float, default=85.0,
                    help="minimum aligned fraction of the SHORTER genome, in percent")
     a = p.parse_args()
+    incubation = {x for x in re.split(r"[,\s]+", a.incubation) if x}
+    if len(incubation) != 9:
+        raise SystemExit(f"--incubation holds {len(incubation)} accessions, expected 9; "
+                         f"refusing to label sample_set from a list that looks wrong")
 
     lengths = {f.stem: genome_length(f) for f in sorted(Path(a.gvmag_dir).glob("*.fna"))}
     if not lengths:
@@ -105,7 +121,7 @@ def main():
     width = len(str(len(clusters)))
     with open(f"{a.out_prefix}_votus.tsv", "w") as tsv, \
          open(f"{a.out_prefix}_representatives.txt", "w") as reps:
-        tsv.write("votu\tgvmag\tsample\tis_representative\trepresentative\t"
+        tsv.write("votu\tgvmag\tsample\tsample_set\tis_representative\trepresentative\t"
                   "length_bp\tcheckv_completeness\tani_to_rep\taf_to_rep\tn_members\n")
         for i, (rep, members) in enumerate(clusters, start=1):
             votu = f"vOTU{str(i).zfill(width)}"
@@ -114,8 +130,10 @@ def main():
                 ani, af = ("100.00", "100.00") if name == rep else \
                     tuple(f"{v:.2f}" for v in edges[rep][name])
                 comp = completeness.get(name)
+                sample = name.split("__")[0]
                 tsv.write("\t".join([
-                    votu, name, name.split("__")[0],
+                    votu, name, sample,
+                    "incubation" if sample in incubation else "environmental",
                     "yes" if name == rep else "no", rep,
                     str(lengths[name]), f"{comp:.2f}" if comp is not None else "NA",
                     ani, af, str(len(members) + 1)]) + "\n")

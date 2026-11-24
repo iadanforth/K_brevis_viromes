@@ -1931,3 +1931,35 @@ fetched, offered to the user.
 **Files:** `scripts/votu_marker_table.py` (new), `output/votus/votu_marker_genes.csv`
 (new), `output/tree/marker_occupancy_raw.tsv` (new), `README.md` (new 10k, caveat in 10j,
 Commands block), `PROMPT_LOG.md`.
+
+---
+
+### 70. 2026-11-24 12:55 (US Eastern) — Claude Code (Opus 5)
+
+> could you also edit gvmags_votus.tsv to include a column for whether this came from an incubation or an environmental sample?
+
+**Done:** Added `sample_set` as column 4 of `output/votus/gvmags_votus.tsv`, right after
+`sample` - 19 incubation, 7 environmental. Written by `scripts/votu_cluster.py`, so step 09
+reproduces it; the committed copy was regenerated and verified byte-identical to the
+previous file once the new column is removed.
+
+**The part that mattered was the consumers.** Unlike `all_gvmag_summaries.tsv`, this file
+has two readers that address columns by POSITION, and a positional reader does not error
+when a column moves - it silently reads the wrong field. `14_gvmag_reference.sh` read ten
+variables with `IFS=$'\t' read`, so `isrep` would have received "incubation" and no genome
+would ever have matched "yes"; `10_gvmag_phylogeny.slurm` tested `$4=="yes"`, so **every
+tree tip would have been named `noVOTU__...`** on the next run. Found both by grepping all
+14 references before touching the file, fixed both (11 variables; `$5`), and exercised each
+against the real table. The remaining consumers all use DictReader/read_tsv and were re-run
+to confirm identical output.
+
+**Removed one duplicate of the incubation accession list** while here:
+`14_gvmag_reference.sh` no longer carries its own copy and re-derives the split - it reads
+the new column. `votu_cluster.py` takes `--incubation`, passed by `09_gvmag_votus.slurm`
+from the list it already checks, and refuses to run unless it holds exactly 9 accessions.
+Independent copies go from four to three.
+
+**Files:** `scripts/votu_cluster.py`, `scripts/09_gvmag_votus.slurm`,
+`scripts/10_gvmag_phylogeny.slurm`, `scripts/14_gvmag_reference.sh`,
+`output/votus/gvmags_votus.tsv`, `README.md` (new 09i, two output-table rows),
+`PROMPT_LOG.md`.

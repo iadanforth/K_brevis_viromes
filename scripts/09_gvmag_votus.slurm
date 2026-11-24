@@ -177,6 +177,7 @@ if ((WITH_REFS)); then
         python -I "$REPO/scripts/votu_nearest_ref.py" \
             --fastani "$OUT/refs/votus_vs_gvmagsV2.tsv" \
             --votus "$OUT/gvmags_votus.tsv" \
+            --incubation "$INCUBATION" \
             --metadata "$GVMAGS_V2_DIR/GVDB_stats.tsv" \
             --out "$OUT/votu_nearest_reference.tsv"
         conda deactivate

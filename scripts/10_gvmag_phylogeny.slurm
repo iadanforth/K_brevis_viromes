@@ -88,7 +88,8 @@ while read -r fna; do
     [[ -s "$fna" ]] || continue
     base=$(basename "$fna" .fna)
     # name the taxon by its vOTU, so tree tips are readable: vOTU003__SRR28004141_bin_2
-    votu=$(awk -F'\t' -v g="$base" '$2==g && $4=="yes" {print $1}' \
+    # $5 is is_representative: a sample_set column was inserted at $4 on 2026-11-24.
+    votu=$(awk -F'\t' -v g="$base" '$2==g && $5=="yes" {print $1}' \
              "$VOTU_DIR/gvmags_votus.tsv" | head -1)
     name=$(echo "${votu:-noVOTU}__${base}" | tr -c 'A-Za-z0-9_-' '_')
     pyrodigal-gv -i "$fna" -a "$OUT/proteins/${name}.faa" -p meta -j "$THREADS" -o /dev/null

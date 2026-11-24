@@ -4427,7 +4427,7 @@ step rather than failing.
 
 | file | contents |
 |---|---|
-| `gvmags_votus.tsv` | one row per GVMAG: its vOTU, whether it is the representative, and its ANI / aligned fraction to that representative |
+| `gvmags_votus.tsv` | one row per GVMAG: its vOTU, its `sample_set` (incubation or environmental, added 2026-11-24 - see 09i), whether it is the representative, and its ANI / aligned fraction to that representative |
 | `gvmags_representatives.txt` | path to one representative genome per vOTU, the list to use for downstream work |
 | `votu_summary.txt` | how many GVMAGs collapsed into how many vOTUs |
 | `all_gvmag_summaries.tsv` | every sample's step-10 summary rows in one table, GVMAG names prefixed with the sample, plus a `sample_set` column (added 2026-11-24, see 09h) |
@@ -6996,7 +6996,7 @@ git push origin main
 
 | file | size | what it holds |
 |---|---|---|
-| `gvmags_votus.tsv` | 3.1 KB | one row per GVMAG: its vOTU, whether it represents it, ANI/AF to the representative |
+| `gvmags_votus.tsv` | 3.4 KB | one row per GVMAG: its vOTU, `sample_set`, whether it represents it, ANI/AF to the representative |
 | `votu_nearest_reference.tsv` | 3.0 KB | each vOTU representative's closest GVMAGs V2 relative, with that reference's taxonomy and ecosystem |
 | `all_gvmag_summaries.tsv` | 24 KB | every sample's per-GVMAG summary combined, with `<sample>__<bin>` names and a `sample_set` column |
 | `gvmags_representatives.txt` | 1.8 KB | the 19 representative `.fna` paths, the input to step 10 |
@@ -8472,6 +8472,40 @@ Two things the table does **not** say:
 2. **It describes one genome per vOTU** - the step 09 representative, which is the genome
    step 10 put into the alignment. A non-representative member of one of the 6 multi-member
    vOTUs could carry a marker its representative lacks; that is untested.
+
+
+#### 09i. A `sample_set` column in `gvmags_votus.tsv` (2026-11-24)
+
+Prompt 70 in `PROMPT_LOG.md`. The same change as 09h, applied to the other step 09 table:
+`output/votus/gvmags_votus.tsv` now carries `sample_set` as **column 4**, straight after
+`sample` - 19 incubation GVMAGs, 7 environmental. It is written by `scripts/votu_cluster.py`,
+so a re-run of step 09 produces it.
+
+**This one needed care, because two consumers read the file by column POSITION**, and a
+positional reader fails silently when a column moves - it does not error, it just reads the
+wrong field:
+
+| consumer | what it did | what would have happened |
+|---|---|---|
+| `scripts/14_gvmag_reference.sh` | `while IFS=$'\t' read -r votu gvmag sample isrep rep ...` | `isrep` would have received `"incubation"`, so no genome would ever match `"yes"` |
+| `scripts/10_gvmag_phylogeny.slurm` | `awk '$2==g && $4=="yes"'` | `$4` is no longer `is_representative`, so **every tree tip would have been named `noVOTU__...`** |
+
+Both are fixed - the bash read now takes 11 variables and `awk` tests `$5` - and both were
+exercised against the real file before committing. The other four consumers
+(`votu_cluster.py`'s own output aside: `votu_origin_table.py`, `votu_marker_table.py`,
+`make_itol_annotations.py`, `summarize_booker_ani.py`, and `plot_incubation_votu_timeseries.R`)
+all address columns by name and were re-run to confirm unchanged output.
+
+**One copy of the incubation list was removed.** `14_gvmag_reference.sh` used to carry its
+own set of 9 accessions and re-derive the split; it now just reads the `sample_set` column.
+`votu_cluster.py` takes the list as `--incubation`, which `09_gvmag_votus.slurm` passes from
+the single list it already checks, and refuses to run unless it holds exactly 9 accessions.
+That takes the number of independent copies from four down to three (`pipeline.conf`,
+`09_gvmag_votus.slurm`, `votu_origin_table.py`), with `votu_cluster.py`'s literal a
+documented fallback for standalone runs.
+
+As in 09h, the committed table was regenerated rather than re-run on the cluster, and
+checked: with the new column removed it is **byte-identical** to the previous file.
 
 
 ----------------------------------------------------------------------------------------
