@@ -1760,3 +1760,29 @@ deleting; nothing cited it.
 **Files:** deleted `output/abundance/gvmag_abundance_timeseries.{pdf,png}`; edited
 `run_pipeline.sh`, `scripts/plot_gvmag_abundance.R`, `README.md` (new 18b, Commands
 section, step 14 outputs table, 18a wording), `PROMPT_LOG.md`.
+
+---
+
+### 65. 2026-11-24 10:10 (US Eastern) — Claude Code (Opus 5)
+
+> Could you please generate a evry simple table with a row for each vOTU and another row for what sample it was found in and another row for whether this was an environmental or incubation sample
+
+**Done:** Wrote `scripts/votu_origin_table.py`, which reads `output/votus/gvmags_votus.tsv`
+from step 09 and writes `output/votu_origin.csv` plus the same table as Markdown on stdout:
+three columns, `votu` / `sample` / `sample_type`. Result: **19 vOTUs, 12 incubation and 7
+environmental**.
+
+Two judgement calls, both recorded in the script's docstring and README section 19. First,
+read "found in" as ASSEMBLED FROM - the sample whose assembly produced the GVMAG that was
+binned and clustered into the vOTU - rather than as detected by read mapping. For the 7
+environmental vOTUs the two give the same answer anyway, since no vOTU is detected in a
+sample it was not assembled from; for the 12 incubation vOTUs they differ, and this table
+answers the first question. Second, six vOTUs were recovered from more than one sample, so
+those rows list every sample rather than splitting into extra rows, which keeps it at one
+row per vOTU as asked. All six happen to be incubation-only, so `sample_type` is never
+mixed; the script checks that rather than assuming it and exits with an error naming the
+vOTU if it ever stops holding - which could happen if the two outstanding assemblies
+(SRR28004142, SRR28004143) add GVMAGs to an existing environmental vOTU.
+
+**Files:** `scripts/votu_origin_table.py` (new), `output/votu_origin.csv` (new),
+`README.md` (new Step 19, Commands block), `PROMPT_LOG.md`.

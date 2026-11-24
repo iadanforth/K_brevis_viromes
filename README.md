@@ -8199,6 +8199,42 @@ Nothing in the analysis depended on that figure. The numbers it displayed are in
 `incubation_votu_timeseries.{pdf,png}` from step 18.
 
 
+### Step 19. A one-row-per-vOTU origin table (2026-11-24)
+
+Written by Claude Code on 2026-11-24, prompt 65 in `PROMPT_LOG.md`. File:
+`scripts/votu_origin_table.py`. Output: `output/votu_origin.csv`.
+
+The plainest summary of what the pipeline recovered: one row per vOTU, the sample it came
+from, and whether that sample was an incubation or an environmental one.
+
+| column | meaning |
+|---|---|
+| `votu` | the vOTU ID assigned in step 09 |
+| `sample` | the SRA run(s) whose assembly produced the GVMAG(s) in this vOTU |
+| `sample_type` | `incubation` (one of the 9 CH1/CH2 experiment runs) or `environmental` |
+
+**"Found in" means assembled from** - the sample whose assembly produced the GVMAG that was
+binned, quality-checked by CheckV/GVClass and clustered into this vOTU. That is how a vOTU
+enters the study at all. For the 7 environmental vOTUs it happens to be the same answer as
+read mapping gives, because no vOTU is detected in a sample it was not assembled from
+(section 17d); for the 12 incubation vOTUs the two questions have different answers, and
+this table answers the first one.
+
+**Six vOTUs were recovered from more than one sample** - the same virus assembled
+independently in several incubations - so those rows list every sample rather than
+splitting into extra rows, which keeps the table at one row per vOTU as asked. All six are
+incubation-only, so `sample_type` is never mixed within a row. The script **checks** this
+rather than assuming it: if a vOTU ever turns up assembled from both an incubation and an
+environmental sample, it exits with an error naming the vOTU instead of silently reporting
+one of the two kinds. That could genuinely happen if the two outstanding assemblies
+(`SRR28004142`, `SRR28004143`) add GVMAGs to an existing environmental vOTU.
+
+Result: **19 vOTUs, 12 incubation and 7 environmental.** `SRR28004154` and `SRR28004137`
+between them account for 9 of the 12 incubation vOTUs, and 5 vOTUs were recovered from
+that pair together - which is the same clustering that shows up as the multi-member vOTUs
+in `votu_rollup.tsv`.
+
+
 ----------------------------------------------------------------------------------------
 
 # Commands
@@ -8461,6 +8497,9 @@ Rscript scripts/plot_votu_vs_cells.R \
     output/abundance/karenia_cell_counts.csv \
     output/abundance strict
 conda deactivate
+
+# --- the plain one-row-per-vOTU origin table (step 19); no environment needed ------
+python3 -I scripts/votu_origin_table.py
 ```
 
 Outputs in `output/abundance/`:
