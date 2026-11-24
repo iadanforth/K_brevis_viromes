@@ -7174,7 +7174,7 @@ saves to skip it.
 | samples | n | dates | source |
 |---|---|---|---|
 | SRR28004145-153 | 9 | 2020-12 to 2021-08, **one per month** | Gulf of Mexico |
-| SRR34748663, SRR34748664 | 2 | 2021-09-29, 2022-03-08 | **coastal Florida waters**, a separate study, with recorded depths and day-resolution dates |
+| SRR34748663, SRR34748664 | 2 | 2021-09-29, 2022-03-08 | labelled **coastal Florida waters** in the SRA, with recorded depths and day-resolution dates. That label is a mislabelling - see section 18a; they are the same survey as the other nine |
 
 The nine Gulf samples are a genuine monthly time series. The two Florida samples are not
 part of it - different location, different study, different accession series. Drawing one
@@ -7458,6 +7458,10 @@ driven by that single point. A correlation found this way is suggestive at best,
 two coastal Florida samples are a different study and should probably be excluded from the
 fit rather than pooled.
 
+> **Corrected 2026-11-24 (section 18a).** The two samples are *not* a different study - the
+> SRA's "coastal Florida" label on them is a mislabelling. They belong in the fit. The
+> power caveat above still stands.
+
 #### 14f. Outputs
 
 In `output/abundance/`:
@@ -7483,8 +7487,9 @@ explicit `plot.background`.
 
 - **Absence of evidence**: see 14e. Non-detection here means "below ~1.4x coverage in this
   sample", not "absent from the Gulf of Mexico".
-- The two coastal Florida samples are a different study and location. They are shown, but
-  they are not month 10 and month 16 of the Gulf series.
+- ~~The two coastal Florida samples are a different study and location. They are shown, but
+  they are not month 10 and month 16 of the Gulf series.~~ **Corrected 2026-11-24
+  (section 18a): the SRA label is wrong and these two are part of the same survey.**
 - Mapping used vOTU **representatives**. A vOTU member genome that differs from its
   representative by more than 5% in some region will lose those reads to the 95% identity
   filter.
@@ -8117,14 +8122,14 @@ metagenomes, which is the comparison Booker et al. 2026 make in their Fig. 4.
 | y | relative abundance, % of the sample's reads, log scale | The quantity the paper reports. Log because the values run from 5×10⁻⁶% to 0.36%, five orders of magnitude. |
 | mapping | CoverM **defaults** - no read-identity filter, no aligned-length filter | A lenient threshold is what allows an environmental read to recruit to a genome assembled from a different experiment, and the paper specifies no cutoffs. This is step 14's `paper` arm. |
 | per vOTU | members summed via `votu_rollup.tsv` | Six vOTUs hold 2-3 near-identical GVMAGs that split the reads between them; summing recovers the cluster's true recruitment. |
-| lines | join the 9 monthly Gulf samples only | Those are the bloom time course (station EH25). The two coastal Florida samples (2021-09-29, 2022-03-08) are from a separate study and are drawn as open triangles at their real dates, unjoined, so the figure does not imply a continuous 15-month survey. |
+| lines | join **all 11** samples in date order | All 11 are one survey (station EH25) - see 18a. Monthly from Dec 2020 to Aug 2021, then two later points; the gap between them is a gap in sampling, not a boundary between studies. |
 | colour | Okabe-Ito recycled, paired with line type | Twelve series need twelve keys and the colour-blind-safe palette has eight; the last four vOTUs are dashed. Colour and line type are both mapped to `votu`, so they merge into one legend. |
 
 **What it shows.** Every one of the 12 incubation vOTUs recruits environmental reads at
 every time point - there are no zeros - across a band from about 10⁻⁵% to 10⁻²%, rising
 roughly an order of magnitude between the February 2021 minimum and the April-August bloom
 period. vOTU13 is the outlier throughout, peaking at **0.358%** in the September 2021
-coastal Florida sample.
+sample.
 
 **The caveat, stated once and carried in the figure's own caption.** Genome breadth never
 exceeds **19.6%** for any point on this plot, and is below 2% for most of them, so these
@@ -8135,6 +8140,40 @@ measurement, made faithfully; the breadth column in
 `output/abundance/incubation_votu_abundance.csv` is there so the reader can check it.
 
 To redraw it with the 95% identity filter instead, pass `strict` as the third argument.
+
+#### 18a. A metadata correction: the two "coastal Florida" samples are not a separate study
+
+Added 2026-11-24, prompt 63 in `PROMPT_LOG.md`.
+
+`SRR34748664` (2021-09-29) and `SRR34748663` (2022-03-08) carry `isolation_source` =
+**coastal Florida** in `metadata/SraRunTable.csv`. Every figure in this project used to
+treat them as a separate study on that basis: drawn as open triangles, never joined to the
+Gulf of Mexico series, on the reasoning that a line through all eleven would assert a
+continuous 15-month survey that did not exist.
+
+**That label is wrong.** The user confirmed on 2026-11-24 that these two runs come from the
+same survey as the other nine and were mislabelled when submitted to the SRA. (The README's
+own sample table at the top already describes both as "EH25 field time series", which is
+consistent with this.) So all 11 environmental samples are **one series**: one marker
+shape, one line through all of them in date order.
+
+**Where the correction lives.** In the three plotting scripts, each as a named constant:
+
+```r
+MISLABELLED <- c("SRR34748664", "SRR34748663")
+```
+
+It is deliberately **not** applied upstream. `metadata/SraRunTable.csv`,
+`gvmag_abundance_long.tsv` and `votu_rollup.tsv` still carry the SRA's own record, so the
+raw metadata stays recoverable and a reader can see exactly what was changed and why. If
+the submission is ever corrected at NCBI, deleting those constants restores agreement.
+`incubation_votu_abundance.csv` carries both: `survey` (corrected) and
+`sra_isolation_source` (what the SRA says).
+
+**Figures rebuilt under the correction:** `incubation_votu_timeseries.{pdf,png}` and
+`gvmag_abundance_timeseries.{pdf,png}`. `plot_votu_vs_cells.R` lost its `shape = survey`
+mapping, since there is no sample-origin distinction left for shape to carry. No numbers
+changed - only which points are joined and how they are drawn.
 
 
 ----------------------------------------------------------------------------------------

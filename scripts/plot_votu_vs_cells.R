@@ -100,16 +100,16 @@ lab <- fits %>% mutate(
 p <- ggplot(d, aes(karenia_cells_per_L, value)) +
   geom_smooth(method = "lm", se = TRUE, colour = "#0072B2",
               fill = "#0072B2", alpha = 0.13, linewidth = 0.8, formula = y ~ x) +
-  geom_point(aes(shape = survey, fill = detected), colour = "#1A1A1A",
+  # All 11 environmental samples are one survey: the SRA's "coastal Florida" label on
+  # SRR34748664 and SRR34748663 is a mislabelling (user, 2026-11-24), so there is no
+  # sample-origin distinction left for shape to carry.
+  geom_point(aes(fill = detected), shape = 21, colour = "#1A1A1A",
              size = 2.8, stroke = 0.8) +
   geom_text(data = lab, aes(label = txt), x = Inf, y = Inf, hjust = 1.04, vjust = 1.5,
             size = 3.0, colour = "grey30", inherit.aes = FALSE) +
   facet_wrap(~ votu_label, scales = "free_y", ncol = 5) +
   scale_fill_manual(values = c(`TRUE` = "#D55E00", `FALSE` = "white"),
                     name = "Detected (>=75% genome breadth)") +
-  scale_shape_manual(values = c(`Gulf of Mexico (monthly)` = 21,
-                                `coastal Florida (separate study)` = 24),
-                     name = "Sample origin") +
   scale_x_continuous(labels = label_number(scale_cut = cut_short_scale())) +
   labs(
     title = "vOTU abundance against Karenia brevis cell concentration",

@@ -23,14 +23,22 @@
 #            The rollup sums each cluster's members back together, so a vOTU's abundance is
 #            the abundance of the whole cluster, not of one arbitrary member.
 #
-# THE TWO SURVEYS
-# ---------------
-# Nine of the 11 environmental samples are the monthly Gulf of Mexico series
-# (Dec 2020 - Aug 2021, station EH25 in the paper) - that is the bloom time course, and it
-# is what the lines join. The other two are coastal Florida samples from a separate study
-# (2021-09-29, 2022-03-08); they are drawn as open triangles at their real dates and are
-# NOT joined to the series, because a line through them would imply a continuous 15-month
-# survey that does not exist.
+# A METADATA CORRECTION
+# ---------------------
+# SRR34748664 and SRR34748663 are recorded in metadata/SraRunTable.csv with
+# isolation_source "coastal Florida", and earlier versions of this figure therefore drew
+# them as a separate study - open triangles, not joined to the Gulf series. That label is
+# WRONG. Per the user on 2026-11-24, these two runs come from the same survey as the nine
+# Gulf of Mexico samples and were mislabelled when submitted to the SRA.
+#
+# So all 11 environmental samples are one series: one marker shape, one line through all
+# of them in date order. The series runs monthly from Dec 2020 to Aug 2021 and then has
+# two later points (2021-09-29 and 2022-03-08); the gap between them is a real gap in
+# sampling, not a boundary between studies.
+#
+# The correction is applied HERE and not upstream. votu_rollup.tsv and SraRunTable.csv
+# still carry the SRA's own metadata, so the raw record stays recoverable and this script
+# is the single place where the correction lives.
 #
 # COLOUR
 # ------
@@ -57,14 +65,22 @@ in_tsv <- args[1]; out_dir <- args[2]
 filt <- if (length(args) >= 3) args[3] else "paper"
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-GULF <- "Gulf of Mexico (monthly)"
 INK <- "#1A1A1A"; MUTED <- "#4A4A4A"
+
+# The two runs the SRA mislabels as "coastal Florida" - see the header. Listed by
+# accession so the correction is explicit and easy to undo if the metadata is ever fixed
+# at the source.
+MISLABELLED <- c("SRR34748664", "SRR34748663")
 
 d <- read_tsv(in_tsv, show_col_types = FALSE) %>%
   filter(filter_set == filt, votu_source_set == "incubation") %>%
   mutate(collection_date = as.Date(collection_date),
          detected = as.logical(detected),
-         abundance_pct = relative_abundance_pct_sum)
+         abundance_pct = relative_abundance_pct_sum,
+         survey = "Gulf of Mexico",
+         sra_isolation_source = ifelse(sample %in% MISLABELLED,
+                                       "coastal Florida (SRA label, incorrect)",
+                                       "Gulf of Mexico"))
 
 if (nrow(d) == 0)
   stop("no incubation rows with filter_set == '", filt, "' in ", in_tsv)
@@ -73,7 +89,7 @@ if (nrow(d) == 0)
 # from this one small file with no other input.
 out_csv <- file.path(out_dir, "incubation_votu_abundance.csv")
 d %>%
-  select(votu, sample, collection_date, survey, abundance_pct,
+  select(votu, sample, collection_date, survey, sra_isolation_source, abundance_pct,
          reads = read_count_sum, breadth = best_covered_fraction,
          n_gvmags_in_votu = n_members, detected) %>%
   arrange(votu, collection_date) %>%
@@ -86,15 +102,12 @@ okabe <- c("#0072B2", "#D55E00", "#009E73", "#CC79A7",
 pal <- setNames(okabe[(seq_along(votus) - 1) %% 8 + 1], votus)
 lty <- setNames(ifelse(seq_along(votus) <= 8, "solid", "22"), votus)
 
-gulf  <- d %>% filter(survey == GULF)
-coast <- d %>% filter(survey != GULF)
-
+# One survey, one series: every sample is a filled circle and the line runs through all
+# eleven in date order (see the metadata correction in the header).
 p <- ggplot(d, aes(collection_date, abundance_pct,
                    colour = votu, linetype = votu, group = votu)) +
-  geom_line(data = gulf, linewidth = 0.7, alpha = 0.9) +
-  geom_point(data = gulf, size = 1.9) +
-  geom_point(data = coast, shape = 2, size = 2.4, stroke = 0.9,
-             show.legend = FALSE) +
+  geom_line(linewidth = 0.7, alpha = 0.9) +
+  geom_point(size = 1.9) +
   scale_colour_manual(values = pal, name = NULL) +
   scale_linetype_manual(values = lty, name = NULL) +
   scale_y_log10(labels = label_number(drop0trailing = TRUE),
@@ -111,8 +124,8 @@ p <- ggplot(d, aes(collection_date, abundance_pct,
       "quantified by mapping each environmental\nsample's reads onto them with CoverM at ",
       if (filt == "paper") "its default settings (no read-identity filter)."
       else "≥95% read identity.",
-      " Lines join the 9-month Gulf of Mexico\nseries (station EH25); open triangles are ",
-      "the two coastal Florida samples, which are a separate study."),
+      "\nAll 11 samples are one survey (station EH25) - the SRA's \"coastal Florida\" ",
+      "label on the 2021-09 and 2022-03 runs is wrong."),
     x = NULL, y = "Relative abundance (% of sample reads)",
     caption = paste0(
       "Data: ", basename(out_csv), "  ·  step 14, `", filt, "` arm.  ",

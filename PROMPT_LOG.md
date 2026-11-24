@@ -1695,3 +1695,38 @@ comparison. Say the word and it goes.
 `output/abundance/incubation_votu_timeseries.{pdf,png}` (new),
 `output/abundance/incubation_votu_abundance.csv` (new), `run_pipeline.sh`,
 `README.md` (new Step 18, Commands block), `PROMPT_LOG.md`.
+
+---
+
+### 63. 2026-11-24 09:30 (US Eastern) — Claude Code (Opus 5)
+
+> Ok you can actually make the triangles in the figure circles. I know that the metadata states that these are from coastal Florida, but they are from the same experiment as the ones labelled Gulf of Mexico. They were just mislabelled
+
+**Done:** Treated the correction as structural rather than cosmetic. If `SRR34748664` and
+`SRR34748663` are the same survey as the other nine, then they should not only share the
+marker shape but also be joined by the same line - drawing them unjoined was the whole
+reason they had been given a separate shape. So all 11 environmental samples are now one
+series in `incubation_votu_timeseries.{pdf,png}`: filled circles throughout, one line
+through all of them in date order. Rebalanced the subtitle, whose second line had started
+running to the panel edge once the new text went in.
+
+Applied the same correction to the other two scripts that had the split baked in, since
+leaving a known-wrong distinction in committed figures would be sloppy:
+`plot_gvmag_abundance.R` (step 17's 2x2 panel - rebuilt) and `plot_votu_vs_cells.R`, which
+lost its `shape = survey` mapping because there is no sample-origin distinction left for
+shape to carry. No numbers changed anywhere - only which points are joined and how they
+are drawn.
+
+Put the correction in each script as a named `MISLABELLED` constant rather than editing
+`metadata/SraRunTable.csv` or the merged tables, so the SRA's own record stays recoverable
+and the change is visible and reversible; `incubation_votu_abundance.csv` now carries both
+`survey` (corrected) and `sra_isolation_source` (what the SRA says). Wrote README section
+18a explaining it, and added dated correction notes at the three earlier places in the
+README that still described the two samples as a separate study, rather than rewriting
+what those sections said at the time.
+
+**Files:** `scripts/plot_incubation_votu_timeseries.R`, `scripts/plot_gvmag_abundance.R`,
+`scripts/plot_votu_vs_cells.R`, `output/abundance/incubation_votu_timeseries.{pdf,png}`,
+`output/abundance/incubation_votu_abundance.csv`,
+`output/abundance/gvmag_abundance_timeseries.{pdf,png}`, `README.md` (new 18a, Step 18
+table, three correction notes), `PROMPT_LOG.md`.

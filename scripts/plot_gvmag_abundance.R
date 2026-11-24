@@ -31,13 +31,15 @@
 # cutoff that defined the vOTUs in step 09. The difference between the columns IS the
 # result: recruitment that vanishes under the identity filter was never this genome's.
 #
-# TWO HONESTY CONSTRAINTS CARRIED OVER FROM THE PREVIOUS FIGURE
-# -------------------------------------------------------------
-# 1. The 11 environmental samples are NOT one survey. Nine are a monthly Gulf of Mexico
-#    series (Dec 2020 - Aug 2021, station EH25 in Booker et al.); two are from a separate
-#    coastal Florida study (2021-09-29, 2022-03-08). A single line through all eleven
-#    would imply a continuous 15-month survey that does not exist, so lines are drawn
-#    through the Gulf series only and the coastal samples are drawn as open triangles.
+# A METADATA CORRECTION, AND ONE HONESTY CONSTRAINT
+# -------------------------------------------------
+# 1. SRR34748664 and SRR34748663 carry isolation_source "coastal Florida" in
+#    metadata/SraRunTable.csv, and this figure used to draw them as a separate study -
+#    open triangles, not joined to the Gulf series. That label is WRONG: per the user on
+#    2026-11-24 they come from the same survey as the other nine and were mislabelled on
+#    submission to the SRA. All 11 environmental samples are therefore one series, joined
+#    by one line in date order. The correction is applied here rather than upstream, so
+#    SraRunTable.csv and the merged tables keep the SRA's own record.
 # 2. Genomes that were measured and found absent are drawn, faintly, rather than dropped.
 #    A reader must be able to see that they were tested.
 #
@@ -76,7 +78,8 @@ d <- read_csv(in_csv, show_col_types = FALSE) %>%
 # value and the caption says so.
 floor_val <- min(d$relative_abundance_pct[d$relative_abundance_pct > 0], na.rm = TRUE) / 2
 
-GULF <- "Gulf of Mexico (monthly)"
+# The two runs the SRA mislabels as "coastal Florida" - see the header.
+MISLABELLED <- c("SRR34748664", "SRR34748663")
 SETCOL <- c("assembled from an incubation sample" = INC,
             "assembled from an environmental sample" = ENV)
 
@@ -97,23 +100,17 @@ base_theme <- theme_bw(base_size = 11) +
     axis.text.x = element_text(lineheight = 0.9)
   )
 
-# One panel row: `yvar` against time, faceted by filter setting. Lines join the Gulf
-# monthly series only; the two coastal Florida samples are open triangles, never joined to
-# it, because they come from a separate study. Genomes measured and found absent are drawn
-# faintly rather than dropped, so a reader can see they were tested.
+# One panel row: `yvar` against time, faceted by filter setting. All 11 environmental
+# samples are one series (see the metadata correction in the header), so one line runs
+# through all of them. Genomes measured and found absent are drawn faintly rather than
+# dropped, so a reader can see they were tested.
 panel <- function(df, yvar, title, ylab) {
-  g <- df %>% filter(survey == GULF)
-  c_ <- df %>% filter(survey != GULF)
   ggplot(df, aes(collection_date, .data[[yvar]], group = genome, colour = set)) +
-    geom_line(data = g, alpha = 0.45, linewidth = 0.4) +
-    # Undetected: small and faint. Detected: solid and large. Shape carries the survey
-    # (circle = Gulf monthly series, triangle = the two coastal Florida samples), so
-    # fill is free to carry detection and nothing is encoded twice.
-    geom_point(data = g  %>% filter(!detected), alpha = 0.35, size = 0.9, shape = 16) +
-    geom_point(data = c_ %>% filter(!detected), alpha = 0.45, size = 1.6,
-               shape = 2, stroke = 0.6) +
-    geom_point(data = g  %>% filter(detected), size = 2.6, shape = 16) +
-    geom_point(data = c_ %>% filter(detected), size = 2.8, shape = 17) +
+    geom_line(alpha = 0.45, linewidth = 0.4) +
+    # Undetected: small and faint. Detected: solid and large. Size alone carries
+    # detection, so nothing is encoded twice.
+    geom_point(data = df %>% filter(!detected), alpha = 0.35, size = 0.9, shape = 16) +
+    geom_point(data = df %>% filter(detected), size = 2.6, shape = 16) +
     facet_wrap(~ filter_set, nrow = 1) +
     scale_colour_manual(values = SETCOL, name = NULL, drop = FALSE) +
     # Without this the legend inherits the last layer's tiny translucent glyph, which is
@@ -139,10 +136,9 @@ p_br <- panel(d, "covered_fraction",
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25),
                      labels = label_number(accuracy = 0.01)) +
   labs(caption = paste0(
-    "Each line is one of the 26 GVMAGs across the 11 environmental samples. Large solid ",
-    "markers pass the 75% breadth rule (dashed line, MIUViG); small faint ones do not.",
-    "\nCircles are the 9-month Gulf of Mexico series; triangles are the two coastal ",
-    "Florida samples, a separate study, so they are not joined to it. ",
+    "Each line is one of the 26 GVMAGs across the 11 environmental samples, which are ",
+    "one survey (station EH25).\nLarge solid markers pass the 75% breadth rule (dashed ",
+    "line, MIUViG); small faint ones do not. ",
     "Abundance zeros floored at ", signif(floor_val, 2), "%."))
 
 p <- (p_ab / p_br) + plot_layout(guides = "collect") &
