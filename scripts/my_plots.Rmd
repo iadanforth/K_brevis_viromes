@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 #rm(list=ls())
-setwd("/Users/isabelledanforth/K_brevis_viromes")
+knitr::opts_knit$set(root.dir = "/Users/isabelledanforth/K_brevis_viromes")
 ```
 
 
@@ -17,6 +17,10 @@ setwd("/Users/isabelledanforth/K_brevis_viromes")
 library(dplyr)
 votu_abundance <- read.csv("/Users/isabelledanforth/K_brevis_viromes/output/abundance/incubation_votu_abundance.csv") %>%
   dplyr::select(votu, sample, collection_date, abundance_pct, family, breadth)
+
+# REMOVE VOTU19 (IQ-TREE analysis shows it is not a member of the Pandoravirales)
+votu_abundance <- votu_abundance %>%
+  filter(votu != "vOTU19")
 
 # comvert collection_date into a date
 library(readr); library(ggplot2); library(lubridate)
@@ -31,32 +35,29 @@ votu_abundance <- votu_abundance %>%
     family == "IM_01"        ~ "Imitervirales family 01",
     family == "IM_14"        ~ "Imitervirales family 14",
     family == "IM_16"        ~ "Imitervirales family 16",
-    family == "PV_05"        ~ "Pandoravirales family 05",
     .default = family
   ))
 
 votu_colors <- c(
   # Imitervirales family 01
-  vOTU03 = "#E69F00",  # orange
-  vOTU06 = "#332288",  # indigo
-  vOTU07 = "#117733",  # forest green
-  vOTU13 = "#CC6677",  # rose
+  vOTU03 = "#003366",  
+  vOTU06 = "#0066cc",  
+  vOTU07 = "#3399ff",  
+  vOTU13 = "#99ccff", 
   # Unclassified
-  vOTU02 = "#D55E00",  # vermillion
-  vOTU09 = "#44AA99",  # teal
-  vOTU12 = "#0072B2",  # blue
-  vOTU17 = "#AA4499",  # purple
+  vOTU02 = "#993300",  
+  vOTU09 = "#cc6633",  
+  vOTU12 = "#ff9966",  
+  vOTU17 = "#ff3300",  
   # Imitervirales family 16
-  vOTU08 = "#999933",  # olive
-  vOTU18 = "#882255",  # wine
+  vOTU08 = "#660033", 
+  vOTU18 = "#cc3366", 
   # Imitervirales family 14
-  vOTU11 = "#56B4E9",  # sky blue
-  # Pandoravirales family 05
-  vOTU19 = "#E7298A"   # magenta
+  vOTU11 = "#330066"  
 )
 
 
-votu_abundance <- ggplot(votu_abundance, aes(collection_date, abundance_pct, colour = votu, group = votu)) +
+votu_abundance_plot <- ggplot(votu_abundance, aes(collection_date, abundance_pct, colour = votu, group = votu)) +
   facet_wrap(~family, scales = "free_y", ncol = 2) +
   geom_line(linewidth = 1) +
   geom_point(size = 2) +
@@ -82,8 +83,8 @@ votu_abundance <- ggplot(votu_abundance, aes(collection_date, abundance_pct, col
     axis.text.y = element_text(size = 20),
     title = element_text(size = 30)
   )
-votu_abundance
-ggsave("votu_abundance.png", votu_abundance, dpi = 300, width = 15, height = 9.00, units = "in")
+votu_abundance_plot
+ggsave("votu_abundance.png", votu_abundance_plot, dpi = 300, width = 15, height = 9.00, units = "in")
 
 ```
 
@@ -158,3 +159,103 @@ ggsave("cell_counts.png", cell_counts, dpi = 300, width = 15, height = 9.00, uni
 
 
 # Some kind of linear regression (cell count ~ vOTU abundance -- each vOTU?)
+```{r}
+# we now want to add cell count data to the votu abundance table 
+cell_ct_long <- cell_ct_long %>%
+  rename(collection_date = date)
+
+library(tidyverse)
+library(lubridate)
+
+# One row per date, one column per phyto group
+cell_wide <- cell_ct_long %>%
+  select(collection_date, phyto_group, cell_count) %>%
+  pivot_wider(names_from = phyto_group, values_from = cell_count) %>%
+  mutate(month = floor_date(collection_date, "month")) %>%
+  select(-collection_date)
+
+# Add the cell counts to each vOTU row by sampling month
+votu_cells <- votu_abundance %>%
+  mutate(month = floor_date(collection_date, "month")) %>%
+  left_join(cell_wide, by = "month") %>%
+  select(-month)
+
+# test it out with votu2
+votu_cells_votu13 <- votu_cells %>%
+  filter(votu == "vOTU13")
+
+library(scales)
+
+kb <- cell_ct_long %>%
+  filter(phyto_group == "k_brevis") %>%
+  mutate(cell_count_plot = pmax(cell_count, 1))   # log scale can't show 0, so floor at 1 cell
+
+# Scaling factor: puts the K. brevis peak at the height of the highest vOTU value
+f <- max(votu_abundance$abundance_pct) / max(kb$cell_count)
+
+library(scales)
+
+votu_abundance$votu <- factor(votu_abundance$votu, levels = c("vOTU03", "vOTU06", "vOTU07", "vOTU13",
+                                                "vOTU02", "vOTU09", "vOTU12", "vOTU17",
+                                                "vOTU08", "vOTU18", "vOTU11"))
+
+votu_plot <- ggplot(votu_abundance, aes(collection_date, abundance_pct)) +
+  # K. brevis drawn first so it sits behind the vOTUs
+  geom_line(data = kb, aes(y = cell_count_plot * f),
+            colour = "grey40", linetype = "dashed", linewidth = 1) +
+  geom_point(data = kb, aes(y = cell_count_plot * f),
+             colour = "grey40", shape = 17, size = 3) +
+  geom_line(aes(colour = votu, group = votu), linewidth = 1) +
+  geom_point(aes(colour = votu), size = 2) +
+  facet_wrap(~family, ncol = 2, scales = "free_y") +
+  labs(x = "Collection date", y = NULL, title = "vOTU abundance in environmental samples through time") +
+  scale_y_log10(
+    name = "Relative abundance (% of sample reads)",
+    sec.axis = sec_axis(~ . / f, name = expression(italic("K. brevis")~"(cells/L)"),
+                        labels = label_comma())
+  ) +
+  theme_classic() +
+  scale_colour_manual(values = votu_colors) +
+  scale_x_date(breaks = unique(votu_abundance$collection_date), date_labels = "%b %Y") + 
+  scale_colour_manual(values = votu_colors) +
+  guides(colour = guide_legend(ncol = 3)) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(size = 15),
+    legend.background = element_rect(fill = "grey95", colour = NA),
+    legend.text = element_text(size = 20),
+    legend.position = "bottom",
+    #legend.position.inside = c(0.85, 0.05),
+    legend.title = element_blank(),
+    axis.title.x = element_text(size = 25),
+    axis.title.y = element_text(size = 25),
+    axis.text.x = element_text(size = 15, angle = 50, hjust = 1),   # 2. angled
+    axis.text.y = element_text(size = 15),
+    title = element_text(size = 30)
+  )
+  
+ggsave("votu_cells.png", votu_plot, dpi = 300, width = 15, height = 9.00, units = "in")
+
+
+# Now lets see if we can fit a linear model 
+# maybe look only at Imitervirales family 16 vOTUs
+# Imitervirales family 14 vOTUs
+# Pandoravirales family 05 vOTUs
+
+votu_cells_IM16 <- votu_cells %>%
+  filter(family == "Imitervirales family 16")
+votu_cells_IM14 <- votu_cells %>%
+  filter(family == "Imitervirales family 14")
+
+lm_IM16 <- lm(k_brevis ~ abundance_pct, data = votu_cells_IM16)
+summary(lm_IM16)
+
+lm_IM14 <- lm(k_brevis ~ abundance_pct, data = votu_cells_IM14)
+summary(lm_IM14)
+
+lm_PV05 <- lm(k_brevis ~ abundance_pct, data = votu_cells_PV05)
+summary(lm_PV05)
+
+lm3_full <- lm(k_brevis ~ abundance_pct*family*collection_date, data = votu_cells)
+summary(lm3_full)
+```
