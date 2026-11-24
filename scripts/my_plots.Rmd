@@ -1,0 +1,160 @@
+---
+title: "Kbrevis_viromes"
+author: "Isabelle Danforth"
+date: "2026-11-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#rm(list=ls())
+setwd("/Users/isabelledanforth/K_brevis_viromes")
+```
+
+
+# Create plot of incubation vOTU abundance in environmental samples through time
+```{r}
+#file.choose()
+library(dplyr)
+votu_abundance <- read.csv("/Users/isabelledanforth/K_brevis_viromes/output/abundance/incubation_votu_abundance.csv") %>%
+  dplyr::select(votu, sample, collection_date, abundance_pct, family, breadth)
+
+# comvert collection_date into a date
+library(readr); library(ggplot2); library(lubridate)
+class(votu_abundance$collection_date)
+votu_abundance <- votu_abundance %>%
+  mutate(collection_date = ymd(collection_date))
+
+# fix names of the families assigned to each vOTU
+votu_abundance <- votu_abundance %>%
+  mutate(family = case_when(
+    family == "unclassified" ~ "Unclassified",
+    family == "IM_01"        ~ "Imitervirales family 01",
+    family == "IM_14"        ~ "Imitervirales family 14",
+    family == "IM_16"        ~ "Imitervirales family 16",
+    family == "PV_05"        ~ "Pandoravirales family 05",
+    .default = family
+  ))
+
+votu_colors <- c(
+  # Imitervirales family 01
+  vOTU03 = "#E69F00",  # orange
+  vOTU06 = "#332288",  # indigo
+  vOTU07 = "#117733",  # forest green
+  vOTU13 = "#CC6677",  # rose
+  # Unclassified
+  vOTU02 = "#D55E00",  # vermillion
+  vOTU09 = "#44AA99",  # teal
+  vOTU12 = "#0072B2",  # blue
+  vOTU17 = "#AA4499",  # purple
+  # Imitervirales family 16
+  vOTU08 = "#999933",  # olive
+  vOTU18 = "#882255",  # wine
+  # Imitervirales family 14
+  vOTU11 = "#56B4E9",  # sky blue
+  # Pandoravirales family 05
+  vOTU19 = "#E7298A"   # magenta
+)
+
+
+votu_abundance <- ggplot(votu_abundance, aes(collection_date, abundance_pct, colour = votu, group = votu)) +
+  facet_wrap(~family, scales = "free_y", ncol = 2) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_y_log10() +
+  scale_x_date(
+    breaks = unique(votu_abundance$collection_date),
+    date_labels = "%b %Y"
+  ) +
+  labs(x = "Date", y = "Relative abundance (% of sample reads)", title = "vOTU abundance in environmental samples through time") +
+  scale_colour_manual(values = votu_colors) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(size = 15),
+    legend.background = element_rect(fill = "grey95", colour = NA),
+    legend.text = element_text(size = 20),
+    legend.position = "inside",
+    legend.position.inside = c(0.85, 0.05),
+    legend.title = element_blank(),
+    axis.title.x = element_text(size = 25),
+    axis.title.y = element_text(size = 25),
+    axis.text.x = element_text(size = 20, angle = 50, hjust = 1),   # 2. angled
+    axis.text.y = element_text(size = 20),
+    title = element_text(size = 30)
+  )
+votu_abundance
+ggsave("votu_abundance.png", votu_abundance, dpi = 300, width = 15, height = 9.00, units = "in")
+
+```
+
+
+# Plot of cell abundance through time 
+```{r}
+#file.choose()
+library(janitor)
+library(stringr)
+library(lubridate)
+cell_ct <- read.csv("/Users/isabelledanforth/Downloads/ycag051_supplementary_material/SupplementalData14.csv", skip = 5) %>%
+ clean_names() %>%
+ dplyr::select(cruise, station, k_brevis, total_diatoms, total_other) %>%
+ slice(c(1:9, 11:12)) %>%
+ mutate(
+    # Extracts "1220" and converts it to "2020-12-01" (Date class)
+    date = my(str_extract(cruise, "\\d{4}"))
+  )
+
+# convert counts into numbers (currently characters)
+library(readr)
+cell_ct <- cell_ct %>%
+  mutate(across(c(k_brevis, total_diatoms, total_other), parse_number))
+
+# convert into tidy format
+library(tidyr)
+
+cell_ct_long <- cell_ct %>%
+  pivot_longer(
+    cols = c(k_brevis, total_diatoms, total_other),
+    names_to = "phyto_group",
+    values_to = "cell_count"
+  ) %>%
+  mutate(
+    cell_count = parse_number(as.character(cell_count)),  # handles "13,333" stored as text
+    date = as.Date(date)
+  )
+
+# prelim plot
+cell_counts <- ggplot(data = cell_ct_long, mapping = aes(x = date, y = cell_count, color = phyto_group)) +
+  geom_point(size = 4, show.legend = FALSE) +
+  geom_line(linewidth = 1.5) +
+  scale_x_date(
+    breaks = unique(cell_ct_long$date),
+    date_labels = "%b %Y"
+  ) +
+  scale_color_manual(
+    values = c(k_brevis      = "goldenrod1",   # 3. your colors
+               total_diatoms = "springgreen3",
+               total_other   = "lightgrey"),
+    labels = c(k_brevis      = expression(italic("Karenia brevis")),   # 1. your labels
+               total_diatoms = "Diatoms",
+               total_other   = "Other protists")
+  ) +
+  labs(x = "Date", y = "Cell count", title = "Abundance of protist taxa") +
+  theme_classic() +                         # complete theme FIRST
+  theme(
+    legend.text = element_text(size = 20),
+    legend.position = "inside",
+    legend.position.inside = c(0.85, 0.9),
+    legend.title = element_blank(),
+    axis.title.x = element_text(size = 25),
+    axis.title.y = element_text(size = 25),
+    axis.text.x = element_text(size = 20, angle = 30, hjust = 1),   # 2. angled
+    axis.text.y = element_text(size = 20),
+    title = element_text(size = 30)
+  )
+cell_counts
+ggsave("cell_counts.png", cell_counts, dpi = 300, width = 15, height = 9.00, units = "in")
+
+```
+
+
+# Some kind of linear regression (cell count ~ vOTU abundance -- each vOTU?)
