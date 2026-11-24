@@ -8170,10 +8170,33 @@ the submission is ever corrected at NCBI, deleting those constants restores agre
 `incubation_votu_abundance.csv` carries both: `survey` (corrected) and
 `sra_isolation_source` (what the SRA says).
 
-**Figures rebuilt under the correction:** `incubation_votu_timeseries.{pdf,png}` and
-`gvmag_abundance_timeseries.{pdf,png}`. `plot_votu_vs_cells.R` lost its `shape = survey`
-mapping, since there is no sample-origin distinction left for shape to carry. No numbers
-changed - only which points are joined and how they are drawn.
+**Figures rebuilt under the correction:** `incubation_votu_timeseries.{pdf,png}`, and at
+the time also `gvmag_abundance_timeseries.{pdf,png}` (since deleted - see 18b).
+`plot_votu_vs_cells.R` lost its `shape = survey` mapping, since there is no sample-origin
+distinction left for shape to carry. No numbers changed - only which points are joined and
+how they are drawn.
+
+#### 18b. The step-17 comparison figure was deleted (2026-11-24)
+
+Prompt 64 in `PROMPT_LOG.md`. `output/abundance/gvmag_abundance_timeseries.{pdf,png}` -
+the 2x2 panel of abundance and breadth across both filter settings for all 26 GVMAGs - was
+deleted at the user's request, and the `Rscript scripts/plot_gvmag_abundance.R` call was
+removed from `run_pipeline.sh` and from the Commands section, so a re-run does not put it
+back.
+
+`scripts/plot_gvmag_abundance.R` itself is **kept**, with a note at the top saying it is no
+longer part of the default run. It is the only thing that draws the lenient-vs-strict and
+abundance-vs-breadth comparison, and the table it reads,
+`output/abundance/gvmag_abundance.csv`, is still written by step 14, so the figure can be
+rebuilt at any time with one command:
+
+```bash
+Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
+```
+
+Nothing in the analysis depended on that figure. The numbers it displayed are in
+`gvmag_abundance_long.tsv` and are reported in section 17d; the headline figure is
+`incubation_votu_timeseries.{pdf,png}` from step 18.
 
 
 ----------------------------------------------------------------------------------------
@@ -8427,7 +8450,6 @@ python3 -I scripts/votu_sample_table.py \
 module load miniforge3
 eval "$(conda shell.bash hook)"
 conda activate r-plot-env
-Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
 Rscript scripts/plot_votu_sample_matrix.R output/votu_sample_table.csv output
 # The headline figure: incubation-derived vOTUs in the environment, through time (step 18).
 # Third argument is the filter arm: `paper` (lenient, default) or `strict`.
@@ -8449,7 +8471,6 @@ Outputs in `output/abundance/`:
 | `gvmag_abundance.csv` | the same, trimmed to the columns the figures read |
 | `votu_rollup.tsv` | per vOTU per sample: members summed, best member's breadth |
 | `gvmag_abundance_matrix.tsv` | genome x sample relative abundance, one block per filter |
-| `gvmag_abundance_timeseries.{pdf,png}` | abundance and breadth through time, both filters |
 
 `plot_votu_vs_cells.R` takes the filter setting as its 4th argument (`strict` or `paper`)
 and the metric as its 5th (`relative_abundance_pct_sum` by default).

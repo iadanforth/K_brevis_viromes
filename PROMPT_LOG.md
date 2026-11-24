@@ -1730,3 +1730,33 @@ what those sections said at the time.
 `output/abundance/incubation_votu_abundance.csv`,
 `output/abundance/gvmag_abundance_timeseries.{pdf,png}`, `README.md` (new 18a, Step 18
 table, three correction notes), `PROMPT_LOG.md`.
+
+---
+
+### 64. 2026-11-24 09:52 (US Eastern) — Claude Code (Opus 5)
+
+> Can you delete the gvmag_abundance_timeseries files?
+
+**Done:** `git rm`'d `output/abundance/gvmag_abundance_timeseries.{pdf,png}` (step 17's 2x2
+panel of abundance and breadth across both filter settings for all 26 GVMAGs). Also
+removed the `Rscript scripts/plot_gvmag_abundance.R` call from `run_pipeline.sh` and from
+the README's Commands section, so a re-run of the pipeline does not recreate the files the
+user just deleted - deleting the output while leaving its generator wired into the
+one-command driver would have undone the deletion silently.
+
+Kept `scripts/plot_gvmag_abundance.R` itself, with a note at the top marking it as not run
+by default and giving the one command that rebuilds the figure. It is the only thing that
+draws the lenient-vs-strict and abundance-vs-breadth comparison, and the table it reads
+(`output/abundance/gvmag_abundance.csv`) is still produced by step 14, so nothing is lost
+and the decision is reversible. Nothing in the analysis depended on the figure: its numbers
+live in `gvmag_abundance_long.tsv` and are reported in README section 17d. Added README
+section 18b recording the deletion and how to undo it.
+
+**Correction to entry 62.** That entry said the figure was being kept because "README
+section 17d cites it as the evidence for the breadth caveat". That was wrong - 17d cites
+the numbers, not the figure, and contains no reference to the file. Checked before
+deleting; nothing cited it.
+
+**Files:** deleted `output/abundance/gvmag_abundance_timeseries.{pdf,png}`; edited
+`run_pipeline.sh`, `scripts/plot_gvmag_abundance.R`, `README.md` (new 18b, Commands
+section, step 14 outputs table, 18a wording), `PROMPT_LOG.md`.

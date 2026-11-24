@@ -1,4 +1,15 @@
 #!/usr/bin/env Rscript
+# NOT RUN BY DEFAULT (2026-11-24, prompt 64). Its outputs,
+# output/abundance/gvmag_abundance_timeseries.{pdf,png}, were deleted at the user's
+# request and the call was removed from run_pipeline.sh and from the README's Commands
+# section. The script is kept because it is the only thing that draws the lenient-vs-strict
+# and abundance-vs-breadth comparison, and because the data it reads
+# (output/abundance/gvmag_abundance.csv) is still produced by step 14. Run it by hand if
+# that comparison is wanted again:
+#
+#   Rscript scripts/plot_gvmag_abundance.R output/abundance/gvmag_abundance.csv output/abundance
+#
+# The headline figure is scripts/plot_incubation_votu_timeseries.R (step 18).
 # GVMAG abundance and breadth through time across the environmental samples.
 #
 # Replaces plot_votu_abundance.R (2026-11-23, prompt 60 in PROMPT_LOG.md), which plotted

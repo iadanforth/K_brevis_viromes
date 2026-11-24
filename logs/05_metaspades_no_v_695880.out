@@ -862,3 +862,4 @@ mimalloc: warning: unable to allocate aligned OS memory directly, fall back to o
  35:23:21.258   156G / 403G  INFO    General                 (path_extenders.cpp        :  36)   Processed 659614 paths from 3298064 (20%)
  35:45:28.305   156G / 403G  INFO    General                 (path_extenders.cpp        :  36)   Processed 989421 paths from 3298064 (30%)
  35:58:24.265   157G / 403G  INFO    General                 (path_extenders.cpp        :  34)   Processed 1048576 paths from 3298064 (31%)
+ 37:00:57.573   157G / 403G  INFO    General                 (path_extenders.cpp        :  36)   Processed 1319228 paths from 3298064 (40%)
