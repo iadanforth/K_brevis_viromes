@@ -1786,3 +1786,44 @@ vOTU if it ever stops holding - which could happen if the two outstanding assemb
 
 **Files:** `scripts/votu_origin_table.py` (new), `output/votu_origin.csv` (new),
 `README.md` (new Step 19, Commands block), `PROMPT_LOG.md`.
+
+---
+
+### 66. 2026-11-24 10:45 (US Eastern) — Claude Code (Opus 5)
+
+> For Kbrevis_virome_tree.png, could you please make the figure better suited for publication? The text is too small and the red lines denoting the vOTUs is too faint. Could you also please explain why there are not 19 vOTUs on this tree?
+
+**Done, part 1 (the missing vOTUs):** vOTU05 and vOTU19 are not in the tree at all.
+`ncldv_markersearch` found zero of the seven core Nucleocytoviricota markers in either and
+silently drops a zero-marker taxon, which is the 1,566 -> 1,564 drop recorded in section
+10j. Verified from `kbrevis_gvmags.table.tsv` rather than taking the earlier note on
+trust: both rows are 0 across all seven columns, every other vOTU scores at least one. Not
+a loosenable threshold - a genome sharing no gene with the others has nothing to align.
+Also relayed why vOTU05 is the awkward case (CheckV 100% complete at 203 kb yet carrying
+none of the seven markers, GVClass lineage stopping at `c_Megaviricetes`), and that it
+should not be reported as a giant-virus genome without more evidence.
+
+**Done, part 2 (the figure):** the old PNG was a hand export from iTOL, so it could not be
+regenerated and its type size and line weight were fixed at iTOL's defaults. Wrote
+`scripts/plot_tree_figure.py`, which draws the tree from
+`output/tree/kbrevis_gvmags.treefile` with everything under version control. None of
+`ete3`, `Bio.Phylo`, `ggtree` or `ape` is installed in this project's environments, so the
+script carries its own Newick parser and radial layout in matplotlib rather than adding a
+dependency. Legend goes from ~4 pt to 15 pt with an opaque frame; vOTU branches become
+saturated #D7191C at 1.9 pt over a white casing; each vOTU gains a leader line to the
+ring, a tall red wedge in the ring and a 13 pt bold label; added a scale bar. Output is
+4500x4500 at 300 dpi plus a vector PDF.
+
+Three things went wrong and were fixed by looking at the render: tracing red along each
+vOTU's full lineage turned most of the backbone red and hid the result, so red now marks
+terminal branches only; labels overprinted where vOTUs are sisters, so a relaxation pass
+spreads them to 3.6 degrees apart while the leader lines keep pointing at true positions;
+the scale bar was clipped outside the axes. A fourth was a plain bug - the label-spreading
+loop used `a` as a variable and clobbered the argparse namespace. Validated the result
+against `votu_tree_context.tsv`: every red tip lands in the order band its sister taxa
+predict.
+
+**Files:** `scripts/plot_tree_figure.py` (new), `output/Kbrevis_virome_tree.png`
+(replaced), `output/Kbrevis_virome_tree.pdf` (new), `README.md` (new Step 20, Commands
+block, and the three places that described the figure as a manual iTOL export - including
+gap 7 of the reproducibility audit, now closed), `PROMPT_LOG.md`.

@@ -6313,10 +6313,12 @@ python3 -I scripts/votu_tree_context.py \
     --out      output/tree/votu_tree_context.tsv
 ```
 
-`output/Kbrevis_virome_tree.png` is **not** produced by any script: it is an image exported
-by hand from iTOL after uploading `output/tree/kbrevis_gvmags.treefile` and the annotation
-files (see `output/tree/README.md`). A re-run will not recreate it; export it again from
-iTOL if it is wanted.
+`output/Kbrevis_virome_tree.png` **was** a hand-exported iTOL image with no generating
+script. **Superseded 2026-11-24 (section 20):** it is now drawn by
+`scripts/plot_tree_figure.py` directly from `output/tree/kbrevis_gvmags.treefile`, so it is
+reproducible and its type size and line weights can be changed without a round trip through
+a web tool. The iTOL annotation files are still written by `make_itol_annotations.py` and
+still work if an interactive tree is wanted.
 
 ### 14. vOTU abundance in the environment through time
 
@@ -6361,7 +6363,7 @@ Writes the three CSVs in `output/` directly, so no separate collection step is n
 | 4 | `03_download_refs.slurm` wrote `datasets-env.yml` into the **repository root** on every run, leaving a stray duplicate of `envs/datasets-env.yml` | **fixed** - writes `envs/datasets-env.lock.yml`, with the machine-specific `prefix:` line stripped |
 | 5 | Root-level `datasets-env.yml` and `sra-toolkit-env.yml` were tracked duplicates of the `envs/` copies | **fixed** - untracked |
 | 6 | `fastp` was a standalone binary on `PATH` via `~/.bashrc`, not in any `envs/*.yml`. It worked here only because jobs inherit the submitting shell; a new account would have failed at step 02 | **fixed 2026-11-19** - now `envs/fastp-env.yml` pinned to the same 1.3.7, activated by `02_fastp.slurm` and built by `00_create_envs.slurm` |
-| 7 | `output/Kbrevis_virome_tree.png` is a hand-exported iTOL image with no generating script | **documented** as a manual step |
+| 7 | `output/Kbrevis_virome_tree.png` is a hand-exported iTOL image with no generating script | **fixed 2026-11-24** - `scripts/plot_tree_figure.py` now draws it from the treefile (section 20) |
 | 8 | Step 07 needs `--export=ALL,GVMAGS_V2_FULL=1` or step 10 fails later | **documented** in the step 7-11 block |
 | 9 | **23 scripts hardcode `/sciclone/home/iadanforth/`** (59 occurrences) and 17 hardcode `--mail-user=iadanforth@wm.edu` | **documented** below - fine for re-running on this account, a blocker for anyone else |
 
@@ -8235,6 +8237,85 @@ that pair together - which is the same clustering that shows up as the multi-mem
 in `votu_rollup.tsv`.
 
 
+### Step 20. A publication-quality phylogeny figure, and why the tree holds 17 vOTUs and not 19 (2026-11-24)
+
+Written by Claude Code on 2026-11-24, prompt 66 in `PROMPT_LOG.md`. File:
+`scripts/plot_tree_figure.py`. Output: `output/Kbrevis_virome_tree.{png,pdf}`.
+
+#### 20a. Why there are 17 vOTUs on the tree, not 19
+
+**vOTU05 and vOTU19 are not in the tree at all** - not unplaced, not collapsed, absent.
+`ncldv_markersearch` found **none of the seven** core *Nucleocytoviricota* marker genes in
+either, and it silently drops a taxon with zero markers before the alignment is built. They
+were the only 2 of all 1,566 input taxa to be dropped, which is why 1,566 went in and 1,564
+came out (section 10j). Straight from `kbrevis_gvmags.table.tsv`:
+
+| genome | GVOGm0013 | GVOGm0023 | GVOGm0054 | GVOGm0172 | GVOGm0461 | GVOGm0760 | GVOGm0890 |
+|---|---|---|---|---|---|---|---|
+| `vOTU05__SRR28004151_bin_29` | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `vOTU19__SRR28004139_bin_7` | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+Every other vOTU scores 1 on at least one marker. The reason is mechanical: a phylogeny is
+built from an alignment of shared genes, so a genome sharing **no** gene with the others
+has nothing to align and no position to occupy. This is not a threshold that could be
+loosened.
+
+**It is also a result worth reporting, not just a technicality.** vOTU05 is the awkward
+one: CheckV called it 100% complete at 203 kb, it has no relative in GVMAGs V2, and it
+carries none of VLTF3, the A32 packaging ATPase, DNA topoisomerase II, TFIIB, DNA
+polymerase B, RNA polymerase alpha or SNF2 helicase. A genuinely complete giant-virus
+genome should carry most of those. Either it is a mis-binned set of contigs, or it is real
+but too divergent for the GVOG HMMs to detect - and its GVClass lineage stopping at
+`c_Megaviricetes` with no order assigned is consistent with very few marker hits. **It
+should not be reported as a giant-virus genome without further evidence.** vOTU19 is the
+CheckV "Not-determined" genome, so its failure is less surprising.
+
+The figure states this in its own legend key - "K. brevis vOTU (17 of 19)" - and the script
+re-derives the count from the tree rather than hard-coding it, printing which vOTUs are
+missing on every run.
+
+#### 20b. The figure
+
+The previous `Kbrevis_virome_tree.png` was exported by hand from iTOL. That made it
+unreproducible, and its type size and line weights were whatever iTOL's defaults gave: a
+legend at roughly 4 pt and hairline red branches, both too weak for publication.
+`scripts/plot_tree_figure.py` now draws the same tree from
+`output/tree/kbrevis_gvmags.treefile`, so every visual parameter is under version control.
+
+No tree-plotting library is installed in this project's environments (no `ete3`, no
+`Bio.Phylo`, no `ggtree`/`ape`), so the script carries its own Newick parser and radial
+layout in about 60 lines of matplotlib. That is a smaller cost than adding a dependency,
+and the Newick the script has to read is IQ-TREE's own output, which is small and
+well-defined.
+
+What changed, and why:
+
+| | before | now |
+|---|---|---|
+| legend | ~4 pt, translucent frame | 15 pt text, 17 pt bold title, opaque frame |
+| vOTU branches | hairline red, traced only at the tip | saturated `#D7191C`, 1.9 pt, drawn over a white casing so they stay legible against dense grey neighbours |
+| finding a vOTU | hunt for a red hairline among 1,547 grey tips | red leader line from tip to ring, tall red wedge in the ring, and a 13 pt bold label outside it |
+| labels | none | all 17 vOTUs labelled, rotated to read outward |
+| scale bar | none | 0.5 substitutions per site, with end ticks |
+| reproducible | no | `python3 -I scripts/plot_tree_figure.py` |
+
+**Red marks each vOTU's own terminal branch, not its lineage back to the root.** Tracing
+ancestors was tried first and looked worse: the 17 vOTUs sit in many different clades, so
+their paths merge low down and turn most of the backbone red, hiding exactly what the
+colour is meant to pick out. The leader lines do the work of drawing the eye instead.
+
+**Labels are nudged apart, branches are not.** Several vOTUs are near neighbours in the
+tree - vOTU03, vOTU09 and vOTU13 are each other's sisters - so their labels would overprint
+at the true tip angle. A relaxation pass spreads labels to a minimum 3.6 degree separation
+while keeping tree order; the leader line still points at the real position, so nothing is
+misplaced.
+
+**Placements were checked, not assumed.** Every red tip in the figure lands in the order
+band that `output/tree/votu_tree_context.tsv` predicts from its sister taxa: vOTU14 in
+Pimascovirales, vOTU15 in Algavirales, vOTU04 beside Asfuvirales, the remaining twelve in
+Imitervirales, and vOTU03/vOTU09/vOTU13 adjacent to one another.
+
+
 ----------------------------------------------------------------------------------------
 
 # Commands
@@ -8442,9 +8523,18 @@ The step list is written into `scripts/plot_pipeline_figure.py` as the `STEPS` c
 live dashboard. Because it no longer carries counts, it only goes stale when a step's tool
 or approach changes, not when the numbers do.
 
-`output/Kbrevis_virome_tree.png` has **no command**: it is exported by hand from iTOL after
-uploading `output/tree/kbrevis_gvmags.treefile` and dragging on the `itol_*.txt` files
-(see `output/tree/README.md`). A re-run will not recreate it.
+```bash
+# --- the phylogeny figure (step 20; matplotlib lives in aniclustermap-env) -------------
+module load miniforge3
+eval "$(conda shell.bash hook)"
+conda activate aniclustermap-env
+python3 -I scripts/plot_tree_figure.py --dpi 300
+conda deactivate
+```
+
+That writes `output/Kbrevis_virome_tree.{png,pdf}`. The `itol_*.txt` files in
+`output/tree/` are still produced by `make_itol_annotations.py` and can still be dragged
+onto iTOL for an interactive version of the same tree (see `output/tree/README.md`).
 
 ## 14. GVMAG abundance in the environmental samples
 
